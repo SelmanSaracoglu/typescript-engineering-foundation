@@ -12,6 +12,3 @@ export function calculateFinalPrice(
 
   return price;
 }
-
-const result = calculateFinalPrice(100, true);
-console.log(result);
