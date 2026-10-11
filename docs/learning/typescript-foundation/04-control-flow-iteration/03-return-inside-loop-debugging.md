@@ -1,48 +1,123 @@
-# Early Return ve Loop İçindeki return Bug'ı
+# Ders 13 — Early Return Bug: Loop Neden Birinci Kayıtta Durdu?
 
-**Önkoşullar:** [Functions ve return](../03-functions-fundamentals/README.md), [Bölüm 04 giriş](./README.md). [Önceki](./02-for-of-iteration-over-arrays.md) [Bölüm 05](../05-objects-arrays-references/README.md)
+## 1. Problem ve gereksinim
 
-## 1. Neden bu derse ihtiyacımız var?
-I2'de gözlenen kritik kusur, birinci kayıt işlendiğinde fonksiyonun tamamının bitmesiydi. Bu bir syntax hatası değil, execution flow hatasıdır.
+Gerçek bir liste filtreleyici birinci kaydı doğru sonuçlandırıp sonrasını sessizce atlayabilir. Typecheck'in yeşil olması bu kusuru göstermeyebilir. Bu dersin amacı aynı fonksiyonun yanlış ve doğru control-flow'unu **satır satır** karşılaştırmaktır.
 
-## 2. Tanım ve mekanizma
-`return`, içinde bulunduğu function çağrısını sonlandırır; yalnız `if` veya `for` block'undan çıkmaz. `break` yalnız döngüyü bitirir; `continue` sonraki iteration'a geçer. Bu derste temel vurgu `return`'ün yeri.
+## 2. Kavram / çalışma modeli
 
-## 3. Açıklamalı, çalıştırılabilir örnek
+`return`, en yakın `if` veya `for` gövdesinden değil, **function'ın tamamından** çıkar. `break` yalnız en yakın uygun loop/switch akışını bitirir; `continue` döngünün sonraki iteration'ına geçer. Bu üç davranış birbirinin yerine geçmez.
+
+## 3. Açıklamalı TypeScript örneği
+
 ```ts
-function firstQualified(names: string[]): string[] {
-  const output: string[] = [];
+function wrongNames(names: string[]): string[] {
+  const result: string[] = [];
   for (const name of names) {
-    output.push(name);
-    return output; // BUG: ilk kayıttan sonra döner
+    result.push(name);
+    return result; // BUG: ilk iteration'da fonksiyon biter
   }
-  return output;
+  return result;
 }
-console.log(firstQualified(["Ali", "Can"])); // ["Ali"]
+console.log(wrongNames(["Ali", "Can"])); // ["Ali"]
 
 function allNames(names: string[]): string[] {
-  const output: string[] = [];
+  const result: string[] = [];
   for (const name of names) {
-    output.push(name);
+    result.push(name);
   }
-  return output;
+  return result;
 }
 console.log(allNames(["Ali", "Can"])); // ["Ali", "Can"]
 ```
 
-## 4. Veri/çalıştırma akışı
-Hatalı sürüm: Ali ile iteration başlar; push sonrası return çalışır; `Can` iteration'ına **asla girilmez**. Düzeltilmiş sürüm: Ali sonra Can eklenir; return loop kapandıktan sonra yürür. İki fonksiyon da typecheck'ten geçer; type checker burada gereksinim doğruluğunu bilemez.
+## 4. Iteration ve execution trace
 
-## 5. Önceki konularla fark ve TypeScript bağlantısı
-Bazı gereksinimler ilk eşleşmeyi bulmayı ister; o durumda loop içinde return **doğru** olabilir. Ancak 'tüm uygun kayıtlar' gereksinimi için bu bug'dır. Dolayısıyla aynı sözdiziminin doğru/yanlış olması iş sözleşmesine bağlıdır.
+**Yanlış sürüm:** `result=[]` → ilk element Ali → push → `["Ali"]` → **return çağrıyı bitirir**. Can hiçbir iteration'da görülmez.
 
-## 6. Sınır durumları, hata ve test tasarımı
-**Tekrarlanabilir debugging:** (1) iki uygun kayıt ver, (2) expected `[Ali,Can]` yaz, (3) actual `[Ali]` gözle, (4) loop iteration sayısına hipotez kur, (5) return satırını debugger ile izle, (6) return'ü döngü sonuna taşı, (7) aynı girdi ve boş girdiyle regresyonu doğrula. Sadece tek kayıtla test bug'ı gizler.
+**Doğru sürüm:** `result=[]` → Ali push → Can push → loop sona erer → return iki isimli array.
 
-## 7. Mülakat ve pekiştirme
-**Question:** How can a loop silently omit valid records? A misplaced early return may terminate the function before the remaining iterations.
+| Input | Wrong | Correct | Fark |
+| --- | --- | --- | --- |
+| `[]` | `[]` | `[]` | yok |
+| `["Ali"]` | `["Ali"]` | `["Ali"]` | yok |
+| `["Ali","Can"]` | `["Ali"]` | `["Ali","Can"]` | var |
 
-`names=[]` için iki function ne döndürür? Bu senaryo bug'ı neden yakalayamaz? `return` ile `break` niçin aynı şey değil?
+Bu yüzden tek kayıt ve boş array testleri bug'ı **gizler**.
 
-## 8. Kanıt ve kaynak
-Özgün I2 içerik kaynağı: [I2 Control Flow, Functions & Data Modeling](../../../I2-control-flow-functions-data-modeling.md). Bu ders yeni bir Increment uygulaması veya H0 yeterlilik gözlemi değildir.
+## 5. İkinci örnek ve mekanizmanın sınırı
+
+### Early return her zaman yanlış mıdır?
+
+Hayır. Gereksinim *ilk uygun elementi bulmak* ise loop içindeki return doğru olabilir:
+
+```ts
+function firstLongName(names: string[]): string | null {
+  for (const name of names) {
+    if (name.length >= 5) {
+      return name;
+    }
+  }
+  return null;
+}
+console.log(firstLongName(["Ali", "Ayşe", "Selman"])); // Selman
+```
+
+Bu fonksiyon **ilk eşleşmeyi** arar; eşleşince gereksinim tamamlanmıştır. Tekrar etmeye devam etmek gerekmez.
+
+Buna karşılık “bütün uygun kullanıcılar” gereksiniminde loop içinde return kusurdur.
+
+### break vs continue vs return
+
+```ts
+function inspect(values: number[]): number[] {
+  const seen: number[] = [];
+  for (const value of values) {
+    if (value < 0) continue; // negatifi atla
+    if (value === 0) break;   // loop'u bitir
+    seen.push(value);
+  }
+  return seen; // function burada döner
+}
+console.log(inspect([2, -1, 3, 0, 5])); // [2, 3]
+```
+
+- 2 eklenir.
+- -1 için continue, push yapılmaz.
+- 3 eklenir.
+- 0 için break, loop biter.
+- 5 işlenmez; function loop sonrasındaki return'a ulaşır.
+
+Aynı yerde `return seen` olsaydı **function** o anda sonuç döndürür; `break` ise döngüden çıkarak sonraki function satırlarına geçebilir.
+
+## 6. Kritik ayrımlar ve sınır durumları
+
+Boş array'de loop içindeki return hiç yürütülmez. Bir elementli input'ta yanlış ve doğru sürüm aynı sonucu verebilir. Kötü/eksik test bu yüzden geçebilir. TypeScript her iki sürümün de `string[]` döndüğünü görür; **çok kayıt gereksinimi** type ile ifade edilmediğinden logic bug yakalanmaz.
+
+**Loop içinde mutation:** `result.push` output array'ini değiştirebilir; input `names` array'ini değiştirmek zorunda değildir. Bu örnekte string primitive değerler taşınır.
+
+## 7. Debugging — kontrollü hata araştırması
+
+**Reproduce:** İki uygun isim ver; expected iki isim, actual bir isim.
+
+**Hypothesis:** Döngü bir kez çalışıyor.
+
+**Trace:** İlk iteration'da `return` gerçekleşir; ikinci iteration'a girilmez.
+
+**Minimal fix:** `return result` satırını loop'un dışına taşı.
+
+**Regression:** Boş, tek, iki ve üç isimli dizilerle sonucu tekrar sınayıp gereksinimle karşılaştır.
+
+**Gerçek dünyadaki risk:** Kayıt tarama, test raporlama veya filtreleme kodu erken return yüzünden kayıtların tamamını işlemeyebilir. Semptom 'yetersiz veri' olabilir; exception şart değildir.
+
+## 8. Mülakat ve cevaplı pekiştirme
+
+**Question:** Why can an early return inside a loop cause a bug? **Answer:** Return ends the function invocation; later elements are not processed.
+
+**Pekiştirme:** (1) `wrongNames([])` kaç döner? (2) Hangi input bug'ı görünür yapar? (3) `firstLongName` örneğinde return niçin doğru? (4) `break` sonrası function çalışmaya devam eder mi?
+
+<details><summary>Kontrol cevapları</summary>
+
+1. Boş array. 2. En az iki işlenmesi gereken element. 3. İş kuralı ilk eşleşmeyi arar. 4. Evet, loop sonrasındaki satırlara ilerleyebilir.
+
+</details>
