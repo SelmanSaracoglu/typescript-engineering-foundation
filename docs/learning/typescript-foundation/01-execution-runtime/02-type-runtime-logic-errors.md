@@ -1,10 +1,5 @@
 # Ders 2 — Type-check Error, Runtime Exception ve Logic Bug
 
-> **Öğrenme yolu:** [TypeScript Foundation](../README.md) → [01 — Execution & Runtime](./README.md)  
-> **Önkoşul:** [Ders 1 — Source, typecheck, build, runtime](./01-source-check-build-run.md).  
-> **Hedef:** Kodda yanlış olan şeyi bulmadan önce **hatanın sınıfını**, gözlenebilir kanıtını ve uygun doğrulama tekniğini seçebilmek.  
-> **Sonraki:** [Ders 3 — Node, npm, scripts ve output](./03-node-npm-scripts-and-output.md).
-
 ## 1. Neden bütün hataları “kod çalışmıyor” diye adlandırmıyoruz?
 
 Şu üç durumla karşılaştığını düşün:
@@ -89,7 +84,7 @@ try {
 5. `catch` çalışır; `error instanceof SyntaxError` kontrolü doğrudur.
 6. Kontrollü mesaj yazdırılır.
 
-> `JSON.parse('42')` ise geçerli JSON'dur ve number 42 döndürür. `JSON.parse` çıktısının her zaman object olduğunu varsaymak ayrı bir yanlıştır. Ayrıntı [10 — JSON parse](../10-json-boundary/03-json-parse.md) dersinde.
+> `JSON.parse('42')` ise geçerli JSON'dur ve number 42 döndürür. `JSON.parse` çıktısının her zaman object olduğunu varsaymak ayrı bir yanlıştır.
 
 **Önemli ayrım:** `try/catch` bir exception'ı ele alabilir; ama exception yakalamak tek başına giren veriyi doğru business modeline dönüştürmez.
 
@@ -216,7 +211,7 @@ Sırf terminalde bir hata gördüğün için `npm install`, TypeScript sürümü
 **Düzeltme:** Sessizce yanlış sonuç üretilebilir.
 
 **Yanılgı 3:** “`throw new Error` ve `return {error: ...}` aynıdır.”  
-**Düzeltme:** Birincisi exception kanalına, ikincisi normal return kanalına gider; kontrollü sonuç modeli [07](../07-safe-runtime-boundaries/README.md)'de.
+**Düzeltme:** Birincisi exception kanalına, ikincisi normal return kanalına gider; bunlar iki farklı kontrol akışıdır.
 
 **Yanılgı 4:** “Stack trace her sorunu bulur.”  
 **Düzeltme:** Logic bug her zaman exception üretmez; expected–actual karşılaştırması gerekir.
@@ -259,6 +254,3 @@ Kodları çalıştırmadan aşağıdaki senaryoları sınıflandır:
 6. Hayır; parsing syntax düzeyidir, shape ve business validation ayrıca gerekir.
 
 </details>
-
-**Sonraki:** [Ders 3 — Araçlar, scriptler ve çıktı](./03-node-npm-scripts-and-output.md).  
-**Tarihsel kaynak:** [I1 — Execution Model](../../../I1-execution-model.md). Bu belge bir öğretim kaynağıdır; öğrencinin debugging bağımsızlığını kanıtlamaz.
