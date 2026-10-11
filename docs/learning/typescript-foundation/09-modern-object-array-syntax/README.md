@@ -4,6 +4,11 @@
 > **Önkoşul:** [Bölüm 1 — Value & Decision Mechanics](../08-value-and-decision-mechanics/README.md).  
 > **Amaç:** Object/array verisini güvenle okuyabilmek; spread/rest arasındaki farkı, referans paylaşımını, opsiyonel erişimi ve string üretimini açıklayıp doğru araç seçebilmek.
 
+## Önkoşullar ve birikimli bağlantı
+
+Destructuring/rest/spread öncesi [05 — reference identity, mutation ve new array ≠ new elements](../05-objects-arrays-references/README.md) okunmalıdır. **Shallow copy** kuralının kaynağı bu identity modelidir; `{...obj}` dış yapıyı kopyalasa da nested object referansı paylaşılabilir. Optional chaining için [06 — optional/nullish](../06-typescript-modeling/README.md), `??` için [08](../08-value-and-decision-mechanics/README.md) önkoşuldur.
+
+
 ## 1. Bu bölüm hangi sorunu çözüyor?
 
 Bir TypeScript uygulaması kullanıcı, test sonucu, konfigürasyon veya log gibi verilerle çalışır. Sık karşılaşacağın gereksinimler:
