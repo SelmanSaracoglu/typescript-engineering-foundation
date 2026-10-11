@@ -108,3 +108,51 @@ Belirti: `toEqual` geçti ama input beklenmedik değişti. 1. Hangi property mut
 Dış array farklıdır; element aynı kalır. Structural equality içerik karşılaştırır. Mutation testi input'un değişmeden kalmasını gözler.
 
 </details>
+
+## 9. Testlerin gösterdiği ve göstermediği şey
+
+```ts
+import { expect, it } from "vitest";
+
+it("checks both structure and identity", () => {
+  const input = [{value:10}];
+  const output = [input[0]];
+
+  expect(output).toEqual([{value:10}]); // geçer
+  expect(output).not.toBe(input);       // geçer
+  // expect(output[0]).not.toBe(input[0]); // BAŞARISIZ olurdu
+});
+```
+
+İlk assertion değer/yapı doğru der. İkinci dış array'in yeni olduğunu ispatlar. Ama element aynı object olduğundan üçüncü assertion'ın **başarısız olması** beklenir. Bir testin kırmızı olması, bazen tam aradığımız doğru kanıttır: implementation sözleşmeyi ihlal ediyor.
+
+### Mutasyon sonrası kıyas
+
+```ts
+const input = [{score:80}];
+const output = [input[0]];
+output[0].score = 0;
+console.log(input[0].score); // 0
+```
+
+Bu code snippet, paylaşılan identity'nin dış etkisini gözlemler. Testte return value tek başına bu hatayı göstermez.
+
+### Düzeldiğini nasıl kanıtlarsın?
+
+Yeni element object'i üreten implementation için üç assertion kur:
+
+1. Expected structure.
+2. Expected independent element identity.
+3. Result üzerinde mutation sonrası input unchanged.
+
+Dördüncü olarak empty input sonucunu `[]` kontrolüyle ele al.
+
+### Bağımsız görev
+
+Ayrı object'lerle aynı içerik taşıyan iki array oluştur. `toEqual`, `toBe` ve `not.toBe` sonuçlarını kodu yürütmeden gerekçelendir.
+
+<details><summary>Kontrol</summary>
+
+Ayrı literal'lerde yapısal eşitlik olabilir fakat array ve element identity farklıdır; `toEqual` geçebilir, `toBe` geçmez.
+
+</details>
