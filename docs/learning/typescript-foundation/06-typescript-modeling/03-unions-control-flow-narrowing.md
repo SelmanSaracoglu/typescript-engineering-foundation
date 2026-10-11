@@ -103,3 +103,56 @@ console.log(isObject({}));   // true
 0; hi; hayır; hayır.
 
 </details>
+
+## 10. İkinci union çalışması: başarı ve hata yolları
+
+```ts
+type CheckResult =
+  | { success:true; amount:number }
+  | { success:false; error:"INVALID_AMOUNT" };
+
+function describe(result: CheckResult): string {
+  if (result.success) {
+    return "Amount: " + result.amount;
+  }
+  return result.error;
+}
+console.log(describe({success:true,amount:0})); // Amount: 0
+console.log(describe({success:false,error:"INVALID_AMOUNT"})); // INVALID_AMOUNT
+```
+
+**Önemli:** `amount=0`, success branch'i açısından geçerli number olabilir; truthiness ile success testi yapmak yerine discriminant alanının kendisini kullanırız.
+
+### Property access tablosu
+
+| Branch | Uygun alan | Diğer alan |
+| --- | --- | --- |
+| `success:true` | amount | error zorunlu değil |
+| `success:false` | error | amount zorunlu değil |
+
+Caller doğrudan `result.amount` okumaya çalışırsa failure olasılığında alan yoktur. Narrowing olmadan güvenli erişim varsayma.
+
+### String/number array üzerinde uygulama
+
+```ts
+function describeInput(value: string | number): string {
+  if (typeof value === "string") {
+    return "Text length: " + value.length;
+  }
+  return "Number: " + value;
+}
+console.log(describeInput("ABC")); // Text length: 3
+console.log(describeInput(0));     // Number: 0
+```
+
+Bu iki branch'te kullanılan property ve operation'lar farklıdır. Narrowing, kodun tür bilinçli olmasına yardım eder.
+
+### Yeni görev
+
+`boolean | string` union'ı için “boolean ise ACTIVE/INACTIVE, string ise aynen dön” şartını kodla. Hangi `typeof` kontrolleri gerekir?
+
+<details><summary>Kontrol</summary>
+
+Boolean branch'inde true/false kararı, string branch'inde return value. Cast ile türü dönüştürmeye gerek yok.
+
+</details>
