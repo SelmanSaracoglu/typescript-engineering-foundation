@@ -2,6 +2,13 @@
 
 **Önkoşul:** [04](../04-control-flow-iteration/README.md). **Sonraki:** [06 — type modeling](../06-typescript-modeling/README.md); modern shallow spread için [09](../09-modern-object-array-syntax/README.md).
 
+## Ayrıntılı dersler
+
+1. [Object, Property, Array ve Element Modeli](./01-objects-properties-arrays-elements.md)
+2. [Reference Identity: Same Object ve New Object](./02-reference-identity-and-aliases.md)
+3. [Mutation, Side Effect ve const Yanılgısı](./03-mutation-side-effects-and-const.md)
+4. [Yeni Array ≠ Yeni Element Object: Copy Sınırı](./04-new-array-versus-new-elements.md)
+
 ## Neden?
 Yeni bir array üretmek, içindeki object'lerin de yeni olduğu anlamına gelmez. Paylaşılan referanslar beklenmedik mutation etkilerine yol açabilir.
 
