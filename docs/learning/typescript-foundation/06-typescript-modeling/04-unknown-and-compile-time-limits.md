@@ -99,3 +99,50 @@ Bu işlemler birbirine bağlı fakat farklıdır. Runtime validation olmadan sta
 INVALID_TYPE; hayır; hayır; null için object döndürür ama null object property taşımaz.
 
 </details>
+
+## 10. Beklenmeyen dış girdinin risk analizi
+
+```ts
+function upper(input: unknown): string {
+  if (typeof input !== "string") return "INVALID";
+  return input.toUpperCase();
+}
+console.log(upper("safe")); // SAFE
+console.log(upper(42));     // INVALID
+console.log(upper(null));   // INVALID
+```
+
+**Kontrol akışı:** Önce runtime guard, sonra string method. Bu iki aşama aynı function'da bulunur ama görevleri farklıdır: guard gerçek değeri kontrol eder, TypeScript ise geçerli branch'te doğru method kullanımını izleyebilir.
+
+### Assertion yanlışlığı nasıl gizler?
+
+```ts
+const input: unknown = {price:"120"};
+const claimed = input as {price:number};
+console.log(typeof claimed.price); // string
+```
+
+TypeScript annotation veya assertion runtime içeriği değiştirmez. Bu değeri number zannederek arithmetic yapılırsa unexpected string concatenation oluşabilir.
+
+### En az beş negatif girdi tasarla
+
+| Input | Beklenen `upper` |
+| --- | --- |
+| `null` | INVALID |
+| `[]` | INVALID |
+| `{}` | INVALID |
+| `42` | INVALID |
+| `false` | INVALID |
+| `" ok "` | " OK " |
+
+Bütün wrong input'larda function'ın hata fırlatmadan controlled string dönmesi burada seçilen sözleşmedir; başka API'de başka sözleşme olabilir.
+
+### Bağımsız görev
+
+`isPositiveNumber(input:unknown):boolean` tasarla. `0`, `-1`, `NaN`, `Infinity`, `"5"` ve `5` için expected tabloyu oluştur. Sadece `typeof` kontrolü yeterli olur mu?
+
+<details><summary>Kontrol</summary>
+
+`typeof` tek başına NaN/Infinity değerlerini dışlamaz; `Number.isFinite` ve pozitiflik kontrolü de gerekir.
+
+</details>
