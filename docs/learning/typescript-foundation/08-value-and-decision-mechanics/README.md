@@ -1,12 +1,4 @@
-# Bölüm 1 — Value & Decision Mechanics: JavaScript'in karar verme temelleri
-
-> **Öğrenme dizini:** [TypeScript Foundation Öğrenme Rotası](../README.md)  
-> **Bölüm amacı:** Bir programın değerleri nasıl karşılaştırdığını, koşulları nasıl değerlendirdiğini ve hangi davranışı ne zaman seçtiğini açıklamak.
-
-## Önkoşullar ve birikimli bağlantı
-
-Bu bölüm [02 — Temel kararlar](../02-values-variables-basic-decisions/README.md) üzerine equality/truthiness/short-circuit ayrıntısı ekler. `undefined` ve `null` modelleri için [06](../06-typescript-modeling/README.md)'ya dön. Temel operator ve `if` öğretimi burada gereksiz yere baştan tekrarlanmaz.
-
+# 08 — Value & Decision Mechanics
 
 ## 1. Bu bölüm niçin temel?
 
@@ -28,13 +20,13 @@ Bu yedi ders, bu hataların **neden** gerçekleştiğini anlamamız için birbir
 
 | Sıra | Ders | Ne öğrenilecek? | Önkoşul |
 |---|---|---|---|
-| 1 | [Equality](./01-equality.md) | `===`, `!==`, `==`, `!=`, referans eşitliği | Tipler, değişkenler |
-| 2 | [Truthy / Falsy](./02-truthy-falsy.md) | Koşullar değerleri nasıl yorumlar? | Equality, `if` |
-| 3 | [Logical Operators](./03-logical-operators.md) | `&&`, `||`, `!`, gruplama | Truthiness |
-| 4 | [Short-Circuit](./04-short-circuit.md) | Sağdaki expression neden çalışmayabilir? | Logical operators |
-| 5 | [Nullish Coalescing](./05-nullish-coalescing.md) | `??` ile `0`, `false`, `""` değerlerini korumak | Truthiness + short-circuit |
-| 6 | [Ternary](./06-ternary.md) | İki sonuç arasında expression ile seçim | Koşul mantığı |
-| 7 | [Switch / Case](./07-switch-case.md) | Çoklu değer eşleştirme, `break`, `return` | Strict equality + control flow |
+| 1 | Equality | `===`, `!==`, `==`, `!=`, referans eşitliği | Tipler, değişkenler |
+| 2 | Truthy / Falsy | Koşullar değerleri nasıl yorumlar? | Equality, `if` |
+| 3 | Logical Operators | `&&`, `||`, `!`, gruplama | Truthiness |
+| 4 | Short-Circuit | Sağdaki expression neden çalışmayabilir? | Logical operators |
+| 5 | Nullish Coalescing | `??` ile `0`, `false`, `""` değerlerini korumak | Truthiness + short-circuit |
+| 6 | Ternary | İki sonuç arasında expression ile seçim | Koşul mantığı |
+| 7 | Switch / Case | Çoklu değer eşleştirme, `break`, `return` | Strict equality + control flow |
 
 **Nasıl kullanılmalı?** İlk öğrenmede 1'den 7'ye sırayla ilerle. Konuyu unuttuğunda ilgili dosyanın **mekanizma**, **debugging** ve **mülakat** bölümlerine dön. Bütünleşik çalışma için aşağıdaki örneği kod çalıştırmadan analiz et.
 
@@ -233,9 +225,4 @@ Bu soruları kod çalıştırmadan çöz. Sonra gerekçeni açıklayabilirsen ö
 
 Bu bölümdeki yedi ders **teorik başvuru kaynakları** olarak hazırlanmıştır. Öğretici örneklerin doğru okunması ile bağımsız kod geliştirme, test çalıştırma, debugging ve başka bir göreve aktarma **aynı başarı ölçütü değildir**. Gerçek uygulama kanıtları I4 çalışma sürecinde, gözlenen yardım seviyesi H0–H4 ile ayrı değerlendirilmelidir.
 
-**Sonraki kavramsal bölüm:** [Bölüm 2 — Modern Object & Array Syntax](../09-modern-object-array-syntax/README.md). Bu belgelerin mevcut içeriği daha sonra aynı pedagojik standarda göre yeniden düzenlenecektir.
-
-
----
-
-> **Kalıcı müfredat notu:** Bu ders [TypeScript Foundation öğrenme rotasının](../README.md) parçasıdır. Dokümandaki önceki Increment/yardım durumları tarihsel bağlamdır; güncel bağımsız yeterlilik kanıtı değildir.
+**Sonraki kavramsal bölüm:** Bölüm 2 — Modern Object & Array Syntax. Bu belgelerin mevcut içeriği daha sonra aynı pedagojik standarda göre yeniden düzenlenecektir.
