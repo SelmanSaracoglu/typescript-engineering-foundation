@@ -1,8 +1,5 @@
 # Ders 5 — Nullish Coalescing: `??` ve doğru varsayılan değer seçimi
 
-> **Öğrenme yolu:** [Dizin](../README.md) → [Bölüm 1](./README.md)  
-> **Önkoşul:** [Truthy/Falsy](./02-truthy-falsy.md), [`||` ve short-circuit](./04-short-circuit.md), `null`/`undefined`.
-
 ## 1. Hangi problemi çözüyor?
 
 Bir ayarın değeri bulunmazsa varsayılan bir değer seçmek isteriz. Ama **bulunmayan değer** ile **mevcut fakat falsy değer** aynı şey değildir.
@@ -227,11 +224,4 @@ Bu fark, mülakatlarda sık sorulur. Aynı `default` kelimesi kullanılsa da mek
 
 ## 11. Sonraki ders
 
-Default değer seçimini gördük. Peki iki farklı sonuç arasında **koşula göre** bir değer seçmek istersek? [Ders 6 — Ternary Operator](./06-ternary.md) ile devam et.
-
-> **Kanıt:** Öğretici belge, repo çalıştırması veya bağımsız beceri raporu değildir.
-
-
----
-
-> **Kalıcı müfredat notu:** Bu ders [TypeScript Foundation öğrenme rotasının](../README.md) parçasıdır. Dokümandaki önceki Increment/yardım durumları tarihsel bağlamdır; güncel bağımsız yeterlilik kanıtı değildir.
+Default değer seçimini gördük. Peki iki farklı sonuç arasında **koşula göre** bir değer seçmek istersek? Ders 6 — Ternary Operator ile devam et.
