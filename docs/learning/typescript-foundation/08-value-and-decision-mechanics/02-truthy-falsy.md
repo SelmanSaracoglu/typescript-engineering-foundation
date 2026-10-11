@@ -1,8 +1,5 @@
 # Ders 2 — Truthy ve Falsy: JavaScript koşulları değerleri nasıl yorumlar?
 
-> **Öğrenme yolu:** [Dizin](../README.md) → [Bölüm 1](./README.md)  
-> **Önkoşul:** [Ders 1 — Equality](./01-equality.md), primitive tipler ve `if`.
-
 ## 1. Neden öğreniyoruz?
 
 `if`, `while`, ternary ve mantıksal operatörler yalnızca `true`/`false` literal'leriyle çalışmaz. JavaScript **herhangi bir değeri boolean bağlamda** yorumlayabilir. Bu yorumun sonucuna *truthy* veya *falsy* deriz.
@@ -194,11 +191,4 @@ Bu tablo, **truthiness ile iş gereksiniminin aynı şey olmadığını** göste
 
 ## 11. Öğrenme bağlantısı
 
-Truthy/falsy bilgisi, [Ders 3 — Logical Operators](./03-logical-operators.md) ve [Ders 4 — Short-Circuit](./04-short-circuit.md) için önkoşuldur. Daha sonra `||` ile `??` arasındaki farkı anlamamızı sağlayacak.
-
-> **Kanıt:** Açıklamalı örnekler, bağımsız kod geliştirme veya repo test kanıtı değildir.
-
-
----
-
-> **Kalıcı müfredat notu:** Bu ders [TypeScript Foundation öğrenme rotasının](../README.md) parçasıdır. Dokümandaki önceki Increment/yardım durumları tarihsel bağlamdır; güncel bağımsız yeterlilik kanıtı değildir.
+Truthy/falsy bilgisi, Ders 3 — Logical Operators ve Ders 4 — Short-Circuit için önkoşuldur. Daha sonra `||` ile `??` arasındaki farkı anlamamızı sağlayacak.
