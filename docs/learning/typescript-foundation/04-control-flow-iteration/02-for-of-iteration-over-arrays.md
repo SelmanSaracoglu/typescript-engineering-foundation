@@ -109,3 +109,52 @@ Test matrisi: boş array, bir uygun, bir uygunsuz, eşik=60, active=false yükse
 1. Sıfır. 2. active=false. 3. ["Ali"]. 4. Object referansı vs string primitive değer.
 
 </details>
+
+## 9. Rehberli çoklu kayıt testi: neden iki uygun kayıt gerekir?
+
+```ts
+type Item = { id: string; enabled: boolean };
+function enabledIds(items: Item[]): string[] {
+  const ids: string[] = [];
+  for (const item of items) {
+    if (item.enabled) ids.push(item.id);
+  }
+  return ids;
+}
+const sample = [
+  {id:"A",enabled:true},
+  {id:"B",enabled:false},
+  {id:"C",enabled:true}
+];
+console.log(enabledIds(sample)); // ["A", "C"]
+```
+
+**Adım izleme:**
+
+1. İlk iterasyonda ids `["A"]` olur.
+2. İkinci iterasyonda condition false; ids değişmez.
+3. Üçüncü iterasyonda `"C"` eklenir.
+4. Son return yalnız döngü bittikten sonra gerçekleşir.
+
+**Hatalı fikir:** Döngü içindeki her elemanda `return ids` çalıştırmak. Bu durumda ilk elementten sonra durulur ve C kaydı asla değerlendirilemez.
+
+| Input | Doğru beklenen |
+| --- | --- |
+| `[]` | `[]` |
+| `[{id:"A",enabled:true}]` | `["A"]` |
+| `[{id:"A",enabled:false}]` | `[]` |
+| A açık, B kapalı, C açık | `["A","C"]` |
+
+### Neden test input sırası önemli?
+
+İlk öğe disabled olduğunda yanlış erken return `[]` döndürebilir; ilk öğe enabled olduğunda yalnız ilk ID döndürebilir. **Farklı sıralar**, yanlış control-flow varsayımlarını açığa çıkarır.
+
+### Bağımsız görev
+
+`score >= 60` koşulunu da ekle. A score 60, B score 90 ama disabled, C score 59 olduğunda beklenen ID'leri yaz; ardından sıfır elementli array'in davranışını açıkla.
+
+<details><summary>Kontrol</summary>
+
+Yalnız A seçilir. Boş array'de döngü body'si hiç çalışmaz ve boş output döner.
+
+</details>
