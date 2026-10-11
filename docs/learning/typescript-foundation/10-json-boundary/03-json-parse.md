@@ -1,9 +1,5 @@
 # Ders 16 — JSON Parsing: `JSON.parse()`, `SyntaxError` ve TypeScript Güven Sınırı
 
-> **Öğrenme yolu:** [JavaScript öğrenme dizini](../README.md) → [Bölüm 3](./README.md)  
-> **Önkoşullar:** [JSON Fundamentals](./01-json-fundamentals.md), [JSON.stringify](./02-json-stringify.md), `try/catch`, `unknown`.  
-> **Bu dersin sorusu:** JSON metninden değere geçerken hangi hatalar oluşabilir ve TypeScript hangi garantiyi *vermez*?
-
 ## 1. Parsing nedir? Serialization'dan farkı ne?
 
 **Parsing (ayrıştırma)**, bir metni tanımlı dil kurallarına göre okuyarak programın kullanabileceği değerlere dönüştürmektir. `JSON.parse()` geçerli JSON metnini JavaScript değerine çevirir.
@@ -278,9 +274,3 @@ Girdi → beklenen gözlenebilir davranış:
 5. `typeof null === "object"` ve `typeof [] === "object"` olduğundan bunları normal object'ten ayırmak gerekir.
 
 </details>
-
-## 11. Sıradaki ders ve kanıt sınırı
-
-**Sıradaki ders:** [JSON Boundary & Runtime Validation](./04-json-boundary-validation.md). Parse sonucu `unknown` → doğru property tipleri → iş kuralı → kontrollü `Result` akışı.
-
-**Kanıt:** Örnekler öğrenme içindir; repository'de typecheck, Vitest veya bağımsız uygulama başarısı olarak değerlendirilmez.
