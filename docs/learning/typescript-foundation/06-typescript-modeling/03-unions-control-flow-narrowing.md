@@ -1,14 +1,11 @@
-# Union Types ve Control-Flow Narrowing
+# Ders 21 — Union Types ve Control-Flow Narrowing
 
-**Önkoşul:** [TypeScript modelleme bölümü](./README.md) · [Önceki](./02-optional-undefined-null.md) · [Sonraki](./04-unknown-and-compile-time-limits.md)
+## 1. Bir değer birden fazla türden biri olabilir
 
-## 1. Neden ihtiyaç duyuyoruz?
-Bir parametre birden fazla tür olabiliyorsa o türlerin ortak olmayan işlemlerini doğrudan çağırmak güvenli değildir.
+Bazı fonksiyonlar hem string hem number input kabul eder. Aynı method bütün türler için güvenli olmayabilir. TypeScript bu belirsizliği union olarak ifade eder.
 
-## 2. Tanım ve mekanizma
-`string | number` bir değerin iki türden **biri** olduğunu söyler. **Narrowing**, `typeof` gibi runtime kontrolünün ardından TypeScript'in o branch'teki olasılıkları daraltmasıdır.
+## 2. Union ve narrowing
 
-## 3. Açıklamalı kod ve çıktı
 ```ts
 function normalize(value: string | number): string | number {
   if (typeof value === "string") {
@@ -16,29 +13,93 @@ function normalize(value: string | number): string | number {
   }
   return value * 10;
 }
-console.log(normalize(" Hi ")); // Hi
-console.log(normalize(3));      // 30
+console.log(normalize("  Hi ")); // Hi
+console.log(normalize(3));       // 30
 ```
 
-## 4. Execution ve veri akışı
-String çağrısında `typeof value` string branch'i seçer, `trim()` güvenli olur. Number çağrısında if geçilmez, geri kalan değer number olarak kullanılır. `return` function'ı ilgili çağrıda sonlandırır.
+`string | number` iki olası type anlamına gelir. `typeof value==="string"` runtime kontrolüdür; TypeScript bu condition'ın true branch'inde value'yu string olarak daraltır. İlk branch return ettiği için sonraki yolda number kalır.
 
-## 5. TypeScript compile-time ile runtime ayrımı
-Narrowing TypeScript'in sihirli runtime dönüştürmesi değildir; gerçek bir kontrolü **okuyarak** tür olasılıklarını daraltır. Başka branch'in çalışmadığı bilgisi de daraltmaya katkı verir.
+## 3. Çalışma izi
 
-## 6. Sınır davranışları ve kritik farklar
-Type assertion `as string` çalışma anında veri dönüşümü veya doğrulaması yapmaz. Bir `string | number` üzerinde doğrudan `.trim()` çağırmak number ihtimalini göz ardı eder.
+| Input | typeof | Seçilen branch | Sonuç |
+| --- | --- | --- | --- |
+| `" Hi "` | string | trim | `"Hi"` |
+| `3` | number | multiply | 30 |
+| `0` | number | multiply | 0 |
 
-## 7. Yaygın yanlış kullanım / debugging
-Type hatası çıktığında hangi branch'in değerin türünü kanıtladığını kontrol et. Gereksiz `as` yerine control-flow kontrolü ekle ve normal iki yolu test et.
+Bu sonuç type anotasyonunun dönüşüm yapmasıyla değil, **JavaScript condition ve expression** yürütmesiyle oluşur.
 
-## 8. Gerçek kullanım
-Uygulamanın model bekleyen iç fonksiyonları ve dışarıdan veri alan sınır fonksiyonları aynı güven seviyesinde değildir. Compile-time shape bilgisi faydalıdır fakat runtime'daki gerçek değeri anlamak için kontrol gerekir.
+## 4. Guard yoksa ne olur?
 
-## 9. Interview preparation
-*How does narrowing work in TypeScript?* Real runtime conditions such as `typeof` allow the checker to refine a union type in a control-flow branch.
+```ts
+// Bilerek yanlış:
+// function broken(v: string | number) {
+//   return v.trim(); // number'da trim yok
+// }
+```
 
-## 10. Bağımsız pekiştirme
-`normalize('  ok ')`, `normalize(0)` sonuçları? `typeof` kontrolü kaldırılırsa hangi satır type hatası üretebilir?
+String'e ait method'u union'ın her olasılığında çağırmak güvenli değildir. TypeScript bunu bildirebilir, fakat `any` ile gizlenmiş runtime number yine hata oluşturabilir.
 
-**Kaynak:** [I2](../../../I2-control-flow-functions-data-modeling.md) ve [I3](../../../I3-safe-types-runtime-boundaries.md). Eğitim içeriği bağımsız öğrenci uygulama/H0 kanıtı değildir.
+## 5. Discriminated union
+
+```ts
+type Result =
+  | { kind:"ok"; value:number }
+  | { kind:"error"; message:string };
+
+function explain(result: Result): string {
+  if (result.kind === "ok") {
+    return "Value: " + result.value;
+  }
+  return "Error: " + result.message;
+}
+console.log(explain({ kind:"ok", value:80 })); // Value: 80
+console.log(explain({ kind:"error", message:"invalid" })); // Error: invalid
+```
+
+Ortak `kind` literal property, branch'i ayırır. `"ok"` branch'inde value; `"error"` branch'inde message vardır. Hatalı branch property erişimi type-check hatası yaratabilir.
+
+## 6. Type assertion kontrol değildir
+
+```ts
+const value: unknown = 42;
+const assumed = value as string;
+// assumed.toUpperCase(); // runtime'da TypeError oluşturabilir
+console.log(typeof assumed); // number
+```
+
+Assertion, type checker'a iddia sunar; runtime value'yu string yapmaz. Guard gerçek runtime türünü ölçer.
+
+## 7. Null ve object narrowing
+
+```ts
+function isObject(value: unknown): boolean {
+  return typeof value === "object" && value !== null;
+}
+console.log(isObject(null)); // false
+console.log(isObject({}));   // true
+```
+
+`typeof null` özel davranışı nedeniyle null ayrıca elenir. Bu kontrol henüz object property shape'ini doğrulamaz.
+
+## 8. Debugging ve sınırlar
+
+**Belirti:** `trim is not a function`. Gerçek typeof değerini incele; string branch'i olmadan method çağrılmış mı?
+
+**Belirti:** Discriminated union'da message okunamıyor. Önce `kind` kontrolü doğru branch'i seçiyor mu bak.
+
+**Boundary:** Return type `string | number` olan fonksiyonu çağıran, gerçek sonuç üzerinde type-specific işlemden önce daraltma yapmak zorunda kalabilir.
+
+## 9. Mülakat / pekiştirme
+
+**Question:** What is type narrowing?
+
+> Runtime checks such as typeof and discriminant comparisons allow TypeScript to refine union types in control-flow branches.
+
+**Kontrol:** `normalize(0)` sonucu? `normalize(" hi ")` sonucu? Assertion gerçek dönüşüm mü? `kind:"ok"` branch'inde message bulunur mu?
+
+<details><summary>Cevaplar</summary>
+
+0; hi; hayır; hayır.
+
+</details>
