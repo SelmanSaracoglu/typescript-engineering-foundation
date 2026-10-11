@@ -90,3 +90,57 @@ Belirti: Bir testin sonucu sonraki testi etkiliyor. Shared fixture object'i muta
 Const yalnız rebinding'i engeller; yeni object literal input'tan ayrı object yaratır; readonly static kontrollere ilişkindir.
 
 </details>
+
+## 9. Side effect'i görünür kılan test
+
+```ts
+type User = { score:number };
+function addTen(user: User): number {
+  user.score += 10;
+  return user.score;
+}
+const input = {score:80};
+const actual = addTen(input);
+console.log(actual);       // 90
+console.log(input.score);  // 90
+```
+
+Bu function **90 return ediyor** ve ayrıca input object'ini mutate ediyor. Sadece `actual===90` assertion'ı side effect hakkında bir bilgi vermez.
+
+### Mutation istemeyen sözleşme
+
+```ts
+type User = { score:number };
+function addTenWithoutMutation(user: User): number {
+  return user.score + 10;
+}
+const input = {score:80};
+const actual = addTenWithoutMutation(input);
+console.log(actual);      // 90
+console.log(input.score); // 80
+```
+
+İki function aynı return sonucunu üretebilir, fakat davranış sözleşmeleri farklıdır. Doğru olanı requirement belirler.
+
+### Expected–actual tablosu
+
+| Kontrol | Mutating function | Non-mutating function |
+| --- | --- | --- |
+| Return | 90 | 90 |
+| Çağrı sonrası input.score | 90 | 80 |
+| Input identity | Aynı object | Aynı object |
+| Input field değişti mi? | Evet | Hayır |
+
+### Hata araştırma
+
+Bir testin sonucu sonraki testi etkiliyorsa test fixture'ları ortak object reference taşıyor olabilir. Testler arasında shared mutable state olup olmadığına bak; rastgele test sırası değiştirmek kök nedeni gidermez.
+
+### Bağımsız görev
+
+Fonksiyonun return değeri doğru kaldığı hâlde input'u değiştirmemesini isteyen bir test yaz. Hangi assertion sonuç değerini, hangisi input mutation'ını kontrol etmeli?
+
+<details><summary>Kontrol</summary>
+
+Return için `expect(actual).toBe(90)`; input için `expect(input.score).toBe(80)` gibi iki ayrı assertion.
+
+</details>
