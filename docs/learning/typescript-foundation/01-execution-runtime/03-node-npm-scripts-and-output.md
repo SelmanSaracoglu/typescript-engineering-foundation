@@ -1,10 +1,5 @@
 # Ders 3 — Node.js, npm, npx, Project Scripts ve Program Output
 
-> **Öğrenme yolu:** [TypeScript Foundation](../README.md) → [01 — Execution & Runtime](./README.md)  
-> **Önkoşullar:** [Ders 1 — Type checking/build/runtime](./01-source-check-build-run.md) ve [Ders 2 — Hata sınıfları](./02-type-runtime-logic-errors.md).  
-> **Hedef:** Terminalde çalıştırılan komutun hangi aracı kullandığını, hangi dosyayı yürüttüğünü ve sonucu nasıl gözlemleyeceğini açıklamak.  
-> **Sonraki:** [02 — Values, Variables & Basic Decisions](../02-values-variables-basic-decisions/README.md).
-
 ## 1. Neden üç farklı araçtan söz ediyoruz?
 
 Kod yazarken şu komutları sık görürüz:
@@ -53,7 +48,7 @@ Execution sırası:
 5. `console.log` ekrana `80` yazar.
 6. Başka bekleyen iş yoksa process sonlanır.
 
-Bu örnek **JavaScript** dosyasıdır; `.ts` kaynak dosyası değildir. TypeScript kodunun bu repoda nasıl `.js` dosyasına dönüştüğü [Ders 1](./01-source-check-build-run.md)'de anlatıldı.
+Bu örnek **JavaScript** dosyasıdır; `.ts` kaynak dosyası değildir. TypeScript kodunun bu repoda nasıl `.js` dosyasına dönüştüğü derlemenin kavramsal modelinde açıklanan.
 
 ## 3. npm nedir? Project script nasıl çalışır?
 
@@ -246,7 +241,7 @@ Ayrıca program bir dosya yazabilir veya exit code ile sonuç bildirebilir; term
 
 **Olası neden:** Testler yanlış senaryoyu kapsıyor olabilir; gerçek logic bug olabilir.
 
-**Araştırma:** Gereksinimden expected tablo hazırla; `calculateFinalPrice(19, true)` gibi kusuru ayırt eden boundary'yi kullan. [Ders 2](./02-type-runtime-logic-errors.md) hataları sınıflandırmayı öğretir.
+**Araştırma:** Gereksinimden expected tablo hazırla; `calculateFinalPrice(19, true)` gibi kusuru ayırt eden boundary'yi kullan.
 
 ### D. “npm run start hiçbir çıktı vermedi”
 
@@ -299,6 +294,3 @@ Bu örnekler **yeni framework, deployment veya başka repo** gerektirmez; yalnı
 7. Hayır; output ve exit code farklı gözlemlerdir.
 
 </details>
-
-**Sonraki öğrenme adımı:** [02 — Values, Variables & Basic Decisions](../02-values-variables-basic-decisions/README.md).  
-**Tarihsel kaynak:** [I1 — Execution Model](../../../I1-execution-model.md). Bu içerik eğitim dokümanıdır, H0 bağımsız uygulama kanıtı değildir.
