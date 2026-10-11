@@ -1,9 +1,5 @@
 # Ders 17 — JSON Boundary: Runtime Validation ve Kontrollü Hata Modeli
 
-> **Öğrenme yolu:** [JavaScript öğrenme dizini](../README.md) → [Bölüm 3](./README.md)  
-> **Önkoşullar:** [JSON syntax](./01-json-fundamentals.md), [serialization](./02-json-stringify.md), [parsing ve `unknown`](./03-json-parse.md), TypeScript union/narrowing ve fonksiyonlar.  
-> **Bu dersin hedefi:** Geçerli JSON ile güvenilir uygulama verisini ayırmak; doğru ve yanlış girdiler için açık sonuç üretmek.
-
 ## 1. Problem: JSON başarıyla parse edildi, şimdi güvenebilir miyiz?
 
 Hayır. `JSON.parse()` yalnızca metni JavaScript değerine dönüştürür. Örneğin:
@@ -420,7 +416,3 @@ Bu yaklaşım, körlemesine kod değiştirmek yerine veri akışını takip eder
 ## 12. Bölüm kapanışı ve sıradaki mühendislik adımı
 
 Buraya kadar: JSON formatı → serialization → parsing → `unknown` → runtime shape → business rule → controlled result zincirini öğrendik.
-
-**Bölüm özeti ve bütünleştirme:** [Bölüm 3 README](./README.md).
-
-**Sonraki çalışma:** Mevcut TypeScript repository'sinde I4 kapsamındaki davranışı tasarlama, gerçek typecheck/test yürütme, debugging ve bağımsız transfer. Buradaki kodlar öğretici örnektir; gerçek uygulama kanıtı olarak işaretlenmez. H0–H4 yardım seviyesi uygulama gözleminde ayrıca kaydedilir.
