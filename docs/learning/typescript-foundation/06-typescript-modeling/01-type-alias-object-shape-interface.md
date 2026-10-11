@@ -98,3 +98,40 @@ Bu statik olarak geçerli `number`, fakat ürün fiyatı için iş kuralına ayk
 Tek kayıt ve dizi; uyumlu shape'lerde evet; number tipi negatifi otomatik yasaklamaz.
 
 </details>
+
+## 10. Uygulama örneği: type uyumlu, iş kuralı yanlış
+
+```ts
+type Product = { name:string; price:number; inStock:boolean };
+function isPremium(product: Product): boolean {
+  return product.inStock && product.price >= 100;
+}
+const cheap: Product = {name:"Elma",price:99,inStock:true};
+const exact: Product = {name:"Nar",price:100,inStock:true};
+const missingStock: Product = {name:"Üzüm",price:200,inStock:false};
+console.log(isPremium(cheap));        // false
+console.log(isPremium(exact));        // true
+console.log(isPremium(missingStock)); // false
+```
+
+Üç object de Product **type shape'ine uygun**. Fakat yalnız exact ürünü premium koşuluna uygundur. Object shape modellemesi, business decision'ı kendiliğinden çözmez.
+
+| Product | Type-check | Business decision |
+| --- | --- | --- |
+| cheap | geçerli | false |
+| exact | geçerli | true |
+| missingStock | geçerli | false |
+
+### Yanlış type tanımını “esnetme” tehlikesi
+
+Bir caller `inStock` alanını unutuyorsa onu `inStock?:boolean` olarak değiştirmek yalnız derleyiciyi susturabilir; iş kuralına göre stok bilgisi **zorunluysa** model artık doğru sözleşmeyi yansıtmaz.
+
+### Yeni görev
+
+Product'a `sku:string` alanı eklenecekse hangi object literal'ler güncellenmeli? `Product[]` içinde her element neden aynı yeni zorunlu alanı sağlamalı?
+
+<details><summary>Kontrol</summary>
+
+Model ve onu üreten örnekler/fixture'lar güncellenir. Required alanın tüm Product kayıtlarında bulunması beklenir; runtime kaynaklar ayrıca doğrulanmalıdır.
+
+</details>
