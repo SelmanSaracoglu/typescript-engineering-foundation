@@ -1,9 +1,5 @@
 # Ders 10 — Spread Syntax: Değerleri Açmak, Birleştirmek ve Shallow Copy
 
-> **Öğrenme yolu:** [JavaScript dizini](../README.md) → [Bölüm 2](./README.md)  
-> **Önkoşul:** Array, object, referans/identity, mutation, [destructuring](./01-object-destructuring.md).  
-> **Hedef:** Spread'in neyi kopyalayıp neyi kopyalamadığını açıklayabilmek; property çakışmalarını, referans aliasing'i ve güvenli güncelleme yöntemlerini çözümleyebilmek.
-
 ## 1. Spread neden var?
 
 Birden fazla array'i birleştirmek veya mevcut object'ten yeni bir dış object üretmek isteyebiliriz. Normalde elemanları tek tek yerleştirmek zahmetlidir. `...` operatör sözdizimi, bulunduğu **bağlamda** bir koleksiyonun elemanlarını/alanlarını açmaya yarar.
@@ -144,7 +140,7 @@ console.log(maxOfThree(...values)); // 9
 
 Çağrıda `...values`, tuple elemanlarını üç ayrı argüman olarak açar. TypeScript'te argüman sayısı önemli olduğu için burada fixed-length tuple kullandık. Keyfi uzunluktaki `number[]` her zaman üç parametreye açılabilir diye varsayılamaz.
 
-**Spread ile rest farkı:** Fonksiyonu çağırırken `fn(...values)` bir array'i **açar**; fonksiyon tanımında `function fn(...values: number[])` ise argümanları **toplar**. [Ders 11](./04-rest.md) bu ayrımı detaylandırır.
+**Spread ile rest farkı:** Fonksiyonu çağırırken `fn(...values)` bir array'i **açar**; fonksiyon tanımında `function fn(...values: number[])` ise argümanları **toplar**. Ders 11 bu ayrımı detaylandırır.
 
 ## 7. Değişmeyen veri (immutability) ne demektir?
 
@@ -232,5 +228,3 @@ Spread bir **validation** aracı değildir. Güvenilmeyen object'in bütün alan
 5. Bir `TestConfig` içerisinde `logging` değerini yalnız `level` alanında değiştiren yeni konfigürasyonu yaz.
 
 **Kısa kontrol:** (1) 9; sonra `...{a:1,b:2}` gelirse 2. (2) 3, çünkü array kopyalansa da eleman object'i aynıdır. (3) Hayır, düz object.
-
-**Sonraki ders:** [Rest Syntax](./04-rest.md). **Kanıt:** Öğrenim belgesi; bireysel kodlama, typecheck, test ve debugging başarısı değildir.
