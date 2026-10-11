@@ -94,3 +94,53 @@ Belirti: Test sonucundaki `result[0]` değişince `input[0]` da değişti. Hipot
 İlk ikisi aynı Object A'yı işaret eder; ayrı literal B üretir. Primitive ayrı değer bağlarıdır. Nested property bir object referansı taşıyabilir.
 
 </details>
+
+## 9. Rehberli deney: function argument olarak object
+
+```ts
+type Score = { value: number };
+
+function reset(score: Score): void {
+  score.value = 0;
+}
+const first: Score = { value:80 };
+const second = first;
+reset(second);
+console.log(first.value); // 0
+```
+
+Function parametresi gelen object reference'ını kullanır. `second` yeni object üretmediği için aynı object'i mutate eder. “Function'a parametre verdim, kopya oluştu” düşüncesi yanlıştır.
+
+### Rebinding ile mutation'ı ayır
+
+```ts
+type Score = { value:number };
+function replace(score: Score): void {
+  score = { value:0 }; // local parameter başka object'i gösterir
+}
+const original = { value:80 };
+replace(original);
+console.log(original.value); // 80
+```
+
+Buradaki `score = {...}` local binding'i değiştirir; caller'ın binding'ini değiştirmez. Buna karşılık `score.value=0` var olan object'in property state'ini mutate eder.
+
+| İşlem | Caller object etkilenir mi? |
+| --- | --- |
+| Parametre üzerinden property mutation | Aynı reference ise evet |
+| Parametreyi yeni object'e reassign etmek | Hayır, caller'ın bağı değişmez |
+| Yeni object oluşturup onu return etmek | Caller ancak return'ü kullanırsa görür |
+
+### Debugging deneyi
+
+Input score 80 iken bir helper sonrası 0 oldu. Helper'ın içinde `score.value=0` mı, yoksa `score={value:0}` mı var? Bu fark tek başına semptomu açıklayabilir.
+
+### Bağımsız görev
+
+İki ayrı object literal'i aynı alanları taşısın. `first===second` sonucu neden false? Bir üçüncü değişkeni `const third=first` ile bağladığında hangileri aynı object'i paylaşır?
+
+<details><summary>Kontrol</summary>
+
+Ayrı literal'ler farklı identity taşır. Third ve first aynı reference'ı paylaşır.
+
+</details>
