@@ -207,8 +207,6 @@ const parsed: unknown = JSON.parse('{"id":"wrong"}');
 
 Bu değer de object'tir. Ancak `id` beklenen `number` değildir. `isObjectRecord()` yalnızca dış yapıyı daraltır; her property'nin doğru tipte olduğunu garanti etmez.
 
-**Sonraki dersin görevi** tam olarak bu property ve business-rule doğrulamasını güvenilir bir sonuç modeline bağlamak.
-
 ## 7. Güvenlik açısından hata ayırımı
 
 Bu üç input'a bakalım:
