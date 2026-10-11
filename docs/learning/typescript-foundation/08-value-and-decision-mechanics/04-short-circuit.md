@@ -1,8 +1,5 @@
 # Ders 4 — Short-Circuit Evaluation: JavaScript ne zaman durur?
 
-> **Öğrenme yolu:** [Dizin](../README.md) → [Bölüm 1](./README.md)  
-> **Önkoşul:** [Logical Operators](./03-logical-operators.md), truthiness ve fonksiyon çağrıları.
-
 ## 1. Short-circuit neden önemlidir?
 
 JavaScript bir ifadeyi değerlendirirken bazı sonuçlar ilk operanddan bellidir. Böyle bir durumda ikinci operandı değerlendirmesi gerekmez. Bu özelliğe **short-circuit evaluation (kısa devre değerlendirme)** denir.
@@ -221,11 +218,4 @@ Bir ifade beklenmeyen sonuç ürettiyse:
 
 ## 11. Sonraki ders
 
-**Falsy** ve **nullish** farklıdır. [Ders 5 — Nullish Coalescing](./05-nullish-coalescing.md), özellikle sıfır/false/boş string değerlerini koruyan güvenli varsayılan seçimini açıklar.
-
-> **Kanıt:** Öğretici örnekler, bağımsız test uygulaması kanıtı değildir.
-
-
----
-
-> **Kalıcı müfredat notu:** Bu ders [TypeScript Foundation öğrenme rotasının](../README.md) parçasıdır. Dokümandaki önceki Increment/yardım durumları tarihsel bağlamdır; güncel bağımsız yeterlilik kanıtı değildir.
+**Falsy** ve **nullish** farklıdır. Ders 5 — Nullish Coalescing, özellikle sıfır/false/boş string değerlerini koruyan güvenli varsayılan seçimini açıklar.
