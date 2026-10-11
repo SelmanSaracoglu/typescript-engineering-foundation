@@ -1,45 +1,101 @@
-# unknown, any ve Compile-Time Model Sınırı
+# Ders 22 — unknown, any ve Compile-Time Güvenlik Sınırı
 
-**Önkoşul:** [TypeScript modelleme bölümü](./README.md) · [Önceki](./03-unions-control-flow-narrowing.md) · [Bölüm 07](../07-safe-runtime-boundaries/README.md)
+## 1. Dışarıdan gelen veri neden şüphelidir?
 
-## 1. Neden ihtiyaç duyuyoruz?
-Güvenilmeyen verinin TypeScript tarafından güvenilir kabul edilmesi, ileride güvenlik ve mantık kusurlarına yol açabilir.
+Uygulama başka bir sistemin verdiği object'i veya kullanıcının gönderdiği metni alır. TypeScript kaynak kodunda bir alanı number ilan etmek, runtime'da string gelmesini **otomatik olarak engellemez**. Bu yüzden doğrulanmamış data için uygun bir type başlangıcı gerekir.
 
-## 2. Tanım ve mekanizma
-`unknown` değer olduğunu ama tipini güvenli biçimde bilmediğimizi belirtir; kontrol olmadan property/method kullanımı engellenir. `any` statik kontrolün önemli kısmını devre dışı bırakır.
+## 2. unknown ve any farkı
 
-## 3. Açıklamalı kod ve çıktı
+**`unknown`** bir değerin türünü henüz güvenli biçimde bilmediğimizi söyler. TypeScript, kontrol olmadan güvenli olmayan property/method kullanımını engeller. **`any`** ise çok sayıda type-check güvenliğini devre dışı bırakır.
+
 ```ts
-function readLabel(value: unknown): string {
-  if (typeof value === "string") {
-    return value.trim();
+function readLabel(input: unknown): string {
+  if (typeof input === "string") {
+    return input.trim();
   }
   return "INVALID_TYPE";
 }
-console.log(readLabel("  ready ")); // ready
-console.log(readLabel(42));          // INVALID_TYPE
-console.log(readLabel(null));        // INVALID_TYPE
+console.log(readLabel(" ready ")); // ready
+console.log(readLabel(42));        // INVALID_TYPE
+console.log(readLabel(null));      // INVALID_TYPE
 ```
 
-## 4. Execution ve veri akışı
-Function'a `unknown` değer gelir. Her çağrıda gerçek runtime `typeof` kontrol edilir. Sadece string değer `trim()` alır. Başka türler controlled string sonucuna gider; exception fırlatmak zorunda değildir.
+`unknown` kendiliğinden hata kodu üretmez. Kontrollü return davranışını bizim condition ve return'ümüz oluşturur.
 
-## 5. TypeScript compile-time ile runtime ayrımı
-`unknown` typecheck'teki güvenli sınırdır ama veriyi **kendi başına** doğrulamaz. Runtime guard işin gerçek kısmını yapar. `any` kullanılması sorunu gizleyebilir; güvenli modelin yerine geçmez.
+## 3. Execution trace
 
-## 6. Sınır davranışları ve kritik farklar
-`typeof x === 'object'` null için de true olabilir; object input'larında shape/property kontrolü gerekir. [07 — Runtime Boundaries](../07-safe-runtime-boundaries/README.md). JSON parse sonucunu TypeScript modeline as etmek, doğrulama değil assertion'dır.
+String geldiğinde typeof kontrolü true olur; trim çağrılır, sonuç caller'a döner. Number ve null için guard false olur, `"INVALID_TYPE"` döner. Hiçbiri zorunlu olarak exception oluşturmaz.
 
-## 7. Yaygın yanlış kullanım / debugging
-Çalışırken `Cannot read properties of ...` hatası alındığında varsayılan veri shape'inin gerçekten mevcut olup olmadığına bak; `as Product` ile problemi örtemezsin.
+## 4. any hatayı nasıl gizler?
 
-## 8. Gerçek kullanım
-Uygulamanın model bekleyen iç fonksiyonları ve dışarıdan veri alan sınır fonksiyonları aynı güven seviyesinde değildir. Compile-time shape bilgisi faydalıdır fakat runtime'daki gerçek değeri anlamak için kontrol gerekir.
+```ts
+// Bilerek riskli model:
+function unsafe(input: any): string {
+  return input.trim();
+}
+// unsafe(42); // runtime TypeError riski
+```
 
-## 9. Interview preparation
-*Why prefer unknown for untrusted input?* It forces the caller to check the value before unsafe operations instead of bypassing type checks.
+Type checker `input` hakkında kontrollere zorlanmaz. Oysa runtime number üzerinde `trim()` method'u yoktur. `any`, veri kaynağını güvenilir yapmaz.
 
-## 10. Bağımsız pekiştirme
-`readLabel([])` ne döner? `as string` kullanmanın array'i string'e dönüştürmediğini açıkla.
+## 5. Type assertion dönüşüm yapmaz
 
-**Kaynak:** [I2](../../../I2-control-flow-functions-data-modeling.md) ve [I3](../../../I3-safe-types-runtime-boundaries.md). Eğitim içeriği bağımsız öğrenci uygulama/H0 kanıtı değildir.
+```ts
+type Product = { name:string; price:number };
+const incoming: unknown = { name:"Elma", price:"100" };
+const assumed = incoming as Product;
+console.log(typeof assumed.price); // string
+```
+
+`as Product` object'in real shape'ini değiştirmez. Price field hâlâ string'dir. Yanlış type iddiası sonraki hesaplamada mantık hatası oluşturabilir.
+
+## 6. Object, null ve array ayrımı
+
+```ts
+function isRecord(input: unknown): boolean {
+  return typeof input === "object" &&
+    input !== null &&
+    !Array.isArray(input);
+}
+console.log(isRecord(null)); // false
+console.log(isRecord([]));   // false
+console.log(isRecord({}));   // true
+```
+
+Bu guard yalnız object-benzeri record temel kontrolüdür. `{}` için true dönmesi gereken `name` ve `price` alanlarının doğru olduğunu **kanıtlamaz**.
+
+## 7. Untrusted input için zihinsel model
+
+```text
+external/unknown input
+    ↓  object/null/array kontrolü
+possible record
+    ↓  field varlığı ve field type kontrolü
+validated application data
+    ↓
+business operation
+```
+
+Bu işlemler birbirine bağlı fakat farklıdır. Runtime validation olmadan statik type assertion güvenli kapı değildir.
+
+## 8. Kritik sınırlar ve debugging
+
+**Belirti:** `input.trim is not a function`. Input'un gerçek typeof değerini gözle. `any` veya `as string` ile statik kontrol gizlenmiş olabilir.
+
+**Belirti:** `price` string geldi, toplama yanlış. External boundary'de field validation yapılıyor mu? `number` annotation runtime conversion değildir.
+
+**Belirti:** Object check geçiyor ama property eksik. Record olmak belirli business model olmak anlamına gelmez.
+
+## 9. Mülakat ve pekiştirme
+
+**Question:** Why is unknown safer than any?
+
+> Unknown requires checking a value before unsafe operations. Any bypasses many static safeguards and can hide runtime type errors.
+
+**Kontrol:** `readLabel([])` sonucu? `as Product` price'ı number yapar mı? `isRecord({})` true ise Product valid midir? `typeof null` neden dikkat ister?
+
+<details><summary>Cevaplar</summary>
+
+INVALID_TYPE; hayır; hayır; null için object döndürür ama null object property taşımaz.
+
+</details>
