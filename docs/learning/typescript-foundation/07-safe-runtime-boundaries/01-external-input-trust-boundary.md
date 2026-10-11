@@ -93,3 +93,41 @@ Test matrisi: null, array, number, boş object, gerekli property'leri olan objec
 Hayır, field'ler henüz doğrulanmadı; typeof null object döner; kötü predicate statik analizi yanıltabilir.
 
 </details>
+
+## 9. Güven sınırı uygulaması: ham object'e güvenme
+
+```ts
+type Product = {name:string;price:number};
+function isProduct(input: unknown): input is Product {
+  if (typeof input !== "object" || input === null || Array.isArray(input)) {
+    return false;
+  }
+  if (!("name" in input) || !("price" in input)) return false;
+  return typeof input.name === "string" &&
+         typeof input.price === "number";
+}
+console.log(isProduct({name:"Elma",price:10})); // true
+console.log(isProduct({name:"Elma",price:"10"})); // false
+```
+
+Bu fonksiyon iki temel aşamayı birleştirir: record guard + field type check. Dış veriyi kullanmadan önce runtime'a bakar.
+
+**Zihinsel ayrım:** Type predicate bildirimi modelle eşleşmeye yardım eder; body gerçek kontrolleri uygular.
+
+| Input | Record? | Alan type? | Sonuç |
+| --- | --- | --- | --- |
+| `null` | hayır | — | false |
+| `[]` | hayır | — | false |
+| `{}` | evet | eksik | false |
+| `{name:"Elma",price:10}` | evet | doğru | true |
+| `{name:"Elma",price:"10"}` | evet | yanlış | false |
+
+### Bağımsız görev
+
+`inStock:boolean` alanını da zorunlu hale getir. Test et: eksik inStock, `inStock:"true"`, `inStock:true`. Kodunu yazmadan önce expected tablo çıkar.
+
+<details><summary>Kontrol</summary>
+
+İlk iki durum reddedilir; boolean true geçerli field type'dır. Ancak bütün iş kuralları bununla doğrulanmış olmaz.
+
+</details>
