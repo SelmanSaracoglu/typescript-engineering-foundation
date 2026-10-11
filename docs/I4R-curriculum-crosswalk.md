@@ -24,7 +24,7 @@ Kalıcı eğitim dizini: `docs/learning/typescript-foundation/`. Bu kayıt yaln�
 
 Eski `docs/learning/javascript/` altındaki 17 ders, 3 bölüm README'si ve ana README **kaldırıldı**. Güncel öğrenme kopyaları yalnız `docs/learning/typescript-foundation/08-...`, `09-...` ve `10-...` altında bulunuyor. Eski dosya geçmişi Git commit history'de kalır.
 
-Eski `docs/I1-execution-model.md`, `docs/I2-control-flow-functions-data-modeling.md` ve `docs/I3-safe-types-runtime-boundaries.md` ise önceki gerçek çalışmanın ve gözlem notlarının tarihsel kayıtları olduğundan korunur. Bunların ders metinleri kalıcı 01–07 içeriğinde yeniden düzenlenmiştir; eski belgeler aktif öğretim adresi değildir.
+Tekrarlı `docs/I1-execution-model.md`, `docs/I2-control-flow-functions-data-modeling.md` ve `docs/I3-safe-types-runtime-boundaries.md` dosyaları da kullanıcı kararıyla `main` dalından kaldırıldı. I1–I3 konularının güncel öğretimi kalıcı 01–07 derslerindedir; eski dosyaların önceki sürümleri gerektiğinde Git commit geçmişinden incelenebilir.
 
 ## Eğitim dosyalarının biçimi
 
