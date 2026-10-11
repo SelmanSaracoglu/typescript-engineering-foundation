@@ -49,4 +49,4 @@ function label(n: number): string {
 
 **Pekiştirme:** `addTax(0)` ne döndürür? `result` neden dışarıdan erişilemez? Function çağrılmadığında body çalışır mı?
 
-**Henüz bu bölümde yok:** callback, higher-order function ve closure; bunlar sonraki öğrenme rotasına aittir. Kaynaklar: [I1](../../I1-execution-model.md), [I2](../../I2-control-flow-functions-data-modeling.md).
+**Henüz bu bölümde yok:** callback, higher-order function ve closure; bunlar sonraki öğrenme rotasına aittir. Kaynaklar: [I1](../../../I1-execution-model.md), [I2](../../../I2-control-flow-functions-data-modeling.md).
