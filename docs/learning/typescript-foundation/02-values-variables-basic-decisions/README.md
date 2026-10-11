@@ -2,6 +2,12 @@
 
 **Önkoşul:** [01 — execution modeli](../01-execution-runtime/README.md). **Sonraki:** [03 — functions](../03-functions-fundamentals/README.md).
 
+## Ayrıntılı dersler
+
+1. [Primitive Değerler: Tür, Değer ve Karşılaştırma](./01-primitive-values-and-types.md)
+2. [const, let, Assignment ve Expression](./02-const-let-assignment-and-expressions.md)
+3. [Karşılaştırmalar ve if/else ile Temel Karar Akışı](./03-comparisons-if-else-branching.md)
+
 ## Neden?
 Her karar önce değerlerden ve expression'lardan oluşur. `const` ile `let` değişken bağlama kurallarıdır; bir iş kuralının doğru uygulanmasını tek başına sağlamaz.
 
