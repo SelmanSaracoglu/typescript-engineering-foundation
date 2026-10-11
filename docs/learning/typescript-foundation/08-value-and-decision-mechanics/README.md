@@ -3,6 +3,11 @@
 > **Öğrenme dizini:** [TypeScript Foundation Öğrenme Rotası](../README.md)  
 > **Bölüm amacı:** Bir programın değerleri nasıl karşılaştırdığını, koşulları nasıl değerlendirdiğini ve hangi davranışı ne zaman seçtiğini açıklamak.
 
+## Önkoşullar ve birikimli bağlantı
+
+Bu bölüm [02 — Temel kararlar](../02-values-variables-basic-decisions/README.md) üzerine equality/truthiness/short-circuit ayrıntısı ekler. `undefined` ve `null` modelleri için [06](../06-typescript-modeling/README.md)'ya dön. Temel operator ve `if` öğretimi burada gereksiz yere baştan tekrarlanmaz.
+
+
 ## 1. Bu bölüm niçin temel?
 
 Kod okumak yalnızca sözdizimini tanımak değildir. Bir fonksiyonun aynı input için neden farklı output ürettiğini açıklayabilmemiz gerekir.
