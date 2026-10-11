@@ -8,6 +8,7 @@
 2. [Reference Identity: Same Object ve New Object](./02-reference-identity-and-aliases.md)
 3. [Mutation, Side Effect ve const Yanılgısı](./03-mutation-side-effects-and-const.md)
 4. [Yeni Array ≠ Yeni Element Object: Copy Sınırı](./04-new-array-versus-new-elements.md)
+5. [Vitest: toEqual, toBe, Mutation ve Identity Testleri](./05-vitest-structural-vs-reference-assertions.md)
 
 ## Neden?
 Yeni bir array üretmek, içindeki object'lerin de yeni olduğu anlamına gelmez. Paylaşılan referanslar beklenmedik mutation etkilerine yol açabilir.
