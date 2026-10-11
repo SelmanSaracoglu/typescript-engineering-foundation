@@ -55,4 +55,4 @@ expect([{ score: 10 }]).not.toBe([{ score: 10 }]); // ayrı array identity
 
 **Mülakat:** *Does spreading an array clone nested objects?* Hayır; yeni dış array oluşturabilir, iç object'ler aynı referansları paylaşabilir.
 
-**Pekiştirme:** İki array'in farklı, iç elemanın aynı olduğu durumu kendi sözlerinle anlat. Değişiklik neden input'a yansır? Kaynak [I2](../../I2-control-flow-functions-data-modeling.md).
+**Pekiştirme:** İki array'in farklı, iç elemanın aynı olduğu durumu kendi sözlerinle anlat. Değişiklik neden input'a yansır? Kaynak [I2](../../../I2-control-flow-functions-data-modeling.md).
