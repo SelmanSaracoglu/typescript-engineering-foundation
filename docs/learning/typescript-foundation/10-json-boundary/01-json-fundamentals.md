@@ -1,9 +1,5 @@
 # Ders 14 — JSON Fundamentals: JSON Nedir, JavaScript Object'ten Farkı Nedir?
 
-> **Öğrenme yolu:** [JavaScript öğrenme dizini](../README.md) → [Bölüm 3](./README.md)  
-> **Önkoşullar:** Object/array, primitive tipler, `typeof`, `null` ve `undefined`.  
-> **Bu dersin sınırı:** JSON sözdizimi ve veri temsili. Dönüştürme sonraki derslerde.
-
 ## 1. Bu konuyu neden öğreniyoruz?
 
 Bir program, kendi belleğinde JavaScript object'leri ve array'leriyle çalışır. Fakat bu değerlerin başka bir programa, dosyaya veya sistem sınırına **veri olarak** aktarılması gerektiğinde ortak bir gösterime ihtiyaç duyarız. JSON (*JavaScript Object Notation*), yapılandırılmış verileri **metinle temsil eden** yaygın, dilden bağımsız bir formattır.
@@ -245,7 +241,3 @@ Bu yapıyı görünce **JSON olarak yazılmış veri** olduğunu bilmelisin. `"p
 </details>
 
 ## 10. Bir sonraki ders ve kanıt sınırı
-
-**Sıradaki ders:** [JSON.stringify — Serialization](./02-json-stringify.md). Bu derste JavaScript değerinin JSON metnine nasıl dönüştürüldüğünü ve dönüşüm sırasında hangi bilginin kaybolabildiğini öğreneceğiz.
-
-**Öğrenme kanıtı:** Buradaki örnekler öğretim amaçlıdır. Bağımsız implementation, typecheck, Vitest ve debugging yeterliliği bu dokümanla kanıtlanmış sayılmaz.
