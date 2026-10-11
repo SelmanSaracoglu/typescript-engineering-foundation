@@ -15,7 +15,7 @@ Bunları rastgele daha kısa kod üretmek için değil, **hangi mekanizma hangi 
 
 ## 2. Derslerin doğru pedagojik sırası
 
-| Ders | Konu | Öğrencinin açıklayacağı davranış | Önkoşul |
+| Ders | Konu | Öğrencinin açıklayacağı davranış | Kavram |
 |---|---|---|---|
 | 8 | Object Destructuring | Property adına göre alan seçimi, alias, `undefined` default, nested referans | Object, property, reference |
 | 9 | Array Destructuring | Sıraya göre eşleştirme, skip, default ve tuple | Array/index, Ders 8 |
@@ -184,7 +184,7 @@ Bu örnekten nasıl akıl yürütürsün?
 7. `summarizeTest` örneğinden en az bir happy-path, bir sınır ve bir yanlış veri testi tasarla. Hangi kontrol hangi gereksinimi doğrular?
 8. `metadata` alanını `null` kabul edecek olsaydık hangi TypeScript tiplerini ve hangi erişimleri gözden geçirmeliyiz?
 
-## 10. Sözlük ve sonraki adım
+## 10. Sözlük
 
 - **Destructuring:** Object/array değerlerinden değişken bağlama.
 - **Alias:** Property'yi farklı bir yerel isimle kullanma.
@@ -195,5 +195,3 @@ Bu örnekten nasıl akıl yürütürsün?
 - **Optional chaining:** Nullish erişimde `undefined` sonucuyla kısa devre.
 - **Nullish fallback:** `??` ile `null`/`undefined` için alternatif.
 - **Interpolation:** `${...}` içindeki expression sonucunu string'e yerleştirme.
-
-**Sıradaki teori:** Bölüm 3 — JSON Boundary. **Gerçek uygulama:** Aktif I4 iş akışında TypeScript implementation, Vitest, debugging ve bağımsız transfer ayrıca doğrulanmalıdır. Belgeleri okumak H0–H4 yeterlilik kararı değildir.
