@@ -2,6 +2,12 @@
 
 **Önkoşul:** [02](../02-values-variables-basic-decisions/README.md). **Sonraki:** [04 — iteration](../04-control-flow-iteration/README.md).
 
+## Ayrıntılı dersler
+
+1. [Function, Parameter ve Argument](./01-function-parameter-argument.md)
+2. [Local Variable, Return Value ve Execution Flow](./02-local-variables-return-flow.md)
+3. [Local Scope, Block Scope ve Shadowing](./03-scope-shadowing-and-blocks.md)
+
 ## Neden?
 Bir function kodu yeniden kullanılabilir bir davranışa ayırır. Fonksiyonun input→processing→output akışını okumadan callback veya closure öğrenmek sağlam temel oluşturmaz.
 
