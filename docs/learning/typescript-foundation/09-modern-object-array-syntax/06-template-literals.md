@@ -1,9 +1,5 @@
 # Ders 13 — Template Literals: Okunabilir String Üretimi
 
-> **Öğrenme yolu:** [JavaScript dizini](../README.md) → [Bölüm 2](./README.md)  
-> **Önkoşul:** String, expression, `+`, ternary, `??`, `typeof`.  
-> **Hedef:** Backtick ve `${...}` kullanımını, değerlendirme sırasını, otomatik string dönüşümünü ve güvenlik sınırlarını açıklamak.
-
 ## 1. Neden `+` ile string birleştirmek yerine template literal?
 
 Bir test kaydından metin üretmek istediğimizi düşünelim:
@@ -115,7 +111,7 @@ console.log(`Retries: ${retries}; enabled: ${enabled}`);
 // Retries: 0; enabled: false
 ```
 
-Hatalı kullanım: `${retries || 3}`. `0` falsy olduğu için `3` yazılır; bu Template Literal sorunu değil, `||` operatörünün kararıdır. `[Ders 5 — Nullish Coalescing](../08-value-and-decision-mechanics/05-nullish-coalescing.md)` ile ilişkilendir.
+Hatalı kullanım: `${retries || 3}`. `0` falsy olduğu için `3` yazılır; bu Template Literal sorunu değil, `||` operatörünün kararıdır. `Ders 5 — Nullish Coalescing` ile ilişkilendir.
 
 ## 5. Object ve array nasıl string'e çevrilir?
 
@@ -141,7 +137,7 @@ console.log(`Roles: ${roles}`); // Roles: viewer,editor
 console.log(`Roles: ${roles.join(", ")}`); // Roles: viewer, editor
 ```
 
-`join(", ")` çıktıyı açıkça biçimlendirmemizi sağlar. Bir object'i JSON metnine dönüştürmek başka bir mekanizmadır: `JSON.stringify()` ([Bölüm 3](../10-json-boundary/02-json-stringify.md)). Template literal bir serializer değildir.
+`join(", ")` çıktıyı açıkça biçimlendirmemizi sağlar. Bir object'i JSON metnine dönüştürmek başka bir mekanizmadır: `JSON.stringify()` (Bölüm 3). Template literal bir serializer değildir.
 
 ## 6. Multiline string ve whitespace
 
@@ -252,5 +248,3 @@ Template literal'in tamamının sonucu **string**'dir; iç expression `30` sayı
 5. `name`, `price` alanları alan `getProductMessage` fonksiyonunu yaz; `"Keyboard costs 49 EUR"` formatında string döndürsün.
 
 **Kısa kontrol:** (1) Çift tırnak düz string'dir; (2) `"Total: 30"`, `string`; (3) `||` 0'ı falsy sayar; `${retries ?? 3}`; (4) object'in varsayılan dönüşümü JSON değildir.
-
-**Bölüm kapanışı:** [Bölüm 2 bütünleşik rehberi](./README.md). **Kanıt:** Bu belge öğretim içeriğidir; gerçek repo uygulaması, test ve bağımsız transfer kanıtı değildir.
