@@ -121,3 +121,60 @@ Boş array'de loop içindeki return hiç yürütülmez. Bir elementli input'ta y
 1. Boş array. 2. En az iki işlenmesi gereken element. 3. İş kuralı ilk eşleşmeyi arar. 4. Evet, loop sonrasındaki satırlara ilerleyebilir.
 
 </details>
+
+## 9. İkinci debugging laboratuvarı: koşullu erken return
+
+Şu kodda sorun yalnız `return` değil, **hangi koşulda** return edildiğidir:
+
+```ts
+type User = { name: string; active: boolean };
+function select(users: User[]): string[] {
+  const names: string[] = [];
+  for (const user of users) {
+    if (!user.active) return names; // BUG: bütün fonksiyon biter
+    names.push(user.name);
+  }
+  return names;
+}
+const data = [
+  {name:"Ali",active:true},
+  {name:"Ece",active:false},
+  {name:"Can",active:true}
+];
+console.log(select(data)); // ["Ali"], beklenen ["Ali","Can"]
+```
+
+Bu kodda:
+1. Ali eklenir.
+2. Ece inactive olduğunda function **return** ile biter.
+3. Can hiç işlenmez.
+
+**Gereksinim inactive öğeyi atlamaksa** bu noktada `continue` kullanmak gerekir:
+
+```ts
+function select(users: User[]): string[] {
+  const names: string[] = [];
+  for (const user of users) {
+    if (!user.active) continue;
+    names.push(user.name);
+  }
+  return names;
+}
+console.log(select(data)); // ["Ali","Can"]
+```
+
+| Statement | Anında olan | Sonraki elemana geçer mi? |
+| --- | --- | --- |
+| `continue` | Mevcut iteration'ın kalanını atlar | Evet |
+| `break` | Döngüyü bitirir | Hayır |
+| `return` | Function'ı bitirir | Hayır |
+
+### Bağımsız görev
+
+Gereksinim “ilk inactive kullanıcıyı bulduğunda isimleri döndür” olsaydı `return` artık bug olur muydu? Sonucun hangi input'ta nasıl değişeceğini iki kayıtlı örnekle açıkla.
+
+<details><summary>Kontrol</summary>
+
+İlk inactive görüldüğünde çalışmanın bitmesi iş kuralıysa return doğru olabilir. Sözleşme “tüm active kullanıcıları topla” olduğunda doğru değildir.
+
+</details>
