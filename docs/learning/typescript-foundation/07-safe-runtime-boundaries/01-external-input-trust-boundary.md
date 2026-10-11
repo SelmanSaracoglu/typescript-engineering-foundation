@@ -1,16 +1,14 @@
-# External Input ve Trust Boundary
+# Ders 23 — External Input ve Trust Boundary
 
-**Önkoşul:** [Bölüm 07 giriş](./README.md) · [Bölüm 06](../06-typescript-modeling/README.md) · [Sonraki ders](./02-property-existence-and-types.md)
+## 1. Güven sınırı nedir?
 
-## 1. Bu konuya neden ihtiyaç duyuyoruz?
-TypeScript'in `Product` olarak beklediği parametre, program dışından gerçekten doğru biçimde gelmeyebilir. Kritik ayrım 'beklenen model' ile 'gelen değer' arasındadır.
+Uygulama, kendi oluşturduğu nesneleri okuyabilir fakat kullanıcıdan, JSON'dan, dosyadan veya dış servisten gelen verinin gerçekten beklenen yapıda olduğunu otomatik bilemez. **Trust boundary**, kontrol edilmemiş veriyle doğrulanmış uygulama modeli arasındaki sınırdır.
 
-## 2. Tanım ve zihinsel mekanizma
-**Trust boundary**, kontrol edilmemiş dış veri ile doğrulanmış iç model arasındaki sınırdır. `unknown` dış değer için güvenli type başlangıcıdır. Güvenlik ve correctness, runtime'da gerçek değerin shape'ini sınayarak kurulur.
+TypeScript `type Product` tanımı dış veriyi runtime'da kontrol etmez. Bu nedenle doğrulanmamış input önce `unknown` olarak ele alınabilir.
 
-## 3. Açıklamalı TypeScript örneği
+## 2. İlk savunma: object, null, array
+
 ```ts
-type Product = { name: string; price: number };
 function isRecord(input: unknown): input is Record<string, unknown> {
   return typeof input === "object" &&
     input !== null &&
@@ -18,29 +16,80 @@ function isRecord(input: unknown): input is Record<string, unknown> {
 }
 console.log(isRecord(null));       // false
 console.log(isRecord([]));         // false
-console.log(isRecord({price: 3})); // true
+console.log(isRecord({ price:3 })); // true
 ```
 
-## 4. Execution ve veri akışı
-`typeof null` object döndürdüğü için `input !== null` zorunludur. Array de object türünde olduğu için `!Array.isArray` ayrı karar verir. Bu ilk kontrol sadece record olduğunu gösterir; Product shape'inin tamamını henüz doğrulamaz.
+JavaScript'te `typeof null==="object"` olduğundan null ayrıca elenir; array de object sınıfında göründüğü için ayrıca `Array.isArray` kontrolü yapılır. Bu üç koşul birlikte verinin array olmayan object-benzeri yapı olduğunu söyler.
 
-## 5. TypeScript ile ilişkisi
-`input is Record<string,unknown>` bir **type predicate**'tir. TypeScript daraltmayı fonksiyonun runtime boolean cevabına göre yapar; predicate'in içinin gerçekten doğru yazılması geliştiricinin sorumluluğudur.
+## 3. Gerçek execution flow
 
-## 6. Sınır davranışları ve önemli ayrımlar
-Kötü bir guard her şey için `true` döndürürse TypeScript aldanabilir. `isRecord({})` true olması Product doğrulandı demek değildir; gerekli property'ler daha sonra kontrol edilir.
+1. `isRecord(null)` → typeof object → null kontrolü false → reddet.
+2. `isRecord([])` → typeof object, null değil → Array.isArray true → reddet.
+3. `isRecord({price:3})` → object, null değil, array değil → true.
 
-## 7. Hata araştırma / doğrulama
-Bir dış veri hatasında önce hangi sınırdan geldiğini tespit et: parse edilen metin mi, kullanıcı nesnesi mi, test fixture mı? Sonra object, null ve array durumlarını gözlemle.
+**Kritik:** Üçüncü girdinin valid Product olduğu sonucu çıkmaz. Name ve inStock alanları henüz kontrol edilmemiştir.
 
-## 8. Gerçek kullanım ve birikimli bağlantı
-Bu mekanizma dışarıdan gelen veriyi uygulama modeline güvenle taşırken kullanılır. JSON metni parsing ve serialization ayrı tekniklerdir; [10 — JSON Boundary](../10-json-boundary/README.md) burada öğrenilen güven sınırını tekrar kullanır, aynı runtime validation bilgisini baştan öğretmez.
+## 4. Type predicate nasıl çalışır?
 
-## 9. Mülakat hazırlığı
-*Why use unknown instead of asserting a type for untrusted data?* Unknown requires runtime checks before values are treated as an application model.
+`input is Record<string,unknown>` imzası, function true döndüğünde TypeScript'in input'u record gibi değerlendirebilmesini sağlar. Ancak predicate'in gerçekten doğru olması geliştiricinin sorumluluğudur.
 
-## 10. Pekiştirme
-`isRecord(42)`, `isRecord('hello')`, `isRecord({})` sonuçlarını tahmin et. `{}` neden geçerli Product olarak kabul edilmemeli?
+```ts
+function unsafeGuard(x: unknown): x is { name: string } {
+  return true; // kasıtlı yanlış!
+}
+const input: unknown = 42;
+if (unsafeGuard(input)) {
+  // input.name varmış gibi kabul edilebilir; runtime'da yanlış varsayım
+}
+```
 
-## Kaynak ve tarihsel kanıt ayrımı
-[I3 — Safe Types, Runtime Boundaries](../../../I3-safe-types-runtime-boundaries.md) yeniden kullanılabilir öğretim kaynağıdır. Bu ders geçmiş H0–H4 sonucunu değiştirmez.
+Her şey için true döndüren guard type checker'ı yanıltabilir. **Type predicate yeni runtime güvenliği yaratmaz; body'deki kontroller yaratır.**
+
+## 5. Bütün veri akışını ayır
+
+```text
+External value (unknown)
+    ↓
+Object / null / array kontrolü
+    ↓
+Property existence
+    ↓
+Property runtime types
+    ↓
+Business constraints
+    ↓
+Trusted application representation
+```
+
+Bunlar tek bir `typeof` ile tamamlanmaz.
+
+## 6. Assertion ile sınırı atlamak
+
+```ts
+type Product = { name: string; price: number };
+const external: unknown = { name:"Elma", price:"100" };
+const assumed = external as Product;
+console.log(typeof assumed.price); // string
+```
+
+`as Product` field'i dönüştürmez. Bu kod gerçek runtime veriyi yanlış kabul eder; sonraki hesaplamalar beklenmedik sonuç verebilir.
+
+## 7. Debugging
+
+Belirti: Dış data runtime'da property hatası oluşturdu. Kaynağın güvenilir olup olmadığını sor. `unknown` kontrolünü nerede kaybettin? First guard null/array ayrımını içeriyor mu? Property varlığının kontrolünü value type kontrolünden ayrı yapıyor musun?
+
+Test matrisi: null, array, number, boş object, gerekli property'leri olan object, yanlış field tipi.
+
+## 8. Mülakat ve pekiştirme
+
+**Question:** Why is a trust boundary important in TypeScript?
+
+> TypeScript types are compile-time declarations. Real external inputs must be checked at runtime before being used as trusted application data.
+
+**Kontrol:** `isRecord({})` true olması geçerli Product kanıtı mı? `typeof null` neden yanlış pozitif olabilir? Type predicate bütün durumlar için true döndürürse ne olur?
+
+<details><summary>Cevaplar</summary>
+
+Hayır, field'ler henüz doğrulanmadı; typeof null object döner; kötü predicate statik analizi yanıltabilir.
+
+</details>
