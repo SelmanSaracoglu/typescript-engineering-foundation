@@ -97,3 +97,48 @@ Belirti: TypeScript type runtime'da kullanılamıyor. Type alias/interface runti
 1. Hayır. 2. Dış input doğrulanmamıştır. 3. Fonksiyon runtime code içerir. 4. Yanlış shape güvenilir sanılabilir.
 
 </details>
+
+## 10. Sorumluluk ayrımı: model, validator ve caller
+
+Aşağıdaki üç parça **üç ayrı dosyayı** temsil eder:
+
+```ts
+// product.ts
+export type Product = { name:string; price:number };
+```
+
+```ts
+// validate.ts
+import type { Product } from "./product";
+export function isProduct(input: unknown): input is Product {
+  return typeof input === "object" && input !== null &&
+    !Array.isArray(input) &&
+    "name" in input && typeof input.name === "string" &&
+    "price" in input && typeof input.price === "number";
+}
+```
+
+```ts
+// app.ts
+import { isProduct } from "./validate";
+const incoming: unknown = {name:"Elma",price:100};
+if (isProduct(incoming)) {
+  console.log(incoming.price); // 100
+}
+```
+
+**Execution:** Caller validator function'ı runtime import eder; `Product` type import'u runtime değer üretmez. Predicate true sonucuna göre caller'da input Product olarak daraltılır.
+
+### Dosya konumuna dikkat
+
+Relative import path, dosyaların gerçek konumuna göre kurulur. Yanlış dosya adı veya path modül çözümlemesinde hata yaratabilir. Ancak dosya ayırmak, input'un doğru olduğuna ilişkin validation kanıtı değildir.
+
+### Bağımsız görev
+
+Modelde `inStock:boolean` zorunlu hale gelsin. Hangi iki dosyada model ve guard değişmeli? Caller'da `incoming.inStock` okunacaksa bu hangi koşuldan sonra güvenlidir?
+
+<details><summary>Kontrol</summary>
+
+Model declaration ve validator guard güncellenir. Caller, guard başarılı olduktan sonra field'e güvenebilir. Bu senaryo için yeni repo/framework kurmak gerekmez.
+
+</details>
