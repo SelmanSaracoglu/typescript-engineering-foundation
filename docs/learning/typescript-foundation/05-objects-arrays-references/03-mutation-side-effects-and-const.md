@@ -1,44 +1,92 @@
-# Mutation, Side Effect ve const Yanılgısı
+# Ders 16 — Mutation, Side Effect ve const Yanılgısı
 
-**Önkoşullar:** [Bölüm 05 giriş](./README.md) · [Önceki](./02-reference-identity-and-aliases.md) · [Sonraki](./04-new-array-versus-new-elements.md)
+## 1. Problemi tanıyalım
 
-## 1. Neden ihtiyaç duyuyoruz?
-Fonksiyonun sadece döndürdüğü sonucu görmek, dışarıdaki veriyi istemeden değiştirdiğini gizleyebilir.
+Bir function doğru return değerini üretirken input object'ini değiştirmiş olabilir. Return edilen değer ile dışarıdan görülen değişiklik ayrı gözlemlerdir. Bu yüzden “function `void` dönüyor, etkisi yok” çıkarımı yanlıştır.
 
-## 2. Tanım ve çalışma mekanizması
-**Mutation**, mevcut nesne/array state'inin değiştirilmesidir. **Side effect**, fonksiyonun normal return dışında gözlenebilir dış etki üretmesidir. `const` binding'in yeniden atanmasını engeller, object içeriğini dondurmaz.
+## 2. Tanım ve zihinsel model
 
-## 3. TypeScript örneği ve gerçek çıktı
+**Mutation** mevcut object/array state'ini yerinde değiştirmektir. **Side effect** normal return değeri dışında gözlenebilen etkidir: dış object'i mutate etmek, log üretmek, dosya yazmak gibi. **Rebinding** bir değişkenin farklı değere bağlanmasıdır; mutation ile aynı işlem değildir.
+
+## 3. Açıklamalı örnek
+
 ```ts
 type Account = { enabled: boolean };
+
 function disable(account: Account): void {
-  account.enabled = false; // input object mutate edilir
+  account.enabled = false; // input mutate edilir
 }
+
 const account: Account = { enabled: true };
 disable(account);
 console.log(account.enabled); // false
 ```
 
-## 4. Bellek/veri akışı açıklaması
-Caller `Account Object A` yaratır. Function parameter'ı aynı object'e referans alır. Body `enabled=false` yapar. `void` function'ın iş değeri döndürmemesini ifade eder; ancak caller'ın object'i değişmiştir.
+## 4. Veri ve referans akışı
 
-## 5. TypeScript type ile runtime reference ilişkisi
-`readonly` property TypeScript düzeyinde değişikliği sınırlandırabilir ama tek başına runtime deep-freeze sağlamaz. Bu başlangıç dersi runtime mutation etkisine odaklanır.
+Caller Object A'yı `enabled=true` ile oluşturur. `disable` parameter'ı A'nın referansını alır. Function A'nın `enabled` property'sini false yapar. `return` ile değer taşınmaz; buna rağmen caller'ın object'i değişmiştir. **Void function yan etkisiz olmak zorunda değildir.**
 
-## 6. Boundary ve kritik ayrımlar
-Mutation her durumda yasak değildir. Bilinçli mutating API'ler bulunabilir; önemli olan contract'ın açık olmasıdır. `const account` satırının ardından `account={...}` yazmak farklı bir hatadır.
+## 5. Mekanizmanın önemli kullanım durumları
 
-## 7. Yaygın bug ve debugging doğrulaması
-Fonksiyonun beklenen çıktısı doğru olsa da input'a ait alanların önce/sonra değerlerini karşılaştır. Side effect'in sözleşmeyle uyumlu olup olmadığını tanımla.
+### const property mutation'ı durdurmaz
 
-## 8. Gerçekçi kullanım
-Kayıt filtreleyen function, test fixture veya configuration dönüştüren kodda **kopyalama sözleşmesi** önemlidir. Sonucu kullanan kişinin mutasyonu input'u etkiliyorsa bunu tasarım kararı olarak kaydetmek gerekir.
+```ts
+const settings = { retries: 3 };
+settings.retries = 5;
+console.log(settings.retries); // 5
+// settings = { retries: 10 }; // const rebinding hatası
+```
 
-## 9. Mülakat hazırlığı
-*Does a void function necessarily have no effect?* No; it can mutate input state or produce other observable effects.
+`const` binding'in yeni object'e atanmasını önler. Object'in property state'ini immutable hâle getirmez.
 
-## 10. Pekiştirme: önce tahmin, sonra karşılaştırma
-`disable(account)` çağrısından sonra caller'ın object'i neden değişti? `const` bunu niye engellemedi?
+### Immutable-style dönüşüm
 
-## Kaynak ve kanıt notu
-Özgün kaynak [I2 — Data Modeling](../../../I2-control-flow-functions-data-modeling.md). Bu kalıcı ders, history/evidence ve H0 düzeyinden bağımsızdır.
+```ts
+type Account = { enabled: boolean; name: string };
+function disabledCopy(input: Account): Account {
+  return { enabled: false, name: input.name };
+}
+const input: Account = { enabled: true, name: "Ali" };
+const result = disabledCopy(input);
+console.log(result.enabled); // false
+console.log(input.enabled);  // true
+console.log(result === input); // false
+```
+
+Yeni object literal, bu düz modelde input'tan ayrı object üretir. Böylece caller input'unun mutation'ı önlenir. Object nested ise yalnız ilk düzey kopyalamanın yetip yetmediği ayrıca düşünülmelidir.
+
+### `readonly` çalışma zamanı freeze değildir
+
+```ts
+type Config = { readonly retries: number };
+const config: Config = { retries: 3 };
+// config.retries = 5; // TypeScript hatası
+```
+
+Bu statik type kısıtlamasıdır. Runtime'da object'i otomatik `Object.freeze` ile dondurmaz. Bu dersi ilerleyen immutable veri yapılarına genişletmiyoruz.
+
+## 6. Sınır durumları ve TypeScript farkı
+
+Mutation **her zaman yanlış** değildir. Bazı API'ler bilinçli olarak input'larını günceller. Hata, bunun sözleşmeden anlaşılmaması veya yanlış object'in değiştirilmesidir.
+
+Bir function çıktı array'i oluştursa bile içeriğe input object'leri push ederse element mutation'ı input'a yansıyabilir. Bu, output array identity'sinden bağımsızdır.
+
+TypeScript `void` veya `readonly` kullanımı tüm dış etkilerin matematiksel olarak yokluğunu kanıtlamaz.
+
+## 7. Debugging — yanlış davranışı izlemek
+
+Belirti: Bir testin sonucu sonraki testi etkiliyor. Shared fixture object'i mutate edilmiş olabilir. İlk testten önce ve sonra object state'ini karşılaştır; aynı reference farklı testler arasında taşınıyor mu? Hata tekrar üretildikten sonra mutation yapılan property'yi bul. Gereksinim pure-like dönüşüm istiyorsa yeni object oluştur ve identity testini yaz.
+
+## 8. Mülakat ve pekiştirme
+
+**Question:** What is the difference between reassignment and mutation? **Answer:** Reassignment changes which value a variable binding holds; mutation changes the state of an existing object.
+
+**Question:** Can a void function have side effects? **Answer:** Yes, it may mutate inputs or perform I/O even when it returns no useful value.
+
+**Pekiştirme:** `const` neden `account.enabled=false` kodunu engellemez? `disabledCopy` niçin input'u değiştirmez? `readonly` çalışma anında freeze sağlar mı?
+
+<details><summary>Kontrol cevapları</summary>
+
+Const yalnız rebinding'i engeller; yeni object literal input'tan ayrı object yaratır; readonly static kontrollere ilişkindir.
+
+</details>
