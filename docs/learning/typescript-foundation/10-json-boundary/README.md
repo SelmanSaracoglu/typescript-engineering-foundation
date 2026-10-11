@@ -12,7 +12,7 @@ Bu geçerli JSON'dur ama beklediğimiz `Product` modelindeki `id` ve `price` ala
 
 ## 2. Pedagojik öğrenme sırası
 
-| Sıra | Ders | Kazanım | Önkoşul |
+| Sıra | Ders | Kazanım | Kavram |
 |---|---|---|---|
 | 14 | JSON Fundamentals | JSON metni ile runtime object'i ayır; sözdizimini oku. | Object, array, primitive türler |
 | 15 | JSON.stringify — Serialization | Metne dönüşümü, veri kaybını ve hata ihtimalini açıkla. | JSON Fundamentals |
@@ -119,7 +119,7 @@ Test seçimi **gözlenebilir dış davranışa** dayanmalıdır. Implementation 
 
 **Türkçe karşılığı:** Önce JSON'u parse ederim. Sözdizimi hatalarını ayrı ele alırım. Sonucu `unknown` kabul edip gerekli property'leri ve runtime tiplerini kontrol ederim. Sonrasında iş kurallarını doğrular, yalnız doğrulanan alanlarla sonucu oluştururum. Başarı ve hata yollarını ayrı test ederim.
 
-## 8. Sözlük ve sonraki adım
+## 8. Sözlük
 
 - **JSON:** Yapılandırılmış veri için metin formatı.
 - **Serialization:** Değer → JSON metni.
