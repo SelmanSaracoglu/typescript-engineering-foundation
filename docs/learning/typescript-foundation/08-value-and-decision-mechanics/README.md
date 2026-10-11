@@ -18,7 +18,7 @@ Bu yedi ders, bu hataların **neden** gerçekleştiğini anlamamız için birbir
 
 ## 2. Öğrenme sırası ve dersler
 
-| Sıra | Ders | Ne öğrenilecek? | Önkoşul |
+| Sıra | Ders | Ne öğrenilecek? | Kavram |
 |---|---|---|---|
 | 1 | Equality | `===`, `!==`, `==`, `!=`, referans eşitliği | Tipler, değişkenler |
 | 2 | Truthy / Falsy | Koşullar değerleri nasıl yorumlar? | Equality, `if` |
@@ -220,9 +220,3 @@ Bu soruları kod çalıştırmadan çöz. Sonra gerekçeni açıklayabilirsen ö
 7. Bir sonraki case'in statement'ları da çalışabilir.
 8. `retries=0` ve beklenen `0` korunumu testi.
 </details>
-
-## 9. Öğrenme durumu, kanıt ve sonraki bölüm
-
-Bu bölümdeki yedi ders **teorik başvuru kaynakları** olarak hazırlanmıştır. Öğretici örneklerin doğru okunması ile bağımsız kod geliştirme, test çalıştırma, debugging ve başka bir göreve aktarma **aynı başarı ölçütü değildir**. Gerçek uygulama kanıtları I4 çalışma sürecinde, gözlenen yardım seviyesi H0–H4 ile ayrı değerlendirilmelidir.
-
-**Sonraki kavramsal bölüm:** Bölüm 2 — Modern Object & Array Syntax. Bu belgelerin mevcut içeriği daha sonra aynı pedagojik standarda göre yeniden düzenlenecektir.
