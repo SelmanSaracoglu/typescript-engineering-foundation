@@ -1,53 +1,110 @@
-# Vitest: toEqual, toBe, Mutation ve Identity Testleri
+# Ders 18 — Vitest: toEqual, toBe, Mutation ve Identity Testleri
 
-**Önkoşul:** [Bölüm girişi](./README.md). Bu bölümdeki kavramlar önceki eğitim içeriğinin yeniden düzenlenmesidir; yeni framework veya ileri type/module kapsamı değildir.
+## 1. Problemi tanıyalım
 
-## 1. Neden gerekiyor?
-Yalnız structural equality testi, aynı object'in iki collection tarafından paylaşılıp paylaşılmadığını ortaya çıkarmaz.
+“Sonuç doğru görünüyor” ile “sonuç input'tan bağımsız object'ler taşıyor” iki farklı gereksinimdir. Testte yalnız içerik karşılaştırması yaparsak element identity bug'ını kaçırabiliriz.
 
-## 2. Kavram ve sözleşme
-`toEqual` **yapı/değer** eşitliği, `toBe` object ve array üzerinde **referans identity** kontrolüdür. İlk assertion sonucu doğru gösterir. İkinci yeni dış array'i, üçüncü yeni element object'ini doğrular. Son assertion, result üzerinde mutation yapıldıktan sonra input'un etkilenmediğini gözler. Bunlar birbirini tamamlar; yalnız yeşil test sayısı yeterli değildir. Örnek, I2'deki `for...of` ve yeni object literal ile kopyalama modelini kullanır; gelecek collections yöntemlerine geçmez.
+## 2. Tanım ve zihinsel model
+
+`toEqual` beklenen yapısal içeriği kıyaslar. Vitest'teki `toBe`, `Object.is` benzeri değer/identity karşılaştırması yapar; object'lerde aynı referansı gerektirir. **Mutation test** sonuç üzerinde değişiklik yapıldıktan sonra input'un etkilenmemesi şartını sınayabilir.
+
+`toBe` ile `===` normal object identity için benzer sonuç verir; `NaN` ve signed zero gibi primitive sınırlarında aynı algoritma değildir.
 
 ## 3. Açıklamalı örnek
+
 ```ts
 import { expect, it } from "vitest";
 
-it("new result objects do not share the input reference", () => {
+it("returns equal content with independent objects", () => {
   const input = [{ name: "Ali", score: 80 }];
-  const output: { name: string; score: number }[] = [];
-  for (const item of input) {
-    output.push({ name: item.name, score: item.score });
+  const result: { name: string; score: number }[] = [];
+  for (const user of input) {
+    result.push({ name: user.name, score: user.score });
   }
 
-  expect(output).toEqual([{ name: "Ali", score: 80 }]);
-  expect(output).not.toBe(input);
-  expect(output[0]).not.toBe(input[0]);
+  expect(result).toEqual([{ name: "Ali", score: 80 }]);
+  expect(result).not.toBe(input);
+  expect(result[0]).not.toBe(input[0]);
 
-  output[0].score = 10;
+  result[0].score = 10;
   expect(input[0].score).toBe(80);
 });
 ```
 
-## 4. Davranış / sınır tablosu
-| Assertion | Hangi soruyu cevaplar? |
+## 4. Veri ve referans akışı
+
+`result` yeni array, içindeki object yeni literal'dir. İlk assertion içerik doğru mu sorusunu cevaplar; ikinci dış array farklı mı, üçüncü element object farklı mı sorusunu cevaplar. Son assertion output'u mutate ederek input'un etkilenmediğini gösterir. **Dört kontrol farklı iddiaları doğrular.**
+
+## 5. Mekanizmanın önemli kullanım durumları
+
+### Yanlış güven: sadece array identity
+
+```ts
+const input = [{ score: 80 }];
+const output = [input[0]];
+console.log(output === input);       // false
+console.log(output[0] === input[0]); // true
+```
+
+Sadece `expect(output).not.toBe(input)` geçer. Ama element izolasyonu **yoktur**.
+
+### Aynı içerik farklı identity
+
+```ts
+const a = [{ score: 80 }];
+const b = [{ score: 80 }];
+console.log(a === b);       // false
+console.log(a[0] === b[0]); // false
+```
+
+Vitest `toEqual` iki yapıyı eşit kabul edebilir. Bu object'ler aynı identity'yi taşımadıkları için `toBe` ile eşleşmez.
+
+### Hangi assertion?
+
+| Gereksinim | Assertion |
 | --- | --- |
-| `toEqual` | Aynı yapı/değer mi? |
-| `not.toBe(input)` | Dış array başka identity mi? |
-| `not.toBe(input[0])` | İç element de yeni mi? |
-| Mutation sonrası input | Dış değişiklik input'u etkiledi mi? |
+| Sonuç içeriği doğru | `toEqual(expected)` |
+| Dış array yeni | `not.toBe(input)` |
+| İç object yeni | `not.toBe(input[0])` |
+| Result mutation input'u etkilemiyor | Değişiklik sonrası `input` beklentisi |
 
-## 5. Hata araştırma ve doğrulama
-Yanlış test: yalnız `expect(output).not.toBe(input)` yazıp element izolasyonu var sanmak. Bug'ı göstermek için `const output=[input[0]]` ile alternatif düşün; dış array yeni olduğu hâlde element aynı kalacaktır. Bu, [04 — New Array vs Elements](./04-new-array-versus-new-elements.md) dersinin test karşılığıdır.
+Yalnız assertion sayısını artırmak kalite değildir; her assertion bir **açık sözleşme**yi test etmelidir.
 
-## 6. Öğretici pratik
-**Önce çalıştırmadan tahmin et:** `output=[input[0]]` iken hangi assertion geçer, hangisi başarısız olur? Mutation testi hangi beklenmeyen side effect'i yakalar?
+### `[]` ve `[{}]`
 
-## 7. Kariyer aktarımı
-Bu mekanizma uygulama kodu, test otomasyonu ve güvenli veri işleme çalışmalarında aynı temel prensibi korur: beklenen davranış, gerçek runtime değer ve doğrulama kanıtını ayrı tutmak.
+```ts
+import { expect, it } from "vitest";
+it("returns no records", () => {
+  const result: object[] = [];
+  expect(result).toEqual([]);
+  expect(result).not.toEqual([{}]);
+});
+```
 
-## 8. Interview preparation
-**Question:** What evidence would distinguish a working example from a verified requirement?  
-**Answer:** A requirement-derived expected outcome, appropriate boundary or negative test, and observed behavior after execution.
+Boş collection, boş object içeren collection değildir.
 
-## 9. Kaynak ve kanıt ayrımı
-[İlk çalışma belgesi](../../../I2-control-flow-functions-data-modeling.md) tarihsel bağlamı korur. Buradaki örnek H0 bağımsızlık/competency kanıtı değildir.
+## 6. Sınır durumları ve TypeScript farkı
+
+Identity izolasyonu her senaryoda gerekli olmayabilir. Bir fonksiyon açıkça var olan object'leri referans olarak döndürmek için tasarlanmışsa `result[0] === input[0]` doğru davranıştır. **Test beklentisi fonksiyon sözleşmesinden çıkar.**
+
+Nested object varsa yeni element literal bile nested reference paylaşabilir. Böyle durumda ayrı nested identity testleri gerekebilir; her kod için otomatik deep copy hedefi koymak yanlış olur.
+
+## 7. Debugging — yanlış davranışı izlemek
+
+Belirti: `toEqual` geçti ama input beklenmedik değişti. 1. Hangi property mutation yaptı? 2. `result[0] === input[0]` true mu? 3. Testte yalnız deep equality mi kontrol ediliyor? 4. Gereksinimin independent copy olup olmadığını doğrula. 5. New object literal ile düzeltip mutation assertion'ı ekle.
+
+**False positive güven:** Teste “does not mutate input” adını vermek yeterli değildir; assertion gerçekten before/after input durumunu gözlemlemelidir.
+
+## 8. Mülakat ve pekiştirme
+
+**Question:** When would you use toEqual rather than toBe? **Answer:** I use toEqual for structural content, and toBe to check reference identity or primitive equality semantics.
+
+**Question:** Can a new array share its element references with the source? **Answer:** Yes; array and element identities must be checked separately.
+
+**Pekiştirme:** `[input[0]]` ile yeni array üretildiğinde hangi test geçer? `toEqual` neden identity'yi ispatlamaz? Mutation testi hangi davranışı doğrular?
+
+<details><summary>Cevap kontrolü</summary>
+
+Dış array farklıdır; element aynı kalır. Structural equality içerik karşılaştırır. Mutation testi input'un değişmeden kalmasını gözler.
+
+</details>
