@@ -1,39 +1,96 @@
-# Conditions, Multiple Conditions ve Branch Seçimi
+# Ders 11 — Multiple Conditions: Doğru Branch Nasıl Seçilir?
 
-**Önkoşullar:** [Functions ve return](../03-functions-fundamentals/README.md), [Bölüm 04 giriş](./README.md).  [Sonraki](./02-for-of-iteration-over-arrays.md)
+## 1. Problem ve gereksinim
 
-## 1. Neden bu derse ihtiyacımız var?
-Tek bir sayısal kontrol kolay görünebilir; iki veya daha çok gereksinim aynı anda geçerli olduğunda hangi branch'in seçileceğini adım adım okumak gerekir.
+Tek bir `if` çok basit görünür. Ancak “kullanıcı aktif olacak, skoru en az 60 olacak; devre dışıysa ayrıca sebep gösterilecek” gibi bir gereksinimde kararların **önceliği** sonucu etkiler. Bir branch'in çalışıp return etmesi, sonraki condition'ların hiç değerlendirilmemesine neden olabilir.
 
-## 2. Tanım ve mekanizma
-Condition, boolean bağlamda değerlendirilen ifadedir. Multiple conditions `&&`, `||` gibi operatörlerle birleştirilir. `if`, `else if`, `else` zinciri ilk uygun dalı seçer; birden fazla bağımsız `if` farklı davranabilir.
+## 2. Kavram / çalışma modeli
 
-## 3. Açıklamalı, çalıştırılabilir örnek
+Bir condition boolean bağlamda değerlendirilir. `if / else if / else` **zinciri** ilk uygun branch'e göre yürür; bağımsız iki `if` ayrı ayrı çalışabilir. `&&` iki koşulu, `||` alternatif koşulları, `!` boolean'ın tersini ifade eder. Bu derste operandlarımız boolean karşılaştırmalardır; `&&` ve `||` için JavaScript'in genel operand-döndürme ayrıntısına geçmiyoruz.
+
+## 3. Açıklamalı TypeScript örneği
+
 ```ts
 type Candidate = { active: boolean; score: number };
-function decision(candidate: Candidate): string {
-  if (!candidate.active) return "inactive";
-  if (candidate.score >= 60) return "qualified";
+function classify(user: Candidate): string {
+  if (!user.active) {
+    return "inactive";
+  }
+  if (user.score >= 60) {
+    return "qualified";
+  }
   return "below-threshold";
 }
-console.log(decision({ active: false, score: 100 })); // inactive
-console.log(decision({ active: true, score: 60 }));   // qualified
-console.log(decision({ active: true, score: 59 }));   // below-threshold
+
+console.log(classify({ active: false, score: 100 })); // inactive
+console.log(classify({ active: true, score: 60 }));   // qualified
+console.log(classify({ active: true, score: 59 }));   // below-threshold
 ```
 
-## 4. Veri/çalıştırma akışı
-1. `active=false` olan kayıt ilk dalda döner; skor 100 olsa da önem taşımaz. 2. Aktif, skor 60 olan kayıt ikinci dalda döner. 3. Aktif, skor 59 olan kayıt iki koşuldan da çıkmayıp sona ulaşır. Her return yalnız o çağrıyı sonlandırır.
+## 4. Iteration ve execution trace
 
-## 5. Önceki konularla fark ve TypeScript bağlantısı
-`candidate.active && candidate.score >= 60` koşulu qualified seçimini kısa yazabilir; fakat ayrı return'lar **hangi nedenle reddedildiğini** görünür kılar. Operatörün truthiness ve short-circuit mekanizması 08'de öğretilir.
+İlk çağrıda `!user.active` true olduğu için "inactive" döner. Skor 100 olsa bile ikinci kontrol **çalışmaz**. İkinci çağrıda inactive branch'i geçilir; skor 60 eşit sınır olduğu için qualified olur. Üçüncü çağrıda iki kontrol de return etmediği için son satır below-threshold döner.
 
-## 6. Sınır durumları, hata ve test tasarımı
-Sadece 80 puanlı aktif örnekle test yazmak `active=false` veya tam 60 sınırındaki hatayı yakalamaz. Test matrisi: `(false,100) → inactive`, `(true,59) → below`, `(true,60) → qualified`, `(true,90) → qualified`.
+| active | score | İlk check | Skor check | Sonuç |
+| --- | ---: | --- | --- | --- |
+| false | 100 | true | çalışmaz | inactive |
+| true | 59 | false | false | below-threshold |
+| true | 60 | false | true | qualified |
+| true | 100 | false | true | qualified |
 
-## 7. Mülakat ve pekiştirme
-**Question:** How can a loop silently omit valid records? A misplaced early return may terminate the function before the remaining iterations.
+## 5. İkinci örnek ve mekanizmanın sınırı
 
-Skor 59 ve active=false için hangi return çalışır? İkinci if ilkinden önce yazılsaydı ne bozulabilirdi?
+**Sırayı ters yazmanın etkisi:**
 
-## 8. Kanıt ve kaynak
-Özgün I2 içerik kaynağı: [I2 Control Flow, Functions & Data Modeling](../../../I2-control-flow-functions-data-modeling.md). Bu ders yeni bir Increment uygulaması veya H0 yeterlilik gözlemi değildir.
+```ts
+function wrong(user: Candidate): string {
+  if (user.score >= 60) return "qualified";
+  if (!user.active) return "inactive";
+  return "below-threshold";
+}
+console.log(wrong({ active: false, score: 100 })); // qualified: yanlış!
+```
+
+Kullanıcı inactive olsa bile skor 100 kontrolü önce seçildi. Bu, TypeScript type error değildir; iş kuralına aykırı kontrol sırası bug'ıdır.
+
+**Bağımsız iki if:**
+
+```ts
+const active = true;
+const score = 100;
+if (active) console.log("active");
+if (score >= 60) console.log("qualified");
+// active
+// qualified
+```
+
+Burada iki mesaj da istenebilir. Yalnız bir sınıf dönecekse return'lü zincir daha uygun olur.
+
+**Birleşik koşul:**
+
+```ts
+const allowed = active && score >= 60;
+console.log(allowed); // true
+```
+
+`false && ...` durumunda sağ operand değerlendirilmez (short-circuit). Bu kod iki kontrolü yalnız **tek boolean sonuçta** birleştirir; inactive ve low-score gibi farklı hata nedenlerini ayrı raporlamaz.
+
+## 6. Kritik ayrımlar ve sınır durumları
+
+**Sınır:** `score=59`, `60`, `61` için `>=` ile `>` farkını kontrol et. **Boş/yanlış veri:** TypeScript `Candidate` tipi dış girdinin runtime biçimini otomatik doğrulamaz; bu dersin koşulları doğru tipte object'e uygulanır. **Öncelik:** Stok/aktiflik gibi hard-stop kararlarını gereksinim önceliğine göre sıralamak gerekir. **Negation:** `!user.active` active boolean false olduğunda true olur; tersini yazarsan dal anlamı değişir.
+
+## 7. Debugging — kontrollü hata araştırması
+
+Belirti: 100 puanlı inactive kullanıcı qualified dönüyor. Hipotez: skor branch'i önce çalışıyor. Debugger ile `score>=60` true olduğunda return satırına ulaşılıp ulaşılmadığına bak. Minimal düzeltme: inactive guard'ını öne al. Regression: inactive/100, active/59, active/60 ve active/100 test et. Rastgele bütün condition'ları `&&` ile birleştirme; hata açıklaması da gereksinimin parçası olabilir.
+
+## 8. Mülakat ve cevaplı pekiştirme
+
+**Question:** Why can changing the order of if statements change behavior? **Answer:** An early return ends the invocation, so later checks may never execute.
+
+**Kendi kendine:** (1) active=false, score=10 sonucu? (2) active=false, score=100 için yanlış sürümün hatası? (3) Tek boolean sonuçla hata nedeni bilgisi korunabilir mi? (4) `score > 60` yazılsaydı tam 60 ne olurdu?
+
+<details><summary>Kontrol cevapları</summary>
+
+1. inactive. 2. Qualified diye yanlış kabul eder. 3. Hayır; tek true/false sonuç sebebi ayırmaz. 4. Qualified yerine below-threshold döner.
+
+</details>
