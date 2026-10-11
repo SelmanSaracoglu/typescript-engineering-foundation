@@ -1,8 +1,5 @@
 # Ders 7 — `switch`, `case`, `break`, `return` ve fall-through
 
-> **Öğrenme yolu:** [Dizin](../README.md) → [Bölüm 1](./README.md)  
-> **Önkoşul:** [Strict equality](./01-equality.md), `if/else`, fonksiyonlarda `return` ve [Ternary](./06-ternary.md).
-
 ## 1. Switch hangi sorunu çözer?
 
 Aynı değişkenin birden fazla olası değerine göre farklı davranış seçmek isteyebiliriz. Örneğin ödeme durumları:
@@ -268,6 +265,4 @@ function eventAction(status: EventStatus): string {
 
 ## 12. Bölüm kapanışı
 
-Equality, truthiness, logical operators, short-circuit, nullish coalescing, ternary ve switch artık tek bir **karar akışı** içinde birbirine bağlanabilir. [Bölüm 1 README](./README.md) birikimli örnek, test matrisi ve genel mülakat yanıtıyla bu bağlantıyı pekiştirir.
-
-> **Kanıt:** Bu belge öğretim kaynağıdır; testlerin çalıştırıldığı veya bağımsız yeterliliğin kanıtlandığı iddiası değildir.
+Equality, truthiness, logical operators, short-circuit, nullish coalescing, ternary ve switch artık tek bir **karar akışı** içinde birbirine bağlanabilir. Bölüm 1 README birikimli örnek, test matrisi ve genel mülakat yanıtıyla bu bağlantıyı pekiştirir.
