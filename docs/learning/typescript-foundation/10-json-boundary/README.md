@@ -3,6 +3,11 @@
 > **Öğrenme dizini:** [JavaScript / TypeScript modüler eğitim](../README.md)  
 > **Bölüm amacı:** Bir JSON metnini okumakla, uygulamanın güvenle kullanacağı veriyi elde etmek arasındaki farkı anlamak.
 
+## Önkoşullar ve birikimli bağlantı
+
+JSON syntax, serialize/parse davranışı bu bölümün yeni katkısıdır. `JSON.parse()` çıktısının doğrulanmamış değer olması ve doğru TypeScript modele taşınması için önce [07 — Safe Runtime Boundaries](../07-safe-runtime-boundaries/README.md) öğrenilmelidir. Burada validation açıklaması o bölümü uygulamaya bağlar, bağımsız ikinci bir type-validation müfredatı kurmaz.
+
+
 ## 1. Bu bölüm neyi çözüyor?
 
 JavaScript kodunun kendi oluşturduğu object'lerle çalışması başka, metin olarak aldığı bir verinin **doğru olduğuna güvenmesi** başka bir problemdir. Örneğin bir JSON dosyasında aşağıdaki satır bulunabilir:
