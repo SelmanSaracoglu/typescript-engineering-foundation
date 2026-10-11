@@ -240,4 +240,3 @@ Bu yapıyı görünce **JSON olarak yazılmış veri** olduğunu bilmelisin. `"p
 
 </details>
 
-## 10. Bir sonraki ders ve kanıt sınırı
