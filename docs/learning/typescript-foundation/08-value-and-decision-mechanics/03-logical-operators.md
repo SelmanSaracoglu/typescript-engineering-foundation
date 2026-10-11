@@ -190,7 +190,3 @@ Bu tablo koddan *önce* yazılabilir. Özellikle üçüncü satır, eksik parant
 3. İlk ifade `true`, doğru gruplanmış ifade `false`.
 4. `&&` ilk falsy operandı, yoksa son operandı döndürür; ikinci operand `"ready"`.
 </details>
-
-## 10. Sonraki ders
-
-Bir mantıksal operatörün sağ tarafındaki fonksiyon **her zaman çağrılır mı?** Ders 4 — Short-Circuit Evaluation bunun çalışma zamanındaki karşılığını gösterir.
