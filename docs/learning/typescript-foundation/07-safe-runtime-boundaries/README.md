@@ -2,6 +2,13 @@
 
 **Önkoşul:** [06](../06-typescript-modeling/README.md). **Sonraki:** [08](../08-value-and-decision-mechanics/README.md). JSON text/parsing ayrıntısı için [10](../10-json-boundary/README.md).
 
+## Ayrıntılı dersler
+
+1. [External Input ve Trust Boundary](./01-external-input-trust-boundary.md)
+2. [Property Existence ve Runtime Type Validation](./02-property-existence-and-types.md)
+3. [Discriminated Result Union: Valid ve Invalid Sonuçlar](./03-discriminated-results.md)
+4. [return, throw, Error ve Exception Akışı](./04-return-versus-throw-and-exceptions.md)
+
 ## Neden?
 Compile-time type yalnız geliştirici beklentisidir. Kullanıcıdan, dosyadan veya JSON'dan gelen veri başka bir gerçek runtime shape'ine sahip olabilir.
 
