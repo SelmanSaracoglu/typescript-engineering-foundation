@@ -2,6 +2,12 @@
 
 **Başlangıç:** Önkoşul yok. **Sonraki:** [02 — Values & Variables](../02-values-variables-basic-decisions/README.md).
 
+## Ayrıntılı dersler
+
+1. [Source, Type Checking, Build ve Runtime](./01-source-check-build-run.md)
+2. [Type, Runtime ve Logic Hatalarını Ayırmak](./02-type-runtime-logic-errors.md)
+3. [Node.js, npm, npx, Script ve Program Çıktısı](./03-node-npm-scripts-and-output.md)
+
 ## Neden?
 TypeScript kodundaki type hatası, çalışan JavaScript'teki exception ve yanlış iş sonucu farklı problemdir. Bunları ayırabilmek debugging'in ilk adımıdır.
 
