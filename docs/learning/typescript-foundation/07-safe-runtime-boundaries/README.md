@@ -52,4 +52,4 @@ function safeDivide(a: number, b: number): number | null {
 
 **Mülakat:** *When should a function return a failure result instead of throwing?* Beklenen, yönetilebilir başarısızlık normal result olabilir; exception olağan akışı kesen durumlar içindir.
 
-**Pekiştirme:** `null`, `[]`, `{}`, eksik name, name=123 için hangi kontrol reddeder? Kaynak [I3](../../I3-safe-types-runtime-boundaries.md).
+**Pekiştirme:** `null`, `[]`, `{}`, eksik name, name=123 için hangi kontrol reddeder? Kaynak [I3](../../../I3-safe-types-runtime-boundaries.md).
