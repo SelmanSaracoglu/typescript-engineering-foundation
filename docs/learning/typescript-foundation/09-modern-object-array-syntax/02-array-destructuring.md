@@ -1,9 +1,5 @@
 # Ders 9 — Array Destructuring: Pozisyona Göre Değer Çıkarma
 
-> **Öğrenme yolu:** [JavaScript dizini](../README.md) → [Bölüm 2](./README.md)  
-> **Önkoşul:** Array, index, `undefined`, [Object Destructuring](./01-object-destructuring.md).  
-> **Hedef:** Array destructuring'in sıra temelli olduğunu açıklamak; atlama, default, nested referans ve fonksiyon dönüşlerini doğru yorumlamak.
-
 ## 1. Ne problemi çözüyor?
 
 Array'den birkaç değer okumak için index kullanabiliriz:
@@ -180,7 +176,7 @@ console.log(first);     // 10
 console.log(remaining); // [20, 30, 40]
 ```
 
-Bu yeni sözdiziminin adı **Rest Syntax**'tır. Görevi `remaining` array'inde kullanılmayan değerleri toplamaktır. Tam mantığını [Ders 11](./04-rest.md)'de öğreneceğiz. Dış array yenidir, fakat nested object'ler referanslarını paylaşabilir.
+Bu yeni sözdiziminin adı **Rest Syntax**'tır. Görevi `remaining` array'inde kullanılmayan değerleri toplamaktır. Tam mantığını Ders 11'de öğreneceğiz. Dış array yenidir, fakat nested object'ler referanslarını paylaşabilir.
 
 ## 9. Gerçekçi örnek: Test sonucu çiftini okumak
 
@@ -226,10 +222,3 @@ Hayır. Okuma işlemi orijinal array'i silmez veya küçültmez.
 5. Üç pozisyon döndüren tuple mı, isimli object mi daha okunur? Gerekçelendir.
 
 **Kısa kontrol:** (2) `a=0`, `b=6`; (3) array'in ilk object elemanını; (4) `[null, "INVALID_PORT"]` ve `[65535, "OK"]`.
-
-**Sonraki ders:** [Spread Syntax](./03-spread.md). **Kanıt:** Ders notları tek başına bağımsız implementation veya test başarısı değildir.
-
-
----
-
-> **Kalıcı müfredat notu:** Bu ders [TypeScript Foundation öğrenme rotasının](../README.md) parçasıdır. Dokümandaki önceki Increment/yardım durumları tarihsel bağlamdır; güncel bağımsız yeterlilik kanıtı değildir.
