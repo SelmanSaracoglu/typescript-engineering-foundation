@@ -42,4 +42,4 @@ Bir test yanlış sayısal sonuç veriyorsa önce derleme hatası aramayın: inp
 
 **Kendi kendine:** `npm run build` geçerse uygulamanın doğru olduğunu neden söyleyemeyiz? `console.log` ile runtime farkı nedir?
 
-Kaynak: [I1 execution model](../../I1-execution-model.md). Bu dosya öğrenme materyalidir, yeterlilik kaydı değildir.
+Kaynak: [I1 execution model](../../../I1-execution-model.md). Bu dosya öğrenme materyalidir, yeterlilik kaydı değildir.
