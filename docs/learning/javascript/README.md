@@ -17,9 +17,9 @@ Bu dizin Increment teslimatlarına göre değil, **kavramsal önkoşul ve öğre
 
 ## Belge kalitesi ve revizyon durumu
 
-**Bölüm 1 ve Bölüm 3**, yeni başlayanların kavramı geri dönüp yeniden öğrenebilmesine yönelik kapsamlı teknik ders kaynakları olarak düzenlendi: neden gerekli → tanım → mekanizma → açıklamalı kod → kritik ayrımlar → hata/debugging → mülakat → pekiştirme.
+**Bölüm 1, Bölüm 2 ve Bölüm 3**, yeni başlayanların kavramları geri dönüp yeniden öğrenebilmesine yönelik kapsamlı teknik ders kaynakları olarak düzenlendi: neden gerekli → tanım → mekanizma → açıklamalı kod → kritik ayrımlar → hata/debugging → mülakat → pekiştirme.
 
-**Bölüm 2** hâlen önceki kısa sürümüdür. Aynı pedagojik seviyeye getirilmesi için ayrıca revizyon gerektirir; dizinde bulunması bütün bölümlerin içerik kalitesinin eşit olduğu anlamına gelmez.
+**Dokümantasyon tamamlandı, ancak bağımsız uygulama yeterliliği doğrulanmadı.** I4 teorik dersleri ile modüler ders dokümantasyonu hazır; repo üzerinde yeni, öğrenci tarafından geliştirilmiş uygulama, test, debugging ve bağımsız transfer kanıtı ayrıca gereklidir.
 
 ## Tarihsel çalışma ve kanıt
 
