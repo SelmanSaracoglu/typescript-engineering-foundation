@@ -116,3 +116,52 @@ Belirti: Result içindeki user güncellenince source user da değişiyor. 1. `re
 Evet; dış array ayrı, element referansı aynı olabilir. Element üzerinde mutation her iki array'den görünür. Spread shallow'dur, nested profile paylaşılır.
 
 </details>
+
+## 9. Düz ve nested copy sözleşmeleri farklıdır
+
+```ts
+type User = { id:number; profile:{city:string} };
+const input: User[] = [
+  {id:1,profile:{city:"Berlin"}}
+];
+const copied = [
+  {id:input[0].id,profile:input[0].profile}
+];
+console.log(copied === input);              // false
+console.log(copied[0] === input[0]);        // false
+console.log(copied[0].profile === input[0].profile); // true
+copied[0].profile.city = "Duisburg";
+console.log(input[0].profile.city); // Duisburg
+```
+
+Burada yeni dış array **ve** yeni element object oluşturduk, fakat `profile` nested reference olarak taşındı. Demek ki element düzeyinde identity izolasyonu, nested property izolasyonunu otomatik sağlamaz.
+
+### Üç düzeyli identity testi
+
+| Nesne düzeyi | Ortak mı? | Kontrol |
+| --- | --- | --- |
+| Array | Hayır | `copied !== input` |
+| Element object | Hayır | `copied[0] !== input[0]` |
+| Nested profile | Evet | `copied[0].profile === input[0].profile` |
+
+İzolasyon hedefi nested seviyeye kadar uzanıyorsa yeni nested object de üretmek gerekir:
+
+```ts
+const independent = [{
+  id: input[0].id,
+  profile: {city:input[0].profile.city}
+}];
+console.log(independent[0].profile === input[0].profile); // false
+```
+
+Bu basit nested model içindir. Bütün karmaşık veri grafiğini otomatik derin kopyalamak başka tasarım sorusudur.
+
+### Bağımsız aktarım
+
+`settings.theme.colors.primary` gibi iç içe veri düşünüp hangi seviyedeki referansın paylaşıldığını çiz. Dış object'i kopyalamak yeterli mi? Kopyalamanın sınırını gereksinime göre açıkla.
+
+<details><summary>Kontrol</summary>
+
+Dış kopya nested referansları paylaşabilir; istenen izolasyon seviyesine göre nested object üretimi gerekir.
+
+</details>
