@@ -142,3 +142,57 @@ Debugging'de “değer niye değişmedi?” sorusunun cevabı çoğu zaman **yan
 1. passed, 80, 50. 2. Hayır. 3. Yeniden declaration varsa ayrı binding; yoksa uygun scope'taki mevcut binding güncellenebilir. 4. Evet, farklı block scope'ları vardır.
 
 </details>
+
+## 10. Rehberli örnek: aynı isim neden farklı sonuç verir?
+
+```ts
+let result = 10;
+function update(): void {
+  let result = 20;
+  result += 5;
+  console.log(result); // 25
+}
+update();
+console.log(result); // 10
+```
+
+Buradaki iç `let result` **ayrı bir binding** oluşturduğu için dış result 10 kalır. Şimdi iç declaration'ı kaldır:
+
+```ts
+let result = 10;
+function update(): void {
+  result += 5;
+}
+update();
+console.log(result); // 15
+```
+
+İkinci örnekte function outer binding'e erişip onu değiştirir. **Yalnız bir kelimelik declaration farkı**, side effect oluşturup oluşturmamayı değiştirir.
+
+### Temporal dead zone sınırı
+
+```ts
+// Bilerek çalıştırılmaması gereken örnek:
+// console.log(status); // ReferenceError / TypeScript uyarısı
+// const status = "ready";
+```
+
+`let` ve `const` için declaration öncesi erişim güvenilir “undefined” okuma yöntemi değildir. Scope içine dahil olmak ve **initialized olmak** aynı şey değildir.
+
+### Shadowing test tablosu
+
+| Yapılan işlem | Outer result | Inner result |
+| --- | ---: | ---: |
+| Inner `let result=20` | 10 | 20 |
+| Inner `result += 5` | 10 | 25 |
+| Inner declaration yok, outer'a +5 | 15 | ayrı inner binding yok |
+
+### Bağımsız görev
+
+İç block'ta `const account={score:10}` tanımlandığında dış block'ta aynı adlı `account` varsa hangisi okunur? Eğer inner object property mutate edilirse dış account object mutlaka değişir mi?
+
+<details><summary>Kontrol</summary>
+
+En yakın scope'taki binding okunur. Inner ve outer farklı object literal'leriyle yaratılmışsa dış object etkilenmez; aynı referansı taşıyorlarsa etkilenebilir. Scope ile object identity farklı kavramlardır.
+
+</details>
