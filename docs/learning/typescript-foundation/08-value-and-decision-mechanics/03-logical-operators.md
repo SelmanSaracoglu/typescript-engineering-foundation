@@ -1,8 +1,5 @@
 # Ders 3 — Logical Operators: `&&`, `||`, `!`
 
-> **Öğrenme yolu:** [Dizin](../README.md) → [Bölüm 1](./README.md)  
-> **Önkoşul:** [Equality](./01-equality.md) ve [Truthy/Falsy](./02-truthy-falsy.md).
-
 ## 1. Neden mantıksal operatörlere ihtiyacımız var?
 
 İş gereksinimleri sıklıkla **birden fazla koşul** içerir:
@@ -196,11 +193,4 @@ Bu tablo koddan *önce* yazılabilir. Özellikle üçüncü satır, eksik parant
 
 ## 10. Sonraki ders
 
-Bir mantıksal operatörün sağ tarafındaki fonksiyon **her zaman çağrılır mı?** [Ders 4 — Short-Circuit Evaluation](./04-short-circuit.md) bunun çalışma zamanındaki karşılığını gösterir.
-
-> **Kanıt:** Bu sayfa teorik eğitim materyalidir; bağımsız kod/test sonucu değildir.
-
-
----
-
-> **Kalıcı müfredat notu:** Bu ders [TypeScript Foundation öğrenme rotasının](../README.md) parçasıdır. Dokümandaki önceki Increment/yardım durumları tarihsel bağlamdır; güncel bağımsız yeterlilik kanıtı değildir.
+Bir mantıksal operatörün sağ tarafındaki fonksiyon **her zaman çağrılır mı?** Ders 4 — Short-Circuit Evaluation bunun çalışma zamanındaki karşılığını gösterir.
