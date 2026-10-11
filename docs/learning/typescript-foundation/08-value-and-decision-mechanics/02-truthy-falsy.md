@@ -124,7 +124,7 @@ console.log(hasNonBlankUsername("   "));    // false
 console.log(hasNonBlankUsername(null));     // false
 ```
 
-Burada `&&` gördük: ilk kontrol false olduğunda `.trim()` değerlendirilmez. Bu, bir sonraki derslerde ele alacağımız *short-circuit* davranışıdır.
+Burada `&&` gördük: ilk kontrol false olduğunda `.trim()` değerlendirilmez. Bu, *short-circuit* (kısa devre) davranışıdır: ilk koşul sonucu belirlediğinde ikinci ifade değerlendirilmez.
 
 ## 7. TypeScript kontrol akışı ile bağlantı
 
@@ -189,6 +189,3 @@ Bu tablo, **truthiness ile iş gereksiniminin aynı şey olmadığını** göste
 4. `typeof x === "string" && x.trim().length > 0`.
 </details>
 
-## 11. Öğrenme bağlantısı
-
-Truthy/falsy bilgisi, Ders 3 — Logical Operators ve Ders 4 — Short-Circuit için önkoşuldur. Daha sonra `||` ile `??` arasındaki farkı anlamamızı sağlayacak.
