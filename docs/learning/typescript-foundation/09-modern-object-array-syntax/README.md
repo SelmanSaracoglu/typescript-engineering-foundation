@@ -1,13 +1,4 @@
-# Bölüm 2 — Modern Object & Array Syntax: Veriyi Okuma, Yeniden Kurma ve Güvenli Erişim
-
-> **Öğrenme yolu:** [JavaScript / TypeScript dizini](../README.md)  
-> **Önkoşul:** [Bölüm 1 — Value & Decision Mechanics](../08-value-and-decision-mechanics/README.md).  
-> **Amaç:** Object/array verisini güvenle okuyabilmek; spread/rest arasındaki farkı, referans paylaşımını, opsiyonel erişimi ve string üretimini açıklayıp doğru araç seçebilmek.
-
-## Önkoşullar ve birikimli bağlantı
-
-Destructuring/rest/spread öncesi [05 — reference identity, mutation ve new array ≠ new elements](../05-objects-arrays-references/README.md) okunmalıdır. **Shallow copy** kuralının kaynağı bu identity modelidir; `{...obj}` dış yapıyı kopyalasa da nested object referansı paylaşılabilir. Optional chaining için [06 — optional/nullish](../06-typescript-modeling/README.md), `??` için [08](../08-value-and-decision-mechanics/README.md) önkoşuldur.
-
+# 09 — Modern Object & Array Syntax
 
 ## 1. Bu bölüm hangi sorunu çözüyor?
 
@@ -26,12 +17,12 @@ Bunları rastgele daha kısa kod üretmek için değil, **hangi mekanizma hangi 
 
 | Ders | Konu | Öğrencinin açıklayacağı davranış | Önkoşul |
 |---|---|---|---|
-| 8 | [Object Destructuring](./01-object-destructuring.md) | Property adına göre alan seçimi, alias, `undefined` default, nested referans | Object, property, reference |
-| 9 | [Array Destructuring](./02-array-destructuring.md) | Sıraya göre eşleştirme, skip, default ve tuple | Array/index, Ders 8 |
-| 10 | [Spread Syntax](./03-spread.md) | Array/object yayma, son-yazılan-property, shallow copy | Ders 8–9, mutation |
-| 11 | [Rest Syntax](./04-rest.md) | Kalanları toplama, rest parameter, spread karşılaştırması | Destructuring, spread, function |
-| 12 | [Optional Chaining](./05-optional-chaining.md) | Nullish erişimde short-circuit, `?.[ ]`, `?.()`, `??` | Bölüm 1 `??`, optional |
-| 13 | [Template Literals](./06-template-literals.md) | Backtick, interpolation, expression, string dönüşümü, multiline | Expression, ternary, `??` |
+| 8 | Object Destructuring | Property adına göre alan seçimi, alias, `undefined` default, nested referans | Object, property, reference |
+| 9 | Array Destructuring | Sıraya göre eşleştirme, skip, default ve tuple | Array/index, Ders 8 |
+| 10 | Spread Syntax | Array/object yayma, son-yazılan-property, shallow copy | Ders 8–9, mutation |
+| 11 | Rest Syntax | Kalanları toplama, rest parameter, spread karşılaştırması | Destructuring, spread, function |
+| 12 | Optional Chaining | Nullish erişimde short-circuit, `?.[ ]`, `?.()`, `??` | Bölüm 1 `??`, optional |
+| 13 | Template Literals | Backtick, interpolation, expression, string dönüşümü, multiline | Expression, ternary, `??` |
 
 **Çalışma yöntemi:** Önce ilgili dersin kavram ve mekanizmasını oku; kodun çıktısını bakmadan tahmin et; karşılaştırma ve debugging kısmında neden farklı sonuç oluştuğunu açıkla; mülakat cevabını kendi cümlenle anlatmayı dene.
 
@@ -205,9 +196,4 @@ Bu örnekten nasıl akıl yürütürsün?
 - **Nullish fallback:** `??` ile `null`/`undefined` için alternatif.
 - **Interpolation:** `${...}` içindeki expression sonucunu string'e yerleştirme.
 
-**Sıradaki teori:** [Bölüm 3 — JSON Boundary](../10-json-boundary/README.md). **Gerçek uygulama:** Aktif I4 iş akışında TypeScript implementation, Vitest, debugging ve bağımsız transfer ayrıca doğrulanmalıdır. Belgeleri okumak H0–H4 yeterlilik kararı değildir.
-
-
----
-
-> **Kalıcı müfredat notu:** Bu ders [TypeScript Foundation öğrenme rotasının](../README.md) parçasıdır. Dokümandaki önceki Increment/yardım durumları tarihsel bağlamdır; güncel bağımsız yeterlilik kanıtı değildir.
+**Sıradaki teori:** Bölüm 3 — JSON Boundary. **Gerçek uygulama:** Aktif I4 iş akışında TypeScript implementation, Vitest, debugging ve bağımsız transfer ayrıca doğrulanmalıdır. Belgeleri okumak H0–H4 yeterlilik kararı değildir.
