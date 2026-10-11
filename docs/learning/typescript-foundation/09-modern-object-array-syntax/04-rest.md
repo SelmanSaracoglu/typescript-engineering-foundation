@@ -1,9 +1,5 @@
 # Ders 11 — Rest Syntax: Kalan Değerleri Toplamak
 
-> **Öğrenme yolu:** [JavaScript dizini](../README.md) → [Bölüm 2](./README.md)  
-> **Önkoşul:** Array/object destructuring, fonksiyon parametresi/argümanı, [Spread](./03-spread.md).  
-> **Hedef:** Rest'in üç kullanım yerini ve Spread'den neden farklı olduğunu anlatmak; bilinmeyen sayıda argümanla doğru tipler kullanmak.
-
 ## 1. `...` aynıysa neden iki isim var?
 
 Spread ve Rest ikisi de üç nokta `...` kullanır. Fakat görevleri birbirinin tersidir:
@@ -224,5 +220,3 @@ Burada `details.length === 0` geçerli boş-array durumunu ele alır. `if (detai
 5. Rest kullanarak ilk elemanı ayıran, kalan değerlerin toplamını hesaplayan fonksiyon tasarla.
 
 **Kısa kontrol:** (1) `a=1`, `b=[2,3]`; (2) ilki ayrı argümanlara açar, ikincisi array'i tek argüman verir ve `number[]` rest sözleşmesine uymaz; (3) `["B","C"]`.
-
-**Sonraki ders:** [Optional Chaining](./05-optional-chaining.md). **Kanıt:** Öğretim notu bağımsız repo geliştirme/test başarısı sayılmaz.
