@@ -1,9 +1,5 @@
 # Ders 1 — Equality: `===`, `!==`, `==`, `!=`
 
-> **Öğrenme yolu:** [JavaScript eğitim dizini](../README.md) → [Bölüm 1](./README.md)  
-> **Önkoşul:** Değişkenler, primitive tipler (`number`, `string`, `boolean`), object ve `typeof`.  
-> **Hedef:** Bir karşılaştırmanın sonucunu ve nedenini açıklamak; tür dönüşümü ile referans eşitliğini ayırt etmek.
-
 ## 1. Equality neden önemli?
 
 Bir uygulama sürekli karar verir: Kullanıcının rolü istenen rol mü? Gelen kimlik numarası kayıtla aynı mı? Testte **actual** ve **expected** aynı mı? Bu sorular yanlış operatörle cevaplanırsa program çalışsa bile **yanlış davranış** üretir.
@@ -183,13 +179,4 @@ Hata ararken şu sırayı izle: iki operandın **runtime değeri**, **typeof son
 3. Tipin nereden dönüştüğünü açık tutar ve boş string/NaN gibi girdilere doğrulama kuralı yazabilirsin.
 </details>
 
-## 10. Sonraki derse bağlantı
-
-Equality bir karşılaştırmadan boolean sonuç üretir. Fakat `if (value)` içindeki değer zaten boolean değilse ne olur? [Ders 2 — Truthy / Falsy](./02-truthy-falsy.md) bu soruyu açıklar.
-
-> **Kanıt sınırı:** Bu belge öğrenme kaynağıdır. Gerçek repo uygulaması, typecheck/Vitest çıktısı ve H0–H4 bağımsızlık gözlemi değildir.
-
-
----
-
-> **Kalıcı müfredat notu:** Bu ders [TypeScript Foundation öğrenme rotasının](../README.md) parçasıdır. Dokümandaki önceki Increment/yardım durumları tarihsel bağlamdır; güncel bağımsız yeterlilik kanıtı değildir.
+Equality bir karşılaştırmadan boolean sonuç üretir. Fakat `if (value)` içindeki değer zaten boolean değilse ne olur? Ders 2 — Truthy / Falsy bu soruyu açıklar.
