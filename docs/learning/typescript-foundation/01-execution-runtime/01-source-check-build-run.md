@@ -1,10 +1,5 @@
 # Ders 1 — TypeScript Source, Type Checking, Build ve JavaScript Runtime
 
-> **Öğrenme yolu:** [TypeScript Foundation](../README.md) → [01 — Execution & Runtime](./README.md)  
-> **Önkoşul:** Yok; `const`, function ve number gibi sözdizimleri örnek içinde açıklanır.  
-> **Hedef:** Bir `.ts` dosyasının neden doğrudan `type` kontrolüyle aynı şey olmadığını, derlenmiş JavaScript'in nasıl çalıştığını ve hangi aşamada hangi hatanın bulunabileceğini açıklamak.  
-> **Sonraki:** [Ders 2 — Type, runtime ve logic hataları](./02-type-runtime-logic-errors.md).
-
 ## 1. Neden bu konuyu öğreniyoruz?
 
 Bir test otomasyonunda `npm test` çalıştırdığını düşün. Kırmızı bir hata gördün. Sorun TypeScript tipinde mi, derlenen dosyada mı, çalıştırılan programda mı, yoksa testin beklediği davranışta mı? Bunlar **ayrı sorular**.
@@ -109,7 +104,7 @@ console.log(addFee(100));
 
 Bu gösterim derleyicinin ürettiği dosyanın karakter karakter kopyası değildir. Gerçek JavaScript çıktısına `target`, `module`, `use strict` veya export mekanizması gibi derleyici seçenekleri etki eder. Önemli olan `: number` bilgisinin **runtime'da bir doğrulama ifadesine dönüşmemesidir**.
 
-> TypeScript'te bir değişkeni `number` ilan etmek, dışarıdan gelen `"100"` string'ini JavaScript çalışırken otomatik olarak number'a çevirmez. Bu, [06 — TypeScript Modeling](../06-typescript-modeling/README.md) ve [07 — Runtime Boundaries](../07-safe-runtime-boundaries/README.md) konularının temelidir.
+**Önemli:** Bir değişkeni `number` ilan etmek, dışarıdan gelen `"100"` string'ini çalışma sırasında otomatik olarak sayıya çevirmez.
 
 ## 5. Bu repository gerçekten nasıl yapılandırılmış?
 
@@ -248,6 +243,3 @@ Bu bir business logic kusuru olurdu; gereksinim gereği negatif değer engellenm
 5. O gereksinimin doğruluğu kanıtlanmış değildir.
 
 </details>
-
-**Sonraki ders:** [Type-check, runtime ve logic bug'ları ayrıştırma](./02-type-runtime-logic-errors.md).  
-**Tarihsel kaynak:** [I1 — Execution Model](../../../I1-execution-model.md). Bu doküman öğretim materyalidir; bağımsız öğrenci uygulaması veya H0 kanıtı değildir.
