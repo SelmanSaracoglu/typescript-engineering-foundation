@@ -125,3 +125,55 @@ Debugging'i kodu rastgele değiştirerek değil **argument → parameter → ope
 1. 20. 2. Hayır, çağrı parametreleri ayrıdır. 3. Biri dış etki, diğeri caller'a verilen değerdir. 4. TypeScript çağrı kontrolü; runtime verisi ayrı sınırdır.
 
 </details>
+
+## 10. Rehberli örnek: iki argument yer değiştirse ne olur?
+
+Şu fonksiyonun parametre adları, caller'ın istediği hesaplama sırasını anlamamıza yardım eder:
+
+```ts
+function remainingBudget(budget: number, spent: number): number {
+  return budget - spent;
+}
+console.log(remainingBudget(120, 30)); // 90
+console.log(remainingBudget(30, 120)); // -90
+```
+
+**Önce tahmin:** İki çağrıda da argument'lar number. Öyleyse TypeScript ikisini de kabul eder. Ama iş anlamları değişir.
+
+| Çağrı | budget | spent | result |
+| --- | ---: | ---: | ---: |
+| `remainingBudget(120,30)` | 120 | 30 | 90 |
+| `remainingBudget(30,120)` | 30 | 120 | -90 |
+
+Bu bir type hatası değil **argument order** kaynaklı davranış hatası olabilir. Parametrelerin adları runtime'da “bu sayı bütçedir” diye doğrulama yapmaz.
+
+### Function tanımından çağrı sonucuna ulaşma
+
+```ts
+function calculate(a: number, b: number): number {
+  const subtotal = a * 2;
+  return subtotal - b;
+}
+const output = calculate(10, 3);
+console.log(output); // 17
+```
+
+1. `a` değeri 10, `b` değeri 3.
+2. `subtotal` 20.
+3. Return expression `20 - 3`.
+4. Caller output bağını 17'ye atar.
+5. Log 17 yazar.
+
+### Test düşüncesi
+
+`calculate(10,3)` için expected 17 ise, `calculate(3,10)` beklenen -4 olur. **Input sırasına duyarlılık** testinde yalnız aynı argument'ı iki yere yazmak yetersiz olabilir.
+
+### Bağımsız aktarım
+
+Yeni bir `subtractFee(balance, fee)` function'ı düşün. Girdi `(50, 20)` için beklenen 30, `(20,50)` için -30. Function'ın parametre/argument akışını açıklayıp hangi durumda business guard eklenmesi gerektiğini gerekçelendir.
+
+<details><summary>Kontrol</summary>
+
+Arithmetic sonucu number'dır; negatif sonuç type açısından mümkündür. Negatif bakiyenin yasak olup olmadığı ayrı iş kuralıdır.
+
+</details>
