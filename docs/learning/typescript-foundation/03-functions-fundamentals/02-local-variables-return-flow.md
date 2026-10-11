@@ -124,3 +124,53 @@ TypeScript `boolean` return beklentisiyle bazı execution yollarının `undefine
 1. Son return. 2. Çağrı tamamlanır. 3. Her çağrı kendi local execution bağlamına sahiptir. 4. Caller'ın normal return sözleşmesi tutarlı olmalıdır.
 
 </details>
+
+## 10. Rehberli hata analizi: yanlış sıradaki return
+
+Gereksinim: Negatif miktar geçersiz, sıfır miktar boş, pozitif miktar geçerli sayılsın.
+
+```ts
+function state(amount: number): string {
+  if (amount <= 0) return "empty";
+  if (amount < 0) return "invalid";
+  return "available";
+}
+console.log(state(-1)); // empty — gereksinime aykırı!
+```
+
+**Neden?** `-1 <= 0` true olduğu için ilk return çalışır. İkinci condition'a hiçbir zaman ulaşılmaz. Yalnız ikinci condition'ı daha doğru yazmak bug'ı çözmez; **branch order** önemlidir.
+
+Doğru öncelik:
+
+```ts
+function state(amount: number): string {
+  if (amount < 0) return "invalid";
+  if (amount === 0) return "empty";
+  return "available";
+}
+console.log(state(-1)); // invalid
+console.log(state(0));  // empty
+console.log(state(1));  // available
+```
+
+| amount | İlk kontrol | İkinci kontrol | Dönüş |
+| ---: | --- | --- | --- |
+| -1 | true | çalışmaz | invalid |
+| 0 | false | true | empty |
+| 1 | false | false | available |
+
+İki kod da string return eder ve typecheck'ten geçebilir. İş kuralını **hangi sırayla** uyguladığımız belirleyicidir.
+
+### Debugging deneyi
+
+Hatalı kodda `console.log("second branch")` satırını ikinci `if` içine koyduğunu düşün. -1 girdisinde bu log neden görünmez? İlk return, fonksiyonun tamamını bitirir.
+
+### Bağımsız görev
+
+`classifyTemperature` fonksiyonunda 0'ın “freezing”, negatiflerin “below freezing”, diğerlerinin “above freezing” olmasını istiyoruz. Üç durumu hangi sırayla test edersin? Önce beklenen tabloyu kur, sonra function body'yi yaz.
+
+<details><summary>Kontrol</summary>
+
+Önce `n < 0`, sonra `n === 0`, geri kalanlar için genel sonuç. `n <= 0` kontrolü önce yapılırsa iki özel durumu tek branch'te birleştirir.
+
+</details>
