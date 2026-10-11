@@ -1,31 +1,25 @@
-# TypeScript Foundation — Birikimli Öğrenme Rotası
+# TypeScript Foundation — Öğrenme Müfredatı
 
-Bu müfredat **Increment sırası değil, kavramsal önkoşul sırasıdır**. İlk defa öğrenen öğrenci 01'den başlar; tekrar yapan kişi ilgili kavram ve önceki ders bağlantısını kullanır.
+Bu müfredat TypeScript ve JavaScript'in mühendislik temellerini **kavram → çalışma mekanizması → kod örneği → sınır durumları → debugging → pekiştirme** düzeniyle ele alır.
 
-| Sıra | Bölüm | Kazanım |
-| --- | --- | --- |
-| 01 | [Execution, Runtime & Working Model](./01-execution-runtime/README.md) | TypeScript source → checking/build → JavaScript → Node → output |
-| 02 | [Values, Variables & Basic Decisions](./02-values-variables-basic-decisions/README.md) | Primitive, expression, assignment, const/let, if/else |
-| 03 | [Functions Fundamentals](./03-functions-fundamentals/README.md) | Parameter/argument, return, scope, input→output |
-| 04 | [Control Flow & Iteration](./04-control-flow-iteration/README.md) | Conditions, loops, for...of, early return |
-| 05 | [Objects, Arrays, References & Mutation](./05-objects-arrays-references/README.md) | Collection, reference identity, new array ≠ new objects |
-| 06 | [TypeScript Modeling Fundamentals](./06-typescript-modeling/README.md) | Type, optional, null/undefined, union, narrowing, unknown |
-| 07 | [Safe Runtime Boundaries](./07-safe-runtime-boundaries/README.md) | Runtime checks, controlled result, exception |
-| 08 | [Value & Decision Mechanics](./08-value-and-decision-mechanics/README.md) | Equality, truthiness, operators, ??, ternary, switch |
-| 09 | [Modern Object & Array Syntax](./09-modern-object-array-syntax/README.md) | Destructuring, spread/rest, optional chaining, template literals |
-| 10 | [JSON Boundary](./10-json-boundary/README.md) | JSON.stringify/parse ve validation sınırı |
+## Ders bölümleri
 
-### Gelecek rota (henüz ders değil)
-11 — Functions as Values & Callbacks · 12 — Closures & Captured State · 13 — Collections & Data Transformation · 14 — Async Foundations. Bu başlıklar ilgili gelecek çalışmalarda hazırlanacaktır.
+| Bölüm | Konu | Ders |
+| --- | --- | ---: |
+| 01 | Execution, Type Checking ve Runtime | 3 |
+| 02 | Values, Variables ve Basic Decisions | 4 |
+| 03 | Functions Fundamentals | 3 |
+| 04 | Control Flow & Iteration | 3 |
+| 05 | Objects, Arrays, References & Mutation | 5 |
+| 06 | TypeScript Modeling Fundamentals | 4 |
+| 07 | Safe Runtime Boundaries | 5 |
+| 08 | Value & Decision Mechanics | 7 |
+| 09 | Modern Object & Array Syntax | 6 |
+| 10 | JSON Boundary | 4 |
+| **Toplam** | | **44** |
 
-## Nasıl çalışılır?
-Önce önceki bölümün ana ayrımını açıklayın. Örnekte çalıştırmadan önce sonucu tahmin edin; sonra gözlenen sonuçla karşılaştırın. Bir davranışı değiştirdiğinizde ilgili test ile doğrulayın. **Doküman okumak, yazmak veya AI ile belge düzenlemek bağımsız H0 yeterlilik kanıtı değildir.** Teknik uygulama ve yardım düzeyleri ayrı tarihsel kanıtlarda tutulur.
+Her klasördeki `README.md` bölümün içerik dizinidir; ilgili ders dosyaları ayrıntılı konu anlatımlarını taşır. Örnekleri okurken ilk olarak sonucu tahmin etmek, ardından yürütmeyi adım adım açıklamak ve sınır durumunu sınamak esastır.
 
-## Tek ana öğretim evi
-- Runtime/compile/output → 01; basit karar/variable → 02; function/scope → 03; loop/early return → 04.
-- Reference/mutation → 05. Spread'in shallow davranışı için [09](./09-modern-object-array-syntax/README.md)'a gidin.
-- Optional/null/undefined/unknown/narrowing → 06; runtime validation ve Result/throw → 07.
-- Truthiness/?? ayrıntısı → 08. JSON syntax/serialization/parsing → 10; doğrulanmamış değerin güvenli modele dönüşümü için [07](./07-safe-runtime-boundaries/README.md).
+## İleride ele alınabilecek konular
 
-## Kanıt / tarihçe
-Eski `docs/I1-*`, `docs/I2-*`, `docs/I3-*` dosyaları tarihsel çalışma ve doğrulama notları için korunur. [I4R crosswalk](../../I4R-curriculum-crosswalk.md) kaynakları bu müfredata eşler. Eğitimde verilen çözümler uygulama yeterliliği yerine geçmez.
+Functions as Values & Callbacks; Closures & Captured State; Collections & Data Transformation; Async Foundations. Bunlar bu müfredattaki 44 dersin henüz işlenmiş kapsamına dahil değildir.
