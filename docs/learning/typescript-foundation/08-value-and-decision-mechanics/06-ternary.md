@@ -1,148 +1,213 @@
-# Ders 6 — Ternary Operator: İki Expression Arasında Seçim
+# Ders 6 — Ternary Operator: `condition ? valueA : valueB`
 
-## 1. Neden ihtiyaç duyuyoruz?
+## 1. Neden ternary kullanırız?
 
-Bir condition'a bağlı **tek değer** üretmek için her zaman çok satırlı `if/else` yazmak gerekmez. Ternary'nin amacı gereksiz kısalık değil, iki açık seçenekten hangisinin değerlendirildiğini görünür kılmaktır.
+Bir program bazen tek bir **değer** üretmek için iki durumdan birini seçer: Hesap aktifse `"Active"`, değilse `"Inactive"`; yaş 18 ve üstüyse `"Adult"`, değilse `"Minor"`.
+
+Bu karar `if/else` ile de verilir:
 
 ```ts
-const score = 60;
-let label: string;
-if (score >= 60) {
-  label = "Passed";
-} else {
-  label = "Failed";
+function ageLabel(age: number): string {
+  if (age >= 18) {
+    return "Adult";
+  } else {
+    return "Minor";
+  }
 }
-console.log(label); // Passed
 ```
 
-Aynı küçük seçim expression olarak da yapılabilir:
+**Ternary operator (koşullu operatör)** aynı iki seçenekten bir **expression sonucu** elde etmeyi sağlar:
 
 ```ts
-const score = 60;
-const label = score >= 60 ? "Passed" : "Failed";
-console.log(label); // Passed
+function ageLabel(age: number): string {
+  return age >= 18 ? "Adult" : "Minor";
+}
+console.log(ageLabel(18)); // "Adult"
+console.log(ageLabel(17)); // "Minor"
 ```
 
-## 2. Tanım ve çalışma mekanizması
+**Temel fark:** `if/else` bir kontrol akışı statement'ıdır; ternary bir **değer üreten expression**'dır. Ternary daha kısa olduğu için değil, basit iki alternatifli sonuçları açık ifade ettiği için tercih edilir.
+
+## 2. Sözdizimi ve değerlendirme sırası
 
 ```text
-condition ? expressionWhenTrue : expressionWhenFalse
+condition ? expressionWhenTruthy : expressionWhenFalsy
 ```
 
-Condition önce değerlendirilir. Truthy ise soldaki, falsy ise sağdaki expression seçilir. **Yalnızca seçilen dal değerlendirilir.** Ternary bir expression'dır; `if/else` ise bir statement'tır.
+1. JavaScript önce `condition` ifadesini değerlendirir.
+2. Sonuç truthy ise `?` sonrasındaki ifade değerlendirilir.
+3. Sonuç falsy ise `:` sonrasındaki ifade değerlendirilir.
+4. **Seçilmeyen ifade çalıştırılmaz.**
+5. Seçilen ifade ternary'nin sonucudur.
 
 ```ts
-function classify(score: number): string {
+const score = 70;
+const result = score >= 60 ? "Passed" : "Failed";
+console.log(result); // "Passed"
+```
+
+Ternary bir **ifade** olduğu için değişkene atanabilir, başka bir fonksiyona argüman olarak verilebilir veya doğrudan `return` edilebilir.
+
+## 3. Ternary ile `if/else` ne zaman tercih edilir?
+
+Ternary:
+
+```ts
+function displayStatus(isActive: boolean): string {
+  return isActive ? "Active" : "Inactive";
+}
+```
+
+`if/else`:
+
+```ts
+function evaluateStatus(isActive: boolean): string {
+  if (!isActive) {
+    console.log("Account is inactive");
+    return "Inactive";
+  }
+  console.log("Account is active");
+  return "Active";
+}
+```
+
+İkincisinde iki branch içinde ek eylemler ve farklı iş adımları var. Böyle durumlarda `if/else` daha okunaklı olabilir. **Ternary tüm karar yapılarını kısaltmak için kullanılmaz.**
+
+## 4. Lazy evaluation: yalnız seçilen branch çalışır
+
+```ts
+function approved(): string {
+  console.log("Approval branch");
+  return "Approved";
+}
+function denied(): string {
+  console.log("Denial branch");
+  return "Denied";
+}
+
+const hasPermission = false;
+const message = hasPermission ? approved() : denied();
+console.log(message);
+// Denial branch
+// Denied
+```
+
+`approved()` çağrılmadı. Bu davranış Short-Circuit Evaluation ile yakından ilişkilidir: Gerekmeyen branch değerlendirilmez.
+
+Bu yüzden side effect içeren ağır kodları ternary içinde gizlemek yerine ayrı bloklarda yazmak daha anlaşılır olabilir.
+
+## 5. Koşul boolean olmak zorunda mı?
+
+Hayır. Ternary koşulunda truthy/falsy değerlendirme yapılır:
+
+```ts
+const input = "";
+const text = input ? "Value exists" : "No value";
+console.log(text); // "No value"
+```
+
+Ancak iş kuralı `0` veya `""` değerini geçerli sayıyorsa `condition` olarak doğrudan değeri kullanmak bug oluşturabilir.
+
+```ts
+function stockLabel(stock: number | undefined): string {
+  return stock !== undefined ? `Stock: ${stock}` : "Stock unknown";
+}
+console.log(stockLabel(0)); // "Stock: 0"
+```
+
+Burada koşulumuz truthiness değil, **değerin `undefined` olmaması**dır. Bu ayrımı önceki derslerde öğrenmiştik.
+
+## 6. Farklı branch tipleri ve TypeScript
+
+Ternary'nin iki kolu farklı tipler üretebilir:
+
+```ts
+function valueByStatus(isReady: boolean): string | number {
+  return isReady ? "Ready" : 0;
+}
+```
+
+Bu durumda sonuç olası `string | number` türündedir. Tüketen kodun bu olasılıkları hesaba katması gerekir.
+
+```ts
+const status: boolean = false;
+const value = status ? "Ready" : 0;
+console.log(value); // 0
+```
+
+Fonksiyon dönüş tipi yalnız `string` olarak tanımlanmışsa number dönen bir kol typecheck hatasına yol açabilir. Tip sisteminin uyarısı, ürün davranışının doğru olduğunu kanıtlamaz; fakat iki branch'in farklı tipte olduğunu görünür kılar.
+
+## 7. İç içe ternary (nested ternary) neden zor olabilir?
+
+```ts
+function label(score: number): string {
+  return score >= 90
+    ? "Excellent"
+    : score >= 60
+      ? "Passed"
+      : "Failed";
+}
+```
+
+Bu geçerli olabilir ancak büyüdükçe okunması ve debug edilmesi güçleşir. Üç farklı karar noktasını açık `if` bloklarıyla da gösterebiliriz:
+
+```ts
+function label(score: number): string {
+  if (score >= 90) return "Excellent";
+  if (score >= 60) return "Passed";
+  return "Failed";
+}
+```
+
+Birinci koşul sağlandığında fonksiyon bittiği için ikinci koşulun ayrıca `score < 90` demesine gerek yoktur.
+
+**Seçim kuralı:** İki açık sonuç ve tek basit koşul → ternary iyi aday. Çok branch, karmaşık yan etkiler veya hata yönetimi → açık `if/else` daha iyi.
+
+## 8. Test tasarımı ve hata ayıklama
+
+```ts
+function examResult(score: number): string {
   return score >= 60 ? "Passed" : "Failed";
 }
-console.log(classify(59)); // Failed
-console.log(classify(60)); // Passed
-console.log(classify(61)); // Passed
 ```
 
-| Girdi | `score >= 60` | Seçilen branch | Sonuç |
-| ---: | --- | --- | --- |
-| 59 | false | false expression | Failed |
-| 60 | true | true expression | Passed |
-| 61 | true | true expression | Passed |
+Sadece `90 → Passed` test etmek yeterli değildir. `>= 60` operatörünü yanlışlıkla `> 60` yazarsan bu test bug'ı bulamaz.
 
-Tam sınırda `>=` yerine yanlışlıkla `>` yazmak gerçek bug üretir. Boundary testi bu farkı yakalamalıdır.
+| Girdi | Beklenen | Neden? |
+|---|---|---|
+| `59` | `"Failed"` | Sınırın altı |
+| `60` | `"Passed"` | Exact boundary |
+| `61` | `"Passed"` | Sınırın üstü |
 
-## 3. Yalnızca bir expression çalışır
-
-```ts
-function yes(): number {
-  console.log("YES called");
-  return 1;
-}
-function no(): number {
-  console.log("NO called");
-  return 2;
-}
-const result = true ? yes() : no();
-// YES called
-console.log(result); // 1
-```
-
-Yürütme: condition true → `yes()` çağrılır → return 1 → `result=1`; `no()` çağrılmaz. Bu, short-circuit davranışını anlamayı gerektirir. Yan etki yapan fonksiyonları iki dalda kullanmak bazen okunabilirliği azaltır.
-
-## 4. Truthiness ile iş kuralını karıştırma
-
-```ts
-const retries = 0;
-console.log(retries ? "Retry" : "No retry"); // No retry
-```
-
-Bu kod 0 değerini boolean bağlamda falsy yorumlar; ama 0'ın iş kuralınca **geçersiz** olduğunu söylemez. Özellikle fallback seçerken `||` ile `??` farklıdır:
-
-```ts
-type Options = { retries?: number };
-function message(options: Options): string {
-  const retries = options.retries ?? 3;
-  return retries === 0 ? "No retry" : `Retries: ${retries}`;
-}
-console.log(message({ retries: 0 })); // No retry
-console.log(message({})); // Retries: 3
-```
-
-`??` yalnız `null` ve `undefined` için alternatif seçer. Ternary burada ayrıca sıfır durumunu etiketler. `options.retries || 3` kullanılsaydı geçerli 0 değeri yanlışlıkla ezilirdi.
-
-## 5. TypeScript ile ilişkisi
-
-İki dalın tipleri, expression'ın tipini etkiler. Örneğin:
-
-```ts
-function state(active: boolean): string | number {
-  return active ? "ON" : 0;
-}
-console.log(state(true)); // "ON"
-console.log(state(false)); // 0
-```
-
-TypeScript her iki branch'in return type'a uygunluğunu denetler. Ancak condition'ın iş açısından doğru kurulup kurulmadığını belirleyemez. Ternary kendiliğinden runtime validation da gerçekleştirmez.
-
-## 6. Yaygın hatalar ve sınır davranışları
-
-- **Yanlış threshold:** `> 60` yerine `>= 60` gereksinimi varsa 60 yanlış branch'e gider.
-- **Falsy değeri eksik veri sanmak:** `0`, `false`, `""` sık sık geçerli değerlerdir; fallback amacı doğru seçilmelidir.
-- **İç içe ternary:** Üç veya daha fazla karar bir araya gelince expression zor okunur. Çoğu zaman açık `if/else if/else` daha iyi tasarımdır.
-- **Operatörleri karıştırmak:** `condition ? x : y` ile `value ?? defaultValue` ve `obj?.property` farklı işler yapar.
-- **İki dal da çağrılır sanmak:** Runtime'da yalnız seçilen expression yürür.
-
-## 7. Debugging: Yanlış branch nasıl araştırılır?
-
-1. Gereksinimden beklenen sonucu çıkart (örneğin 60 dahil).
-2. Gerçek input ve türünü debugger/log ile doğrula.
-3. Condition'ın true/false sonucunu ayrı gözle.
-4. Seçilen branch'i takip et, diğer branch'in çalışmadığını kontrol et.
-5. Operator hatası hipotezini tek değişiklikle sınayıp 59/60/61 sınır testlerini tekrarla.
-
-## 8. Gerçekçi kullanım
-
-```ts
-type TestResult = { name: string; passed: boolean };
-function summary(test: TestResult): string {
-  const label = test.passed ? "PASS" : "FAIL";
-  return `${label}: ${test.name}`;
-}
-console.log(summary({ name: "Login", passed: false })); // FAIL: Login
-```
-
-Bu kod zaten belirlenmiş `passed` değerini okunabilir metne dönüştürür. Sonucun gerçekten doğru olduğuna ilişkin test kanıtı üretmez.
+**Debugging sırası:** Condition değeri → truthiness/boolean sonucu → seçilen branch → branch değeri → beklenen iş kuralı.
 
 ## 9. Mülakat hazırlığı
 
-**Question: When would you use a ternary rather than if/else?**
+**Question: What is the ternary operator in JavaScript?**
 
-> A ternary is an expression that picks one of two values. It evaluates only the selected branch. I use it for short, readable value selections and prefer explicit if/else for complex logic.
+> The ternary operator is a conditional expression with the syntax `condition ? a : b`. It evaluates the condition and returns the result of only one branch. It is useful for simple two-way value selection, while `if/else` is often clearer for complex logic.
 
-**Türkçe:** Ternary iki değerden birini seçen expression'dır; koşuldan sonra yalnız seçilen taraf yürütülür. Karmaşık akışta okunabilirlik için açık if/else tercih edilebilir.
+**Türkçe:** Koşulun durumuna göre iki ifadeden birinin sonucunu üreten operatördür. Basit değer seçiminde okunaklıdır, karmaşık kararlarda `if/else` daha uygundur.
+
+**Question: Does a ternary evaluate both branches?**
+
+> No. Only the selected branch is evaluated, so functions in the other branch are not called.
 
 ## 10. Pekiştirme
 
-1. `false ? 10 : 20` ne döndürür?
-2. `score=60` iken `score > 60 ? "yes" : "no"` çıktısı nedir?
-3. `0 ? "on" : "off"` sonucu neden böyledir?
-4. `true ? yes() : no()` hangi fonksiyonu çağırır?
-5. `retries=0` iken `??` ile `||` fallback sonuçları neden farklı olabilir?
-6. Nested ternary'yi `if/else` ile değiştirmenin ne zaman daha okunaklı olacağını açıkla.
+1. `false ? "A" : "B"` sonucu nedir?
+2. `isBlocked` true ise `"Denied"`, değilse `"Granted"` döndüren ifade yaz.
+3. `const label = stock ? "Known" : "Missing"` neden `stock = 0` için hatalı olabilir?
+4. Karmaşık üç seviyeli seçimde neden `if/else` daha okunaklı olabilir?
+
+<details><summary>Kontrol cevapları</summary>
+
+1. `"B"`.
+2. `isBlocked ? "Denied" : "Granted"`.
+3. `0` falsy fakat geçerli stok değeridir.
+4. Branch'lerin mantığı ve debugging adımları açık görünür.
+</details>
+
+## 11. Sonraki ders
+
+Ternary iki alternatifli değer seçiminde yararlı. Bir ifadenin `"pending"`, `"approved"`, `"failed"` gibi **çok sayıda sabit değerine** göre karar gerekiyorsa Ders 7 — Switch / Case konusuna geç.
