@@ -215,7 +215,3 @@ Bir ifade beklenmeyen sonuç ürettiyse:
 3. `isEnabled` değerini ve koşulun business rule'unu.
 4. `||` ikinci operand string'i döndürür.
 </details>
-
-## 11. Sonraki ders
-
-**Falsy** ve **nullish** farklıdır. Ders 5 — Nullish Coalescing, özellikle sıfır/false/boş string değerlerini koruyan güvenli varsayılan seçimini açıklar.
