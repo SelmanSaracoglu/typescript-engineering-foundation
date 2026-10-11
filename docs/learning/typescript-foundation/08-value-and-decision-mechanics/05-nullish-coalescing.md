@@ -221,7 +221,3 @@ Bu fark, mülakatlarda sık sorulur. Aynı `default` kelimesi kullanılsa da mek
 3. `-5` nullish değildir; negatif fiyat kuralı ayrı doğrulanmalıdır.
 4. Gruplamayı parantezle açıklamalıyız: örn. `(a ?? b) || c`.
 </details>
-
-## 11. Sonraki ders
-
-Default değer seçimini gördük. Peki iki farklı sonuç arasında **koşula göre** bir değer seçmek istersek? Ders 6 — Ternary Operator ile devam et.
