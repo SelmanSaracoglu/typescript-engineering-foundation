@@ -8,6 +8,7 @@
 2. [Property Existence ve Runtime Type Validation](./02-property-existence-and-types.md)
 3. [Discriminated Result Union: Valid ve Invalid Sonuçlar](./03-discriminated-results.md)
 4. [return, throw, Error ve Exception Akışı](./04-return-versus-throw-and-exceptions.md)
+5. [Temel Module Sınırı: export ve import type](./05-basic-module-boundaries-import-type.md)
 
 ## Neden?
 Compile-time type yalnız geliştirici beklentisidir. Kullanıcıdan, dosyadan veya JSON'dan gelen veri başka bir gerçek runtime shape'ine sahip olabilir.
