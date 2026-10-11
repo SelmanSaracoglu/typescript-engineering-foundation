@@ -1,47 +1,102 @@
-# Optional Property, undefined ve null
+# Ders 20 — Optional Property, undefined ve null
 
-**Önkoşul:** [TypeScript modelleme bölümü](./README.md) · [Önceki](./01-type-alias-object-shape-interface.md) · [Sonraki](./03-unions-control-flow-narrowing.md)
+## 1. Eksik alanla boş değer neden ayrı?
 
-## 1. Neden ihtiyaç duyuyoruz?
-Eksik property ile özellikle 'değer yok' olarak işaretlenmiş property aynı şey değildir; bunları karıştırmak UI, test ve validation hatası üretir.
+Bir hesapta takma ad henüz belirtilmemiş olabilir; başka hesapta ikinci ad özellikle `null` olabilir. Bu iki durum object shape'inin farklı sözleşmeleridir.
 
-## 2. Tanım ve mekanizma
-`field?: T` property'nin bulunmayabileceğini; `field: T | null` property'nin gerekli olduğunu ama null taşıyabileceğini ifade eder. `undefined` mevcut olmayan/uninitialized değerle sık görülür; `null` bilinçli boş değerdir.
+## 2. Üç tip tanımı arasındaki fark
 
-## 3. Açıklamalı kod ve çıktı
 ```ts
-type Product = {
+type User = {
   name: string;
-  price?: number;
+  nickname?: string;
   middleName: string | null;
 };
-const p: Product = { name: "Elma", middleName: null };
-console.log(p.price);      // undefined
-console.log(p.middleName); // null
-if (p.price !== undefined) {
-  console.log(p.price * 2);
-}
+const user: User = { name:"Ali", middleName:null };
+console.log(user.nickname);    // undefined
+console.log(user.middleName);  // null
+console.log("nickname" in user);   // false
+console.log("middleName" in user); // true
 ```
 
-## 4. Execution ve veri akışı
-`price` değeri object'te bulunmaz; property okununca undefined gelir. `middleName` property olarak vardır ama null taşır. `if` daraltması price yokken hesaplamayı engeller.
+`nickname?` alanı bulunmayabilir. `middleName: string|null` alanı **zorunlu**, fakat değeri null olabilir. `undefined` ile `null` aynı şey değildir.
 
-## 5. TypeScript compile-time ile runtime ayrımı
-`price` okunduğunda `number | undefined` olasılığı dikkate alınır. `middleName: string | null` property'yi atlamaya izin vermez. Optional property ile `T | undefined` her compiler seçeneğinde aynı **yazma** semantiği demek değildir; burada okuma davranışına odaklanılır.
+## 3. Runtime okuma akışı
 
-## 6. Sınır davranışları ve kritik farklar
-`0` falsy olabilir fakat geçerli fiyat değeridir. `price || 10` sıfırı değiştirir; `price ?? 10` yalnız nullish değerlerde fallback yapar. Ayrıntılı mekanizma [08 nullish](../08-value-and-decision-mechanics/05-nullish-coalescing.md).
+1. `user` object'i `name` ve `middleName` property'leriyle kurulur.
+2. `user.nickname` property erişimi eksik alanı okumaya çalışır; sonuç undefined.
+3. `user.middleName` var olan property'yi okur; değer null.
+4. `in` operator'ı varlık kontrolü yapar; value'nun geçerli tipte olduğunun kanıtı değildir.
 
-## 7. Yaygın yanlış kullanım / debugging
-Yanlış fallback ile gerçek eksik veri durumunu ayır. Önce `price` undefined mı null mı 0 mı? Her durumun beklenen sözleşmesini ayrı belirt.
+## 4. Optional property için daraltma
 
-## 8. Gerçek kullanım
-Uygulamanın model bekleyen iç fonksiyonları ve dışarıdan veri alan sınır fonksiyonları aynı güven seviyesinde değildir. Compile-time shape bilgisi faydalıdır fakat runtime'daki gerçek değeri anlamak için kontrol gerekir.
+```ts
+function display(user: User): string {
+  const nickname = user.nickname;
+  if (nickname !== undefined) {
+    return nickname.toUpperCase();
+  }
+  return user.name;
+}
+console.log(display({ name:"Ali", middleName:null })); // Ali
+console.log(display({ name:"Ali", nickname:"Al", middleName:null })); // AL
+```
 
-## 9. Interview preparation
-*What is the difference between an optional property and a nullable property?* Optional may be absent; nullable can be present with null, depending on its declared type.
+`toUpperCase` yalnız string üzerinde kullanılır. Undefined kontrolü bu branch'de güvenli erişim sağlar. Eğer nickname boş string ise sonuç boş string olabilir; onu reddetmek yeni bir iş kuralı ister.
 
-## 10. Bağımsız pekiştirme
-`{name:'Elma',middleName:null}` geçerli mi? `{name:'Elma'}` neden farklı? `price:0` ile `price:undefined` için ne gözlersin?
+## 5. Nullish fallback ile truthiness
 
-**Kaynak:** [I2](../../../I2-control-flow-functions-data-modeling.md) ve [I3](../../../I3-safe-types-runtime-boundaries.md). Eğitim içeriği bağımsız öğrenci uygulama/H0 kanıtı değildir.
+```ts
+type Settings = { retries?: number | null };
+function retries(s: Settings): number {
+  return s.retries ?? 3;
+}
+console.log(retries({}));               // 3
+console.log(retries({ retries:null })); // 3
+console.log(retries({ retries:0 }));    // 0
+```
+
+`??` yalnız null ve undefined durumunda alternatif seçer. `||` ise 0 gibi falsy değerlerde de alternatif seçebilir. Sıfır geçerli retry değeri ise bu ayrım önemlidir.
+
+## 6. Optional ile union property aynı değildir
+
+```ts
+type A = { label?: string };
+type B = { label: string | undefined };
+const a: A = {};
+// const b: B = {}; // B için label gerekli
+```
+
+İlk model property'nin **yokluğuna** izin verir. İkincide property zorunludur ama undefined değerini tutabilir. Bazı yazma semantiği farkları `exactOptionalPropertyTypes` compiler ayarına bağlıdır.
+
+## 7. Hatalı property erişimi
+
+```ts
+const maybeName: string | undefined = undefined;
+// maybeName.toUpperCase(); // runtime güvenli değil
+console.log(maybeName ?? "Guest"); // Guest
+```
+
+`typeof null === "object"` sonucu null'u gerçek object yapmaz. Nullish değerlerde nested property erişimi exception oluşturabilir.
+
+## 8. Debugging ve test
+
+**Belirti:** Retry 0 verildi, sistem 3 gösterdi. Kodda `s.retries || 3` var mı? Truthiness kaynaklı yanlış fallback olabilir.
+
+**Belirti:** Undefined üzerinde method çağrısı. Hangi property eksik, static model doğru mu, runtime guard var mı?
+
+Test değerlerini ayrı ele al: eksik property, explicit undefined, null, 0, boş string, normal değer.
+
+## 9. Mülakat / pekiştirme
+
+**Question:** What's the difference between an optional and a nullable field?
+
+> Optional fields can be absent. Nullable fields can hold null as a declared value.
+
+**Kontrol:** Nickname yoksa sonuç? MiddleName null olduğunda property var mı? Retry=0 için `??`? `label?:string` ve `label:string|undefined` aynı mı?
+
+<details><summary>Cevaplar</summary>
+
+Undefined; evet; 0; hayır, property varlığı sözleşmesi farklıdır.
+
+</details>
