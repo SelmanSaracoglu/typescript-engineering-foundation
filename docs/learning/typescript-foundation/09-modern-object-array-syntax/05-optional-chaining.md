@@ -1,9 +1,5 @@
 # Ders 12 — Optional Chaining (`?.`): Eksik Veride Güvenli Erişim
 
-> **Öğrenme yolu:** [JavaScript dizini](../README.md) → [Bölüm 2](./README.md)  
-> **Önkoşul:** Object/array property erişimi, `null`/`undefined`, short-circuit, `??`, union types.  
-> **Hedef:** Optional chaining'in hangi hatayı önlediğini ve hangi hatayı **önlemediğini** açıklamak; nested veriler için doğru zinciri kurmak.
-
 ## 1. Neden bu operatöre ihtiyaç var?
 
 Bir kullanıcının `profile` bilgisi bazen bulunmayabilir:
@@ -221,7 +217,7 @@ Burada neden `?? 0` kullandık? Çünkü gerçek `retryCount: 0` değerini eksik
 | Beklenmedik TypeError | Runtime değer callable değil | Type guard / veri sınırı kontrolü gerekli mi? |
 | Sayaç ilerlemiyor | Sağdaki expression çalışmadı | Optional chaining kısa devre yaptı mı? |
 
-**Güvenlik notu:** Dışarıdan gelen JSON verisine `as User` yazıp `?.` kullanmak property türlerini doğrulamaz. [Bölüm 3](../10-json-boundary/README.md) runtime doğrulamayı ayrıca öğretir.
+**Güvenlik notu:** Dışarıdan gelen JSON verisine `as User` yazıp `?.` kullanmak property türlerini doğrulamaz. Bölüm 3 runtime doğrulamayı ayrıca öğretir.
 
 ## 11. Mülakat hazırlığı
 
@@ -246,5 +242,3 @@ Burada neden `?? 0` kullandık? Çünkü gerçek `retryCount: 0` değerini eksik
 5. Opsiyonel `onError` callback'i için doğru çağrı sözdizimini yaz.
 
 **Kısa kontrol:** (1) undefined; (2) `profile` eksikse `.city` korumasız kalır; (3) `||` 0'ı yanlışlıkla fallback'a dönüştürür; (4) array boş olduğundan index'te eleman bulunmaz; (5) `onError?.(message)`.
-
-**Sonraki ders:** [Template Literals](./06-template-literals.md). **Kanıt:** Bu doküman örnekleri bağımsız test/implementation sonucu değildir.
