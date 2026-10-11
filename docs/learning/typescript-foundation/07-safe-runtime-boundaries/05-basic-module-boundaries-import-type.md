@@ -1,48 +1,99 @@
-# Temel Module Sınırı: export ve import type
+# Ders 27 — Module Boundary: export, import type ve Sorumluluk Ayrımı
 
-**Önkoşul:** [Bölüm girişi](./README.md). Bu bölümdeki kavramlar önceki eğitim içeriğinin yeniden düzenlenmesidir; yeni framework veya ileri type/module kapsamı değildir.
+## 1. Neden birden fazla dosya?
 
-## 1. Neden gerekiyor?
-Model tanımı ile runtime validation farklı sorumluluklar taşıdığında farklı dosyalarda tutulabilir. Ancak dosyaları çoğaltmak başlı başına doğru mimari değildir.
+Bir uygulama modelinin (`Product`) tanımı ile ona gelen verinin doğrulanması iki ayrı sorumluluktur. Kod tabanı büyüdüğünde farklı modüllerde tutmak okunabilirliği sağlayabilir. Ancak yeni dosya üretmek tek başına doğru tasarım veya güvenlik kanıtı değildir.
 
-## 2. Kavram ve sözleşme
-`export type` başka module'ların compile-time model bilgisini kullanmasına izin verir; `import type` runtime değeri olmayan tür bağımlılığını açık gösterir. `export function` runtime'da çağrılacak fonksiyonu dışarı açar. Örnek **iki farklı dosyada** yer alacak biçimde etiketlenmiştir; tek bir `.ts` dosyası olarak birleştirilip çalıştırılmaz. TypeScript compile-time type bağımlılığı, gerçek runtime input'un shape'ini doğrulamaz; fonksiyonun kontrolleri bunu yapar.
+## 2. export type ve import type
 
-## 3. Açıklamalı örnek
+Birinci dosya:
+
 ```ts
 // src/product.ts
-export type Product = { name: string; price: number };
+export type Product = {
+  name: string;
+  price: number;
+};
+```
 
+İkinci dosya:
+
+```ts
 // src/productValidation.ts
 import type { Product } from "./product";
 
-export function acceptsProduct(value: unknown): value is Product {
-  return typeof value === "object" && value !== null &&
-    !Array.isArray(value) &&
-    "name" in value && typeof value.name === "string" &&
-    "price" in value && typeof value.price === "number";
+export function isProduct(input: unknown): input is Product {
+  return typeof input === "object" &&
+    input !== null &&
+    !Array.isArray(input) &&
+    "name" in input &&
+    typeof input.name === "string" &&
+    "price" in input &&
+    typeof input.price === "number";
 }
 ```
 
-## 4. Davranış / sınır tablosu
-| Kod | Amaç |
-| --- | --- |
-| `export type Product` | Type modelini paylaşmak |
-| `import type { Product }` | Derleme zamanı type bağımlılığı |
-| `export function acceptsProduct` | Runtime'da çağrılacak doğrulama davranışı |
+Bunlar tek code block olarak **tek dosyada birleştirilmeyecek iki ayrı dosya** örneğidir.
 
-## 5. Hata araştırma ve doğrulama
-Yanlış yaklaşım: `import type` yaptıktan sonra dış input'un otomatik Product olduğunu sanmak. `as Product` veya dosya ayırma runtime kontrolün yerine geçmez. Bu örnekte `unknown` doğrulama sınırını korur.
+## 3. Type dependency ve runtime behavior
 
-## 6. Öğretici pratik
-**Önce çalıştırmadan tahmin et:** `import type` çalışma anında Product instance'ı üretir mi? `export type` kullanırken validation neden hâlâ gereklidir?
+- `export type` type modelini diğer dosyaların statik kontrollerine açar.
+- `import type` yalnız compile-time type bağımlılığıdır.
+- `export function` runtime'da çağrılacak gerçek fonksiyonu dışarı açar.
+- `input is Product` predicate, function'ın true sonucuna bağlı TypeScript narrowing sağlar.
+- **Gerçek doğrulama**, function body içindeki koşulları çalıştırmaktır.
 
-## 7. Kariyer aktarımı
-Bu mekanizma uygulama kodu, test otomasyonu ve güvenli veri işleme çalışmalarında aynı temel prensibi korur: beklenen davranış, gerçek runtime değer ve doğrulama kanıtını ayrı tutmak.
+## 4. Data flow
 
-## 8. Interview preparation
-**Question:** What evidence would distinguish a working example from a verified requirement?  
-**Answer:** A requirement-derived expected outcome, appropriate boundary or negative test, and observed behavior after execution.
+```text
+Unknown external value
+      ↓
+isProduct runtime checks
+      ↓ boolean result
+true → Product olarak daraltılmış input
+false → reddedilen shape
+```
 
-## 9. Kaynak ve kanıt ayrımı
-[İlk çalışma belgesi](../../../I3-safe-types-runtime-boundaries.md) tarihsel bağlamı korur. Buradaki örnek H0 bağımsızlık/competency kanıtı değildir.
+Modülleri ayırmak dış veriyi kendiliğinden Product yapmaz. `import type { Product }` gerçek model object'i veya validator fonksiyonu üretmez.
+
+## 5. Runtime guard hatalıysa?
+
+```ts
+// Riskli, bilerek yanlış guard:
+function fakeIsProduct(_input: unknown): _input is Product {
+  return true;
+}
+```
+
+TypeScript bu iddiayı kullanabilir; ancak runtime'da alanlar yanlış olabilir. Predicate imzası tek başına veri doğrulamanın kanıtı değildir.
+
+## 6. Gerçek repo farkı
+
+Bu repository'de `src/product.ts` kendi Product modelini ve seçim fonksiyonunu export eder. `src/productValidation.ts` ise `import type` ile bu modeli kullanır ve runtime input kontrolü yapar. Ders, mevcut dosya sorumluluklarını açıklar; yeni framework veya modül sistemi kurmaz.
+
+## 7. Sınır ve debugging
+
+Belirti: Module import bulunamıyor. Relative path gerçekten doğru mu? Dosya adı ve compiler module ayarları ne? TypeScript compilation hata raporunu kontrol et.
+
+Belirti: Type import doğru ancak `price:"100"` geçiyor. Validator'daki property type kontrolleri eksik olabilir; `import type` runtime doğrulama sağlamaz.
+
+Belirti: TypeScript type runtime'da kullanılamıyor. Type alias/interface runtime object değildir; sadece `export type` ile sınıf/instance üretilmez.
+
+## 8. Mülakat hazırlığı
+
+**Question:** What is the difference between import type and importing a runtime function?
+
+> Import type brings in compile-time type information and is erased in emitted JavaScript. A runtime function import provides executable code.
+
+## 9. Pekiştirme
+
+1. `import type` Product instance'ı oluşturur mu?
+2. Validator neden `unknown` input kabul ediyor?
+3. `export function` neden `export type` ile aynı davranış değil?
+4. Runtime type guard her zaman true dönerse ne tehlike var?
+
+<details><summary>Cevaplar</summary>
+
+1. Hayır. 2. Dış input doğrulanmamıştır. 3. Fonksiyon runtime code içerir. 4. Yanlış shape güvenilir sanılabilir.
+
+</details>
