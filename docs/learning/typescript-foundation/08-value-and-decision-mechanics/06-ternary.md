@@ -1,9 +1,5 @@
 # Ders 6 — Ternary Operator: İki Expression Arasında Seçim
 
-> [Foundation](../README.md) → [08 — Value & Decision Mechanics](./README.md) → bu ders
-
-**Önkoşul:** [Truthy/falsy](./02-truthy-falsy.md), [logical operators](./03-logical-operators.md), [short-circuit](./04-short-circuit.md). **Sonraki:** [Switch](./07-switch-case.md).
-
 ## 1. Neden ihtiyaç duyuyoruz?
 
 Bir condition'a bağlı **tek değer** üretmek için her zaman çok satırlı `if/else` yazmak gerekmez. Ternary'nin amacı gereksiz kısalık değil, iki açık seçenekten hangisinin değerlendirildiğini görünür kılmaktır.
@@ -68,7 +64,7 @@ const result = true ? yes() : no();
 console.log(result); // 1
 ```
 
-Yürütme: condition true → `yes()` çağrılır → return 1 → `result=1`; `no()` çağrılmaz. Bu, [short-circuit](./04-short-circuit.md) davranışını anlamayı gerektirir. Yan etki yapan fonksiyonları iki dalda kullanmak bazen okunabilirliği azaltır.
+Yürütme: condition true → `yes()` çağrılır → return 1 → `result=1`; `no()` çağrılmaz. Bu, short-circuit davranışını anlamayı gerektirir. Yan etki yapan fonksiyonları iki dalda kullanmak bazen okunabilirliği azaltır.
 
 ## 4. Truthiness ile iş kuralını karıştırma
 
@@ -150,5 +146,3 @@ Bu kod zaten belirlenmiş `passed` değerini okunabilir metne dönüştürür. S
 4. `true ? yes() : no()` hangi fonksiyonu çağırır?
 5. `retries=0` iken `??` ile `||` fallback sonuçları neden farklı olabilir?
 6. Nested ternary'yi `if/else` ile değiştirmenin ne zaman daha okunaklı olacağını açıkla.
-
-**Öğretim/evidence sınırı:** Bu kalıcı ders H0 veya I4 uygulama yeterliliği kanıtı değildir. Orijinal uzun anlatım da [tarihsel kaynağında](../../javascript/01-value-and-decision-mechanics/06-ternary.md) korunur.
