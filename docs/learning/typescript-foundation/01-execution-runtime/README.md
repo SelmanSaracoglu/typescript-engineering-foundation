@@ -1,51 +1,43 @@
-# 01 — Execution, Runtime & TypeScript Working Model
+# 01 — Execution Model, Runtime ve Toolchain Temeli
 
-**Başlangıç:** Önkoşul yok. **Sonraki:** [02 — Values & Variables](../02-values-variables-basic-decisions/README.md).
+> [TypeScript Foundation ana öğrenme rotası](../README.md)  
+> **Önkoşul:** Yok. **Sonraki bölüm:** [02 — Values, Variables & Basic Decisions](../02-values-variables-basic-decisions/README.md).
 
-## Ayrıntılı dersler
+## Bu bölümün hedefi
 
-1. [Source, Type Checking, Build ve Runtime](./01-source-check-build-run.md)
-2. [Type, Runtime ve Logic Hatalarını Ayırmak](./02-type-runtime-logic-errors.md)
-3. [Node.js, npm, npx, Script ve Program Çıktısı](./03-node-npm-scripts-and-output.md)
+TypeScript dosyasından JavaScript yürütmesine kadar hangi aşamada **ne olduğunu** ayırt edebilmek: source, type checking, build, Node.js runtime, output ve test beklentisi. Temel başarı, komutları ezberlemek değil; gördüğün bir hata için doğru katmanı ve kanıtı seçmektir.
 
-## Neden?
-TypeScript kodundaki type hatası, çalışan JavaScript'teki exception ve yanlış iş sonucu farklı problemdir. Bunları ayırabilmek debugging'in ilk adımıdır.
+## Dersler — önerilen sıra
 
-## Çalışma zinciri
+| Sıra | Ders | Öğrendiğinde açıklayabileceğin şey |
+| --- | --- | --- |
+| 1 | [TypeScript Source, Type Checking, Build ve Runtime](./01-source-check-build-run.md) | Type annotation neden runtime'da bulunmaz? `.ts` nasıl JS olarak yürütülür? |
+| 2 | [Type-check Error, Runtime Exception ve Logic Bug](./02-type-runtime-logic-errors.md) | Bir kusur hangi katmanda ortaya çıkar? Beklenen ile actual sonuç nasıl karşılaştırılır? |
+| 3 | [Node.js, npm, npx, Scripts ve Output](./03-node-npm-scripts-and-output.md) | Projede hangi komut hangi aracı çalıştırır? Neden program çıktısı yürütmenin tamamı değildir? |
+
+İlk okumada dersleri sırayla işle. Tekrar yaparken her dosyanın **execution trace**, **hata analizi**, **mülakat** ve **pekiştirme** bölümlerine dön.
+
+## Konuların birbirine bağı
+
 ```text
-.ts source → TypeScript type checking → emitted .js → Node.js runtime → observable output
+Ders 1: source → typecheck/build → JavaScript → Node runtime
+         ↓
+Ders 2: hangi hata hangi aşamada ortaya çıkar?
+         ↓
+Ders 3: komutla çalıştırma, çıktı/exit durumu ve tanılama
+         ↓
+Bölüm 02: değerler, değişkenler, karar ifadeleri
 ```
-Bu zincir bir **kavramsal modeldir**: `tsc --noEmit` yalnız type-check yapabilir, build JavaScript üretebilir, sonrasında Node üretilmiş dosyayı çalıştırabilir.
 
-```ts
-const price: number = 100;
-console.log(price + 20); // 120
-```
-Type annotation `number` JavaScript output'ta kalmaz; runtime'da `price` gerçekten 100 değerini tutar. `console.log` tüm runtime değildir, yalnız gözlenebilir bir etkidir.
+Bu, zorunlu olarak her dosyanın tip kontrolünü geçtikten sonra derleneceğini söyleyen bir pipeline değildir; **öğrenme sırasıdır**.
 
-## Üç farklı hata
-```ts
-const count: number = "3"; // type-check hatası
-JSON.parse("{broken}");    // çalışırken SyntaxError
-function double(n: number) { return n + 2; } // 4 için 6: logic bug, beklenen 8
-```
-İkinci satırın TypeScript bakımından kabul edilmesi JSON metnini doğru yapmaz. Üçüncü satır çalışabilir ama gereksinimi karşılamaz.
+## Bölüm sonu kontrol
 
-## Repository araçları
-| Komut | Soru |
-| --- | --- |
-| `npm run typecheck` | TypeScript kontrolleri geçiyor mu? |
-| `npm run build` | JavaScript üretilebiliyor mu? |
-| `npm run start` | Node ile program ne yapıyor? |
-| `npm test` | Tanımlanmış test beklentileri sağlanıyor mu? |
+- `npm run typecheck` ile `npm run build` arasındaki farkı anlatabilir misin?
+- `npm run start` terminale hiçbir şey yazmazsa otomatik olarak hata olduğunu söyleyebilir misin?
+- Typecheck geçen ama iş kuralını yanlış uygulayan küçük bir örnek verebilir misin?
+- Bir logic bug ile runtime exception için neden farklı debugging kanıtı toplarsın?
 
-Node runtime'dır, npm paket ve script yönetir, npx paket CLI'ını çalıştırabilir. `npm run typecheck` bu repoda `tsc --noEmit` çalıştırır. Build ile test aynı garanti değildir.
+## Tekrar ve tarihçe
 
-## Debugging örneği
-Bir test yanlış sayısal sonuç veriyorsa önce derleme hatası aramayın: input'u ve gerçekleşen return değerini bulun, hesaplama expression'ını kontrol edin, sonra beklenen davranışla karşılaştırın.
-
-**Mülakat:** *What is the difference between TypeScript checking and JavaScript runtime validation?* Type checking kod yazılırken türleri kontrol eder; runtime validation gerçek veriyi çalışma anında sınar. [06](../06-typescript-modeling/README.md) ve [07](../07-safe-runtime-boundaries/README.md)'de ayrıntısı var.
-
-**Kendi kendine:** `npm run build` geçerse uygulamanın doğru olduğunu neden söyleyemeyiz? `console.log` ile runtime farkı nedir?
-
-Kaynak: [I1 execution model](../../../I1-execution-model.md). Bu dosya öğrenme materyalidir, yeterlilik kaydı değildir.
+Bu README **yalnızca öğrenme navigasyonudur**; üç dersin uzun açıklamalarını ikinci kez kopyalamaz. [Eski I1 çalışması](../../../I1-execution-model.md) geçmiş kaynak olarak mevcut; güncel öğretim için yukarıdaki dersleri kullan. Eski dosyayı kaldırmak, diğer bölümlerde ona verilen bağlantılar incelendikten sonra ayrı bir temizlik kararıdır. Bu dokümanın hazırlanması bağımsız H0 uygulama kanıtı değildir.
