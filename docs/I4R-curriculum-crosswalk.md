@@ -29,3 +29,13 @@ Bu dosya **envanter ve taşıma kararıdır**, yeni müfredatın tamamlandığı
 - `undefined`, `null`, reference ve validation için birer ana öğretim evi olacak; diğer dersler kısa hatırlatma ve linkle yetinecek.
 - I4R dokümantasyon çıktısı H0 veya I4 implementation/debugging/transfer kanıtı oluşturmaz.
 - Repo `src/`, `tests/`, gerçek test sonuçları ve tüm Markdown bağlantıları geçiş tamamlandığında ayrıca doğrulanacak.
+
+## I4R uygulama ilerlemesi — 11 Ekim 2026
+
+- Yeni müfredat root'u ve 01–07 öğretim chapter README'leri oluşturuldu.
+- Mevcut I4'ün 7 + 6 + 4 = 17 dersinin tamamı 08–10 bölüm yollarında bulunuyor. **Ternary dersi** yeni dizinde özlü bir yeniden yazımdır; önceki uzun sürüm `docs/learning/javascript/01-value-and-decision-mechanics/06-ternary.md` içinde korunuyor.
+- Eski `docs/I1-*`, `docs/I2-*`, `docs/I3-*` silinmedi; tarihsel not ve evidence olarak kaldı. Eski `docs/learning/javascript/` da kayıp riskine karşı tutuldu.
+- Öğrenme dizininin 11 ana README dosyasında 74 relative link kontrol edildi; bilinen hedeflere göre kırık bağlantı bulunmadı.
+- Yeni 17 I4 dersinde 87 relative link ve code-fence etiketleri kontrol edildi; taşınan yeni path'lerde kırık bağlantı bulunmadı. Ternary dersindeki eski sürüm bağlantısı kasıtlıdır.
+- TypeScript code block'larının tamamı otomatik type-check edilmedi. `npm run typecheck` ve `npm test` bağlı GitHub arayüzünden çalıştırılamadığı için sonuçları **doğrulanmadı**. Bu eksik koşullar nedeniyle I4R Closure Report henüz kapalı sayılamaz.
+- I4 uygulama/debugging/H0 transfer durumu değişmedi.
