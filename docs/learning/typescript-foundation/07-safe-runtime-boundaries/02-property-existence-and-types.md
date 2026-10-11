@@ -85,3 +85,47 @@ Belirti: `price` alanı var ama hesap sonucu string birleşmesi. Önce property'
 Price string; NaN typeof number olduğu için geçebilir; array object'ten ayrıca ayrılmalıdır.
 
 </details>
+
+## 9. Daha sıkı iş kuralı: geçerli fiyatın sınırı
+
+Şu validator mevcut shape kontrolüne ek olarak fiyatın **sonlu ve negatif olmayan** number olmasını ister:
+
+```ts
+function isValidPrice(input: unknown): boolean {
+  return typeof input === "number" &&
+         Number.isFinite(input) &&
+         input >= 0;
+}
+console.log(isValidPrice(0));        // true
+console.log(isValidPrice(-1));       // false
+console.log(isValidPrice(NaN));      // false
+console.log(isValidPrice(Infinity)); // false
+console.log(isValidPrice("10"));     // false
+```
+
+**Neden üç koşul?** typeof temel runtime türünü, isFinite sonlu sayısallığı, `>=0` business constraint'i ölçer. Bir kontrolün görevi diğerinin yerine geçmez.
+
+### Property varlığının negatif testi
+
+```ts
+const a = {price:undefined};
+const b = {};
+console.log("price" in a); // true
+console.log("price" in b); // false
+```
+
+Bu örnek, alanın varlığı ile alanın geçerli value taşıması arasındaki farkı gösterir.
+
+### Hata ayıklama laboratuvarı
+
+Belirti: Validator `{name:"Elma",price:NaN}` object'ini kabul ediyor. Type check geçebilir; çünkü NaN number türündedir. Expected sözleşme sonlu fiyat istiyorsa `Number.isFinite` kontrolünü eklemek gerekir.
+
+### Bağımsız görev
+
+Yukarıdaki `validate` function'ına fiyat sınırı ekle. `0`, `-1`, `NaN`, `Infinity` ve `100` için beklenen sonucu iş kuralından çıkart.
+
+<details><summary>Kontrol</summary>
+
+0 ve 100 kabul; negatif, NaN ve Infinity reddedilir.
+
+</details>
