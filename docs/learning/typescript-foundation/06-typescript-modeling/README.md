@@ -39,4 +39,4 @@ Başlangıçta iki olası tür vardır; `typeof` kontrolü ilgili branch'de olas
 
 **Mülakat:** *Does a TypeScript type validate JSON at runtime?* Hayır. JSON sonrası verinin gerçek şekli ve değerleri runtime kontrolleriyle doğrulanır.
 
-**Pekiştirme:** `nickname?: string` ile `nickname: string | null` farkı? `unknown` neden `any`'den daha güvenli? Kaynaklar: [I2](../../I2-control-flow-functions-data-modeling.md), [I3](../../I3-safe-types-runtime-boundaries.md).
+**Pekiştirme:** `nickname?: string` ile `nickname: string | null` farkı? `unknown` neden `any`'den daha güvenli? Kaynaklar: [I2](../../../I2-control-flow-functions-data-modeling.md), [I3](../../../I3-safe-types-runtime-boundaries.md).
