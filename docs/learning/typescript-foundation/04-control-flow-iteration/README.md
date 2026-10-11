@@ -2,6 +2,12 @@
 
 **Önkoşul:** [03 — functions](../03-functions-fundamentals/README.md). **Sonraki:** [05 — references](../05-objects-arrays-references/README.md).
 
+## Ayrıntılı dersler
+
+1. [Conditions, Multiple Conditions ve Branch Seçimi](./01-conditions-multiple-branches.md)
+2. [for...of ve Çok Kayıtlı Iteration](./02-for-of-iteration-over-arrays.md)
+3. [Early Return ve Loop İçindeki return Bug'ı](./03-return-inside-loop-debugging.md)
+
 ## Problem
 Tek kaydı kontrol etmek ile çok kayıt üzerinde doğru zamanda karar vermek farklıdır. Döngü içindeki erken return gerçek kayıplara yol açabilir.
 
