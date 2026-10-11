@@ -207,7 +207,3 @@ Sadece `90 → Passed` test etmek yeterli değildir. `>= 60` operatörünü yanl
 3. `0` falsy fakat geçerli stok değeridir.
 4. Branch'lerin mantığı ve debugging adımları açık görünür.
 </details>
-
-## 11. Sonraki ders
-
-Ternary iki alternatifli değer seçiminde yararlı. Bir ifadenin `"pending"`, `"approved"`, `"failed"` gibi **çok sayıda sabit değerine** göre karar gerekiyorsa Ders 7 — Switch / Case konusuna geç.
