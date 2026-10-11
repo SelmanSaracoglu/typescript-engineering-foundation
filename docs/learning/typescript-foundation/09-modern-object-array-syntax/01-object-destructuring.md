@@ -1,9 +1,5 @@
 # Ders 8 — Object Destructuring: Nesnenin Alanlarını Anlamlı Değişkenlere Ayırmak
 
-> **Öğrenme yolu:** [JavaScript dizini](../README.md) → [Bölüm 2](./README.md)  
-> **Önkoşul:** Object, property erişimi (`user.name`), değişkenler, `undefined`, referans kavramı.  
-> **Hedef:** Sözdizimini ezberlemek yerine hangi property'nin hangi değişkene bağlandığını, varsayılanların ne zaman çalıştığını ve referans etkisini açıklamak.
-
 ## 1. Neden ihtiyaç duyuyoruz?
 
 Bir fonksiyonun kullanıcı verisi aldığını düşünelim. Klasik property erişimiyle her yerde `user.id`, `user.name`, `user.role` yazabiliriz:
@@ -127,7 +123,7 @@ const city = profile.city ?? "Unknown";
 console.log(city); // Unknown
 ```
 
-Bu kod `profile: undefined` için çalışır; `profile: null` kabul eden bir modelde aynı varsayılan davranışı bekleme. Optional Chaining'i [Ders 12](./05-optional-chaining.md)'de ayrı öğreneceğiz.
+Bu kod `profile: undefined` için çalışır; `profile: null` kabul eden bir modelde aynı varsayılan davranışı bekleme. Optional Chaining'i Ders 12'de ayrı öğreneceğiz.
 
 ## 6. Fonksiyon parametresinde destructuring
 
@@ -164,7 +160,7 @@ settings.theme = "light";
 console.log(user.settings.theme); // light
 ```
 
-Bu davranış "destructuring object'i derin kopyaladı" anlamına gelmez. Yeni dış object kopyası istiyorsak [Spread](./03-spread.md) dersindeki farklı mekanizmayı değerlendirmeliyiz.
+Bu davranış "destructuring object'i derin kopyaladı" anlamına gelmez. Yeni dış object kopyası istiyorsak Spread dersindeki farklı mekanizmayı değerlendirmeliyiz.
 
 ## 8. Gerçekçi senaryo: Test sonucundan rapor satırı
 
@@ -215,10 +211,3 @@ Object'te property **adı**, array'de **pozisyonu** önemlidir (Ders 9).
 4. `name` ve `price` property'si alan, adı ve fiyatı bir string olarak döndüren `describe` fonksiyonunu yaz.
 
 **Kısa kontrol:** (1) `currentStatus = "pending"`, `retries = 0`; (2) `profile` eksik olduğu için nested erişim başarısız olabilir; önce default object ya da `?.` ile güvenli erişim; (3) aynı nested referans; (4) tasarladığın input/output contract'ı açık olmalı.
-
-**Sonraki ders:** [Array Destructuring](./02-array-destructuring.md). **Kanıt durumu:** Teorik eğitim belgesi; gerçek uygulama, typecheck, Vitest, debugging ve H0–H4 bağımsızlık değerlendirmesi değildir.
-
-
----
-
-> **Kalıcı müfredat notu:** Bu ders [TypeScript Foundation öğrenme rotasının](../README.md) parçasıdır. Dokümandaki önceki Increment/yardım durumları tarihsel bağlamdır; güncel bağımsız yeterlilik kanıtı değildir.
