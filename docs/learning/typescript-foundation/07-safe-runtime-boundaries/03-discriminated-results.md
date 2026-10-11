@@ -100,3 +100,53 @@ Belirti: Invalid input success dönüyor. Hangi guard yanlış? Property existen
 Failure; hayır; normal return kanalıdır.
 
 </details>
+
+## 10. Caller tarafındaki kontrol eksikse ne olur?
+
+```ts
+type Result =
+  | {ok:true; value:number}
+  | {ok:false; error:"INVALID"};
+
+function calculate(input: number): Result {
+  if (input < 0) return {ok:false,error:"INVALID"};
+  return {ok:true,value:input*2};
+}
+const result = calculate(-1);
+if (result.ok) {
+  console.log(result.value);
+} else {
+  console.log(result.error); // INVALID
+}
+```
+
+Bu kullanımda error branch'i beklenen normal sonucu temsil eder. Caller “Result her zaman value taşır” diye varsayamaz.
+
+### Birleşik input/output tablosu
+
+| Input | ok | Dönen alan |
+| ---: | --- | --- |
+| -1 | false | error |
+| 0 | true | value 0 |
+| 1 | true | value 2 |
+
+**Sınır:** Function'ın `input:number` olması NaN/Infinity değerlerini otomatik engellemez. Gerçek gereksinim bunları reddetmeyi istiyorsa koşullar genişletilmelidir.
+
+### Hatalı discriminant tasarımı
+
+```ts
+// Yanlış sözleşme: success/failure ayrımı yok.
+// type Ambiguous = { value?:number; error?:string };
+```
+
+Bu modelde hem value hem error eksik olabilir. Caller hangi branch'e sahip olduğunu anlamakta zorlanır. Literal `ok:true/false` iki durumun yapısını belirginleştirir.
+
+### Bağımsız görev
+
+`Result` error kodunu `"INVALID" | "OUT_OF_RANGE"` ile genişletmek istiyorsun. Hangi input hangi kodu dönmeli? Önce gereksinim tanımla; ardından discriminated union ve beklenen sonuç tablosu hazırla.
+
+<details><summary>Kontrol</summary>
+
+Hata kodunun doğru seçimi iş sözleşmesine bağlıdır. Discriminant her sonuçta tutarlı biçimde bulunmalıdır.
+
+</details>
