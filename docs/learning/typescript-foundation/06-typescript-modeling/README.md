@@ -2,6 +2,13 @@
 
 **Önkoşul:** [05 — objects](../05-objects-arrays-references/README.md). **Sonraki:** [07 — runtime boundary](../07-safe-runtime-boundaries/README.md), [08 — decision mechanics](../08-value-and-decision-mechanics/README.md).
 
+## Ayrıntılı dersler
+
+1. [type, interface ve Object Shape](./01-type-alias-object-shape-interface.md)
+2. [Optional Property, undefined ve null](./02-optional-undefined-null.md)
+3. [Union Types ve Control-Flow Narrowing](./03-unions-control-flow-narrowing.md)
+4. [unknown, any ve Compile-Time Model Sınırı](./04-unknown-and-compile-time-limits.md)
+
 ## Temel fark
 TypeScript `type` veya `interface` programcının beklediği shape'i type-check sırasında açıklar; runtime'da gelen her değeri otomatik doğrulamaz.
 
