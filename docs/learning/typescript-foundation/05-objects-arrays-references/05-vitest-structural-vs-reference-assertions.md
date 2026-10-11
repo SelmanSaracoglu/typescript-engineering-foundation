@@ -6,7 +6,7 @@
 Yalnız structural equality testi, aynı object'in iki collection tarafından paylaşılıp paylaşılmadığını ortaya çıkarmaz.
 
 ## 2. Kavram ve sözleşme
-`toEqual` **yapı/değer** eşitliği, `toBe` object ve array üzerinde **referans identity** kontrolüdür. İlk assertion sonucu doğru gösterir. İkinci yeni dış array'i, üçüncü yeni element object'ini doğrular. Son assertion, result üzerinde mutation yapıldıktan sonra input'un etkilenmediğini gözler. Bunlar birbirini tamamlar; yalnız yeşil test sayısı yeterli değildir. Buradaki `map` kullanımı, I2 sırasında yapılan manuel object-copy davranışını kısa test fixture içinde göstermek içindir; array transformation yöntemlerinin öğretimi gelecek bölümlerdedir.
+`toEqual` **yapı/değer** eşitliği, `toBe` object ve array üzerinde **referans identity** kontrolüdür. İlk assertion sonucu doğru gösterir. İkinci yeni dış array'i, üçüncü yeni element object'ini doğrular. Son assertion, result üzerinde mutation yapıldıktan sonra input'un etkilenmediğini gözler. Bunlar birbirini tamamlar; yalnız yeşil test sayısı yeterli değildir. Örnek, I2'deki `for...of` ve yeni object literal ile kopyalama modelini kullanır; gelecek collections yöntemlerine geçmez.
 
 ## 3. Açıklamalı örnek
 ```ts
@@ -14,10 +14,10 @@ import { expect, it } from "vitest";
 
 it("new result objects do not share the input reference", () => {
   const input = [{ name: "Ali", score: 80 }];
-  const output = input.map(item => ({
-    name: item.name,
-    score: item.score
-  }));
+  const output: { name: string; score: number }[] = [];
+  for (const item of input) {
+    output.push({ name: item.name, score: item.score });
+  }
 
   expect(output).toEqual([{ name: "Ali", score: 80 }]);
   expect(output).not.toBe(input);
