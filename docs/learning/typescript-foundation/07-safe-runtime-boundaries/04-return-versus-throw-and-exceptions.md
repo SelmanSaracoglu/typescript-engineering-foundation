@@ -101,3 +101,45 @@ Belirti: Catch çalışmadı. Function gerçekten throw mu yapıyor yoksa error 
 Hayır; hayır; hayır, açık Result kullanılabilir.
 
 </details>
+
+## 10. Aynı koşul için iki farklı hata sözleşmesi
+
+```ts
+function safeDivide(a: number, b: number): number | null {
+  if (b === 0) return null;
+  return a / b;
+}
+function strictDivide(a: number, b: number): number {
+  if (b === 0) throw new Error("DIVIDE_BY_ZERO");
+  return a / b;
+}
+console.log(safeDivide(6,0)); // null
+try {
+  strictDivide(6,0);
+} catch(error: unknown) {
+  if (error instanceof Error) console.log(error.message); // DIVIDE_BY_ZERO
+}
+```
+
+Her iki function da b=0 durumunu **engeller**, ancak caller'ın ele alması gereken kanal farklıdır.
+
+| Çağrı | Normal return | Exception |
+| --- | --- | --- |
+| `safeDivide(6,0)` | null | yok |
+| `strictDivide(6,0)` | yok | Error |
+| `safeDivide(6,3)` | 2 | yok |
+| `strictDivide(6,3)` | 2 | yok |
+
+### Reproduction ve debugging
+
+Strict fonksiyonda catch tetiklenmediğini düşün. Gerçekte `strictDivide` mı çağrıldı, yoksa `safeDivide` gibi normal error sonucu dönen başka bir fonksiyon mu? Throw olup olmadığını önce doğrula.
+
+### Bağımsız aktarım
+
+Bir `parsePort(input:string)` function'ı tasarla. Boş string, `"0"`, `"8080"`, `"abc"` durumları için normal error result mı, exception mı kullanılacağını seç ve nedenini açıkla. Yalnız isimden otomatik karar verme.
+
+<details><summary>Kontrol</summary>
+
+İş sözleşmesi invalid input'u beklenen sonuç olarak tanımlıyorsa explicit Result uygun olabilir. Gerçek exception politikası API sözleşmesine bağlıdır.
+
+</details>
