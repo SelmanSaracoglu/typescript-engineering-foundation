@@ -1,9 +1,5 @@
 # Ders 15 — JSON Serialization: `JSON.stringify()`
 
-> **Öğrenme yolu:** [JavaScript öğrenme dizini](../README.md) → [Bölüm 3](./README.md)  
-> **Önkoşul:** [Ders 14 — JSON Fundamentals](./01-json-fundamentals.md).  
-> **Bu dersin sorusu:** JavaScript değerlerini JSON metnine dönüştürürken hangi bilgiler korunur, hangileri değişir?
-
 ## 1. Serialization nedir, neden kullanılır?
 
 **Serialization (serileştirme)**, bellekteki bir değeri saklamak veya aktarmak için uygun bir gösterime dönüştürmektir. JSON serialization, JavaScript tarafında çoğunlukla `JSON.stringify()` ile yapılır.
@@ -328,9 +324,3 @@ Bu testler **tasarım örneğidir**; mevcut repository'de çalıştırıldıklar
 5. Top-level `undefined` dönüşü `undefined` olabilir; döngüsel referans veya BigInt hata oluşturabilir.
 
 </details>
-
-## 12. Sıradaki ders ve kanıt sınırı
-
-**Sıradaki ders:** [JSON.parse — Parsing ve SyntaxError](./03-json-parse.md). JSON metnini JavaScript değerine dönüştürürken hatayı nasıl yöneteceğimizi ve TypeScript `any` riskini inceleyeceğiz.
-
-**Kanıt:** Bu belge öğretim kaynağıdır; bağımsız repo uygulaması, Vitest ve debugging sonucunu temsil etmez.
