@@ -1,6 +1,6 @@
 # JavaScript / TypeScript — Modüler Öğrenme Dizini
 
-Bu dizin Increment teslimatlarına göre değil, **kavramsal önkoşul ve öğrenme sırasına** göre düzenlenmiştir. Her ders ayrı Markdown belgesidir; bölüm `README.md` dosyaları kavramları birbirine bağlar.
+Bu dizin Increment teslimatlarına göre değil, **kavramsal önkoşul ve öğrenme sırasına** göre düzenlenmiştir. Her konu ayrı Markdown dersidir; bölüm `README.md` dosyaları kavramları birikimli örneklerle birbirine bağlar.
 
 ## Öğrenme rotası
 
@@ -10,16 +10,16 @@ Bu dizin Increment teslimatlarına göre değil, **kavramsal önkoşul ve öğre
 
 ## Dokümanlardan nasıl yararlanılır?
 
-- **İlk kez öğreniyorsan:** Dersleri sırayla oku, örneklerin çıktısını önce kendin tahmin et, gerekçesini açıklamayı dene.
-- **Tekrar yapıyorsan:** Kavram, mekanizma, kritik ayrımlar ve debugging bölümlerine dön.
-- **Mülakata hazırlanıyorsan:** Mülakat sorularını önce kendi cümlelerinle yanıtla; örnek cevabı sonra karşılaştır.
-- **Uygulamaya geçiyorsan:** Derslerdeki teorik bilgiyi gerçek repo kodu, testler, typecheck ve debugging ile ayrıca doğrula.
+- **İlk kez öğreniyorsan:** Dersleri sırayla oku. Kodun çıktısını açıklamadan önce kendin tahmin et; yalnızca sonucu değil *nedenini* söyle.
+- **Tekrar yapıyorsan:** Kavramın çalışma mekanizmasını, sınır davranışlarını, yanlış kullanım örneklerini ve debugging adımlarını incele.
+- **Mülakata hazırlanıyorsan:** Her dosyanın **Mülakat hazırlığı** bölümündeki İngilizce soruya önce kendin cevap ver, ardından örnek cevabı Türkçe açıklamasıyla karşılaştır.
+- **Pratiğe geçiyorsan:** Öğretim örneğini gerçek repo kodundan ayır. Yeni bir görev geliştir, TypeScript typecheck/Vitest ile doğrula ve debugging sürecini kaydet.
 
 ## Belge kalitesi ve revizyon durumu
 
-**Bölüm 3**, kavram tanımı → neden gerekli → adım adım mekanizma → kod ve sınır durumları → hata/debugging → mülakat → pekiştirme düzeninde ayrıntılı öğretim notları olarak hazırlandı.
+**Bölüm 1 ve Bölüm 3**, yeni başlayanların kavramı geri dönüp yeniden öğrenebilmesine yönelik kapsamlı teknik ders kaynakları olarak düzenlendi: neden gerekli → tanım → mekanizma → açıklamalı kod → kritik ayrımlar → hata/debugging → mülakat → pekiştirme.
 
-**Bölüm 1 ve 2 belgeleri**, önceki kısa sürümleridir; aynı derinlik standardına ulaşmaları için ayrıca revizyon gerektirir. Bu dizinde bulunmaları, pedagojik kalitelerinin Bölüm 3 ile aynı olduğu anlamına gelmez.
+**Bölüm 2** hâlen önceki kısa sürümüdür. Aynı pedagojik seviyeye getirilmesi için ayrıca revizyon gerektirir; dizinde bulunması bütün bölümlerin içerik kalitesinin eşit olduğu anlamına gelmez.
 
 ## Tarihsel çalışma ve kanıt
 
@@ -27,4 +27,4 @@ Mevcut `docs/I1-*`, `docs/I2-*` ve `docs/I3-*` belgeleri geçmiş Increment çal
 
 - Teorik öğrenme ve örnekleri anlama, bağımsız programlama yeterliliği anlamına gelmez.
 - I4 için gerçek repo uygulaması, `typecheck`, Vitest, debugging ve bağımsız transfer gözlemi ayrıca yapılmalıdır.
-- Yardım seviyesi H0–H4, yalnızca gerçek uygulama davranışına göre kaydedilecektir.
+- Yardım seviyesi H0–H4, yalnızca gerçek uygulama davranışına göre kaydedilir.
