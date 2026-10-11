@@ -90,3 +90,56 @@ Belirti: Boş input'ta fonksiyon `[{}]` döndürüyor. Expected `[]` ise output 
 Birincinin length'i 0, ikincinin 1; `users[0].score` number; üçüncü index out-of-range olabilir; fonksiyon `user.name` string'ini push eder.
 
 </details>
+
+## 9. İkinci örnek: iç içe object ve array'e ulaşmak
+
+```ts
+type Team = {
+  title: string;
+  members: { name: string; active: boolean }[];
+};
+const team: Team = {
+  title:"QA",
+  members:[
+    {name:"Ali",active:true},
+    {name:"Ece",active:false}
+  ]
+};
+console.log(team.title);              // QA
+console.log(team.members.length);     // 2
+console.log(team.members[0].name);    // Ali
+```
+
+Şu erişim zincirini oku: `team` object → `members` array property → `[0]` ilk member object → `.name` string property. Bir katmanı atlamak yanlış biçimli erişim oluşturabilir.
+
+### Yanlış index'i ayırt et
+
+```ts
+const names = ["A", "B"];
+console.log(names[1]);  // B
+console.log(names[2]);  // undefined
+```
+
+Array length=2 olması son index'in 2 olduğu anlamına gelmez; index 0 ve 1'dir. `names[2].toUpperCase()` doğrudan yürütülse runtime hata riski doğar.
+
+### Kayıt sayısı ile aktif kayıt sayısı
+
+```ts
+let activeCount = 0;
+for (const member of team.members) {
+  if (member.active) activeCount++;
+}
+console.log(activeCount); // 1
+```
+
+`team.members.length` 2; aktif member sayısı 1. Container uzunluğu iş filtresinin sonucunu otomatik vermez.
+
+### Bağımsız görev
+
+Üç üyeli bir team düşün: ikisi inactive, biri active. Hem `length` hem `activeCount` sonuçlarını tahmin et. Boş `members=[]` için hangi değerler çıkar?
+
+<details><summary>Kontrol</summary>
+
+Length 3, activeCount 1. Boş array için ikisi de 0.
+
+</details>
