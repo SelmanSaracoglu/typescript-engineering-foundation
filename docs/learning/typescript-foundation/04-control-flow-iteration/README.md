@@ -47,4 +47,4 @@ Bu örnek **üstte tanımlanan** `entries` ve `names` bağlamında hatalı kod p
 
 **Mülakat:** *Why can returning inside a loop be a bug?* Return fonksiyonun tamamını bitirir; sonraki öğelere geçilmez.
 
-**Pekiştirme:** Üç girdinin her iteration'ında hangi branch çalışır? `return` ikinci iterasyondan sonra olsa hangi kayıtlar kaybolur? Kaynak: [I2](../../I2-control-flow-functions-data-modeling.md).
+**Pekiştirme:** Üç girdinin her iteration'ında hangi branch çalışır? `return` ikinci iterasyondan sonra olsa hangi kayıtlar kaybolur? Kaynak: [I2](../../../I2-control-flow-functions-data-modeling.md).
