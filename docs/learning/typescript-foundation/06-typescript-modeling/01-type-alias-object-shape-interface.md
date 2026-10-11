@@ -1,45 +1,100 @@
-# type, interface ve Object Shape
+# Ders 19 — Type Alias, Interface ve Object Shape
 
-**Önkoşul:** [TypeScript modelleme bölümü](./README.md) · [Bölüm 05](../05-objects-arrays-references/README.md) · [Sonraki](./02-optional-undefined-null.md)
+## 1. Neden modelleme yapıyoruz?
 
-## 1. Neden ihtiyaç duyuyoruz?
-Bir array'deki kaydın hangi property'leri taşıdığını açık modellemeden, bir fonksiyonun giriş/çıkış sözleşmesi okunamaz.
+Bir function ürün alıyorsa hangi alanları beklediğini açıklayabilmeliyiz. `name` metin, `price` sayı, `inStock` boolean mı? Bu sözleşme dağınık kullanılırsa caller ve implementasyon aynı şeyi beklemeyebilir.
 
-## 2. Tanım ve mekanizma
-`type` mevcut bir veri modeline isim verir; `interface` object shape gibi sözleşmeleri tarif edebilir. Bu aşamada amaç iki sözdizimini yarıştırmak değil, verilen object'in **hangi alanları hangi tiplerde** taşımasının beklendiğini anlamaktır.
+## 2. TypeScript type tanımı bir runtime nesnesi değildir
 
-## 3. Açıklamalı kod ve çıktı
 ```ts
-type User = { name: string; score: number; active: boolean };
-interface UserInfo { name: string; score: number; active: boolean }
-
-function describe(user: User): string {
-  return user.active ? user.name : "inactive";
+type Product = {
+  name: string;
+  price: number;
+  inStock: boolean;
+};
+function label(product: Product): string {
+  return product.inStock ? product.name : "unavailable";
 }
-const ali: User = { name: "Ali", score: 80, active: true };
-const info: UserInfo = ali;
-console.log(describe(info)); // Ali
+const apple: Product = { name:"Elma", price:100, inStock:true };
+console.log(label(apple)); // Elma
 ```
 
-## 4. Execution ve veri akışı
-`ali` object'i üç property içerir. Type checker alanların isim ve türlerini kontrol eder. TypeScript structurally typed olduğundan `UserInfo` ve `User` aynı gerekli shape'i tanımlar ve örnekte birbirleriyle kullanılabilir.
+`type Product` yalnız **statik shape beklentisi** kurar. `apple` gerçek runtime object'idir. Derlenen JavaScript'te type alias bulunmaz; object literal ise gerçek data olarak kalır.
 
-## 5. TypeScript compile-time ile runtime ayrımı
-Tipin adı runtime object'e yeni property eklemez ve doğrulama yapmaz. `type` union/primitive gibi biçimleri de modelleyebilir; `interface`in ana başlangıç kullanım alanı object contract'tır. Derin farklar bu dersin hedefi değildir.
+## 3. Adım adım yürütme
 
-## 6. Sınır davranışları ve kritik farklar
-`User[]` bir `User` object'i değil, User elementlerinden oluşan array beklenmesi demektir. TypeScript object'i runtime'da zorla dönüştürmez; dış veri kontrolü Bölüm 07'dedir.
+1. `apple` üç property'li object olarak oluşur.
+2. TypeScript required alanların ve tiplerin uyumluluğunu kontrol eder.
+3. `label(apple)` aynı object referansıyla çağrılır.
+4. `product.inStock` true olduğu için Elma döner.
+5. `label` fonksiyonu ne object kopyalar ne de type tanımından object üretir.
 
-## 7. Yaygın yanlış kullanım / debugging
-'Property missing' hatası gördüğünde öncelikle modelin hangi alanı zorunlu tuttuğuna ve caller'ın o alanı gerçekten sunduğuna bak. `as User` ile kontrolü susturmak veri üretmez.
+## 4. interface ve structural typing
 
-## 8. Gerçek kullanım
-Uygulamanın model bekleyen iç fonksiyonları ve dışarıdan veri alan sınır fonksiyonları aynı güven seviyesinde değildir. Compile-time shape bilgisi faydalıdır fakat runtime'daki gerçek değeri anlamak için kontrol gerekir.
+```ts
+interface ListedProduct {
+  name: string;
+  price: number;
+  inStock: boolean;
+}
+const listed: ListedProduct = {
+  name:"Nar", price:110, inStock:false
+};
+console.log(label(listed)); // unavailable
+```
 
-## 9. Interview preparation
-*Does a TypeScript type create a runtime object?* No; it describes a compile-time expectation, not a runtime constructor or validator.
+`ListedProduct` ve `Product` adları aynı değil; ancak burada required shape'leri uyumlu. TypeScript çoğu object ilişkisini **structural typing** ile değerlendirir. Interface nesne sözleşmelerini yazmanın diğer yoludur; type alias ise union ve primitive gibi modelleri de isimlendirebilir.
 
-## 10. Bağımsız pekiştirme
-`score` alanı eksik object örneğinin neden typecheck'ten geçmemesi gerektiğini açıkla. `User[]` ile `User` arasındaki farkı iki kayıtla göster.
+## 5. Eksik alan ve yanlış tip
 
-**Kaynak:** [I2](../../../I2-control-flow-functions-data-modeling.md) ve [I3](../../../I3-safe-types-runtime-boundaries.md). Eğitim içeriği bağımsız öğrenci uygulama/H0 kanıtı değildir.
+```ts
+// Bilerek statik hata örnekleri:
+// const missing: Product = { name:"Elma", price:100 };
+// const wrong: Product = { name:"Elma", price:"100", inStock:true };
+```
+
+İlkinde required `inStock` yoktur, ikincide `price` string'dir. Modeli `as Product` ile susturmak alan üretmez; dış data runtime'da yanlış kalır.
+
+## 6. Tek kayıt ile array
+
+```ts
+const one: Product = { name:"Elma", price:100, inStock:true };
+const many: Product[] = [one];
+console.log(many.length); // 1
+console.log(many[0] === one); // true
+```
+
+`Product[]`, Product elementlerinin collection'ı demektir. Array'e object reference eklemek yeni element object üretmez. Aynı type adını paylaşmak object identity ile ilgili garanti değildir.
+
+## 7. İş kuralları type değildir
+
+```ts
+const invalidBusinessPrice: Product = {
+  name:"Elma", price:-100, inStock:true
+};
+console.log(invalidBusinessPrice.price); // -100
+```
+
+Bu statik olarak geçerli `number`, fakat ürün fiyatı için iş kuralına aykırı olabilir. Runtime validation ve iş kuralı ayrı gereksinimlerdir.
+
+## 8. Debugging
+
+**Property missing:** Önce modelde alan gerçekten zorunlu mu bak; caller eksikse düzelt. Alanı gereksiz yere `?` yapma.
+
+**Runtime değer yanlış:** Dışarıdan gelen object'in gerçek property türünü incele. Type assertion validation sağlamaz.
+
+**Beklenmeyen mutation:** Aynı `Product` modeline uyan iki object'in identity'sini de ayrıca kontrol et.
+
+## 9. Mülakat hazırlığı
+
+**Question:** Do TypeScript interfaces and types create runtime objects?
+
+> No. They describe compile-time contracts. A runtime object is created by JavaScript expressions such as object literals.
+
+**Pekiştirme:** `Product` ile `Product[]` farkı? İki farklı isimli ama aynı shape'li model kullanılabilir mi? `price:-1` type-check'ten geçebilir mi?
+
+<details><summary>Kontrol cevapları</summary>
+
+Tek kayıt ve dizi; uyumlu shape'lerde evet; number tipi negatifi otomatik yasaklamaz.
+
+</details>
