@@ -1,45 +1,126 @@
-# Local Variable, Return Value ve Execution Flow
+# Ders 9 — Local Variables, Return, Early Exit ve Function Flow
 
-**Önkoşul:** [Bölüm 02](../02-values-variables-basic-decisions/README.md) · [Bölüm dizini](./README.md) · [Önceki](./01-function-parameter-argument.md) · [Sonraki](./03-scope-shadowing-and-blocks.md)
+## 1. Neden öğreniyoruz?
 
-## Neden ihtiyaç duyuyoruz?
-`return`'ün yalnız sonuç yazmak değil ilgili function çağrısını bitirmek olduğunu bilmek hem testte hem debugging'de gereklidir.
+Bir function bazen birden fazla `return` barındırır. Kodun sonunda bir satır bulunması, her çağrının mutlaka o satıra ulaşacağı anlamına gelmez. Erken return, doğru yerleştirildiğinde gereksiz iç içe koşulları azaltabilir; yanlış yerdeyse işlemeyi yarıda keser.
 
-## Tanım ve mekanizma
-**Local variable** function body içinde kullanılan bağdır. **Return value** çağırana iletilen değerdir. Bir `return` yürütüldüğünde aynı çağrıdaki sonraki statement'lar çalışmaz.
+## 2. Temel kavramlar
 
-## Açıklamalı örnek
+**Local variable** function çağrısı içinde kullanılan bağdır. **Return statement** ilgili fonksiyon çağrısının yürütmesini durdurur ve (varsa) caller'a değer döndürür. **Early return**, fonksiyon gövdesinin sonuna varmadan koşullu bir yol üzerinden çıkılmasıdır.
+
+Öğretici model: `argument → parameter binding → local computations → chosen return → caller`. Her control-flow yolunu ayrı izlemek gerekir.
+
+## 3. Açıklamalı TypeScript örneği
+
 ```ts
 function classify(score: number): string {
   const threshold = 60;
   if (score < threshold) {
     return "retry";
   }
-  const label = "passed";
-  return label;
+  const result = "passed";
+  return result;
 }
+
 console.log(classify(59)); // retry
 console.log(classify(60)); // passed
+console.log(classify(75)); // passed
 ```
 
-## Input → processing → output / execution trace
-59 çağrısında `threshold=60`, condition true ve ilk `return` ile function sonlanır; `label` üretilmez. 60 çağrısında if geçilmez; `label='passed'` oluşturulup döndürülür.
+## 4. Execution flow — adım adım
 
-## TypeScript ile ilişki
-Return type `string` bütün ulaşılabilir normal yolların string üretmesini bekler. `return`'ün kendi başına her durumda doğru branch seçtiğini garanti etmez.
+**`classify(59)`:** `score=59`; `threshold=60`; `59<60` true; `return "retry"` çağrıyı bitirir. `result` satırına **ulaşılmaz**.
 
-## Sınır davranışları ve kritik ayrımlar
-Bir branch'de `return` unutulursa fonksiyon beklenmedik `undefined` döndürebilir. `console.log()` çağırana değer return etmek değildir. `void` dönüş tipi bilinçli şekilde sonuç kullanılmadığında yaygındır.
+**`classify(60)`:** `score=60`; `60<60` false; execution sonraki satıra ilerler; `result="passed"`; return passed.
 
-## Debugging ve gerçek kodu okuma
-Hatalı output veya beklenmeyen `undefined` için her branch'i kağıt üzerinde izle ve hangisinin return ile sonlandığını işaretle.
+**`classify(75)`:** Aynı ikinci yol seçilir.
 
-## Mülakat hazırlığı
-*Does return just send data?* It returns a value (if given) and ends execution of the current function invocation.
+| Girdi | Condition | İşlenen return | Sonuç |
+| --- | --- | --- | --- |
+| 59 | true | ilk | retry |
+| 60 | false | son | passed |
+| 75 | false | son | passed |
 
-## Kendi kendine pekiştirme
-`classify(0)`, `classify(60)` ve `classify(61)` hangi satırlara ulaşır?
+Aynı function tanımının farklı invocation'ları farklı yollar üzerinden biter.
 
-**Kapsam:** Bu bölümde **callback, higher-order function ve closure yoktur**. Bunlar daha sonraki Foundation öğrenme bölümlerine aittir.
+## 5. Farklı durumlarla derinleştirme
 
-**Kaynak/kanıt:** [I1](../../../I1-execution-model.md) ve [I2](../../../I2-control-flow-functions-data-modeling.md) içindeki kavramlar yeniden öğretilmiştir; bir öğrencinin H0 performansı hakkında yeni iddia oluşturmaz.
+### `return` ile `console.log` aynı değil
+
+```ts
+function compute(n: number): number {
+  console.log("computing");
+  return n * 2;
+}
+const value = compute(5); // computing
+console.log(value);       // 10
+```
+
+İlk log function gövdesinden, ikinci log caller'dan gelir. Function'ın normal return kanalı `10` değeridir.
+
+### Ulaşılamayan satır
+
+```ts
+function absolute(n: number): number {
+  if (n < 0) return -n;
+  return n;
+  // console.log("finished"); // return'den sonra çalışmaz
+}
+```
+
+Bir `return`'den sonraki expression aynı yolda yürütülmez. Bunun debugging'de önemi büyüktür: “Bu log niye görünmedi?” sorusu bazen yanlış dosyaya değil **erken biten control-flow yoluna** işaret eder.
+
+### Return unutulunca
+
+```ts
+// Bilerek yanlış model:
+// function isAdult(age: number): boolean {
+//   if (age >= 18) return true;
+//   // 17 için return yok: yanlış sözleşme
+// }
+```
+
+TypeScript `boolean` return beklentisiyle bazı execution yollarının `undefined` döneceğini belirtebilir. Bazı fonksiyonların bilinçli olarak `void` dönmesi ayrı tasarım kararıdır.
+
+## 6. TypeScript ile çalışma zamanı farkı
+
+`function classify(score: number): string` her normal yürütme yolunda string dönme sözleşmesi taşır. Bu sözleşme her string'in doğru iş kategorisi olduğunu kanıtlamaz. `"passed"` yerine `"ok"` dönmek type bakımından geçebilir; requirement farklıysa logic bug olur.
+
+`return` exception değildir. `throw`, normal çağrının sonuç kanalını terk eder ve exception handling mekanizmasına ilerler. Şimdilik return mekanizmasını anlamak yeterlidir.
+
+## 7. Sınır ve kritik ayrımlar
+
+**Sınır testi:** 59, 60, 61 tam olarak `<60` operator'ının davranışını ayırır. `score=0` ya da `score=-1` de normal number değerleridir; negatif skorların kabul edilmesi ayrı iş kuralıdır.
+
+**Yanlış konum:** Döngüyle çok kayıt işleyen function'ın içine yanlış `return` koymak ilk kayıt sonrası bütün çağrıyı bitirir; `return`'ü if/loop'tan çıkış sanmamak gerekir.
+
+**Yan etki:** Log, input object mutation veya dosya yazma gibi etkiler return edilen değerden bağımsız olabilir. Function'ın doğru sonuç dönmesi yan etki oluşturmadığını kanıtlamaz.
+
+## 8. Debugging — kanıttan düzeltmeye
+
+**Belirti:** 59 için yanlışlıkla "passed" geliyor.
+1. Beklenen sınıflandırmayı gereksinimden yaz.
+2. Gerçekte hangi `score` argument'ının geçtiğini doğrula.
+3. `score < threshold` condition'ının runtime sonucunu izle.
+4. Threshold yanlışsa minimum değişikliği yap.
+5. 59/60/61 testlerini yeniden çalıştır.
+
+**Belirti:** `console.log("finished")` hiç görünmüyor. Önce `return` veya exception nedeniyle execution'ın daha erken bitip bitmediğini kontrol et; otomatik olarak logger hatası sanma.
+
+## 9. Mülakat hazırlığı ve bağımsız pekiştirme
+
+**Question: What does a return statement do?**
+
+> It completes the current function invocation and optionally supplies a value to the caller. It does not merely leave the nearest if block.
+
+**Question: Is an early return always a bug?**
+
+> No. It is useful when the function should stop once a condition is met. It is a bug when the requirement needs additional work after that return.
+
+**Pekiştirme:** (1) `classify(60)` hangi return'a gider? (2) `return` sonrası satır neden çalışmaz? (3) İki çağrı aynı local `threshold` binding'ini mi paylaşır? (4) Tüm yolların return üretmesi neden önemlidir?
+
+<details><summary>Cevap kontrolü</summary>
+
+1. Son return. 2. Çağrı tamamlanır. 3. Her çağrı kendi local execution bağlamına sahiptir. 4. Caller'ın normal return sözleşmesi tutarlı olmalıdır.
+
+</details>
