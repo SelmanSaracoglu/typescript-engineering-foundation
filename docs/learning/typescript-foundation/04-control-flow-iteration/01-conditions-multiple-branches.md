@@ -94,3 +94,41 @@ Belirti: 100 puanlı inactive kullanıcı qualified dönüyor. Hipotez: skor bra
 1. inactive. 2. Qualified diye yanlış kabul eder. 3. Hayır; tek true/false sonuç sebebi ayırmaz. 4. Qualified yerine below-threshold döner.
 
 </details>
+
+## 9. Rehberli senaryo: yetki ve aktiflik birbirine karışmasın
+
+Bir endpoint'e erişim için kullanıcı hem aktif hem admin olmalıdır.
+
+```ts
+type Access = { active: boolean; role: "admin" | "viewer" };
+
+function reason(user: Access): string {
+  if (!user.active) return "ACCOUNT_DISABLED";
+  if (user.role !== "admin") return "INSUFFICIENT_ROLE";
+  return "ALLOWED";
+}
+console.log(reason({ active:false, role:"admin" })); // ACCOUNT_DISABLED
+console.log(reason({ active:true, role:"viewer" })); // INSUFFICIENT_ROLE
+console.log(reason({ active:true, role:"admin" })); // ALLOWED
+```
+
+**İki kontrol farklı sorulara cevap verir:** Account açık mı? Role yeterli mi? Function'ın return değeri yalnız boolean olmadığı için reddin nedenini de bildirir.
+
+| active | role | İlk check | Result |
+| --- | --- | --- | --- |
+| false | admin | disabled | ACCOUNT_DISABLED |
+| false | viewer | disabled | ACCOUNT_DISABLED |
+| true | viewer | devam | INSUFFICIENT_ROLE |
+| true | admin | devam | ALLOWED |
+
+**Risk:** İlk koşulun `user.role === "admin"` olması hâlinde inactive admin yanlışlıkla kabul edilebilir. İki koşulun birlikte gerekli olması sorumluluğu kodda açık tutulmalıdır.
+
+### Bağımsız transfer
+
+Yeni kural: Admin olmak yetmez; `verified` alanı da true olmalıdır. Önce expected truth table oluştur. Hangi durumda `ACCOUNT_DISABLED`, hangi durumda `INSUFFICIENT_ROLE`, hangi durumda yeni `NOT_VERIFIED` döneceğini sıralı tasarla.
+
+<details><summary>Kontrol</summary>
+
+Öncelikler gereksinime göre belirlenir. Örnekte inactive önce, sonra role, sonra verified kontrol edilebilir. Her error code için en az bir negatif ve bir pozitif case düşün.
+
+</details>
