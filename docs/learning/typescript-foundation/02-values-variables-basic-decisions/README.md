@@ -7,6 +7,7 @@
 1. [Primitive Değerler: Tür, Değer ve Karşılaştırma](./01-primitive-values-and-types.md)
 2. [const, let, Assignment ve Expression](./02-const-let-assignment-and-expressions.md)
 3. [Karşılaştırmalar ve if/else ile Temel Karar Akışı](./03-comparisons-if-else-branching.md)
+4. [Gereksinimden Beklenen Sonuca ve Boundary Testine](./04-requirements-boundaries-and-expected-results.md)
 
 ## Neden?
 Her karar önce değerlerden ve expression'lardan oluşur. `const` ile `let` değişken bağlama kurallarıdır; bir iş kuralının doğru uygulanmasını tek başına sağlamaz.
