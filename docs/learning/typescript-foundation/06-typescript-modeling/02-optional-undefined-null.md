@@ -100,3 +100,53 @@ Test değerlerini ayrı ele al: eksik property, explicit undefined, null, 0, bo�
 Undefined; evet; 0; hayır, property varlığı sözleşmesi farklıdır.
 
 </details>
+
+## 10. Derinleştirme: yokluk, null ve boş string farklı davranır
+
+```ts
+type Profile = { nickname?: string | null };
+function display(profile: Profile): string {
+  if (profile.nickname === undefined) return "MISSING";
+  if (profile.nickname === null) return "CLEARED";
+  if (profile.nickname === "") return "EMPTY";
+  return profile.nickname;
+}
+console.log(display({}));                   // MISSING
+console.log(display({nickname:null}));      // CLEARED
+console.log(display({nickname:""}));        // EMPTY
+console.log(display({nickname:"Ali"}));     // Ali
+```
+
+Bu function dört ayrı durumu ayırıyor. Hepsini “boş” saymak, iş kuralı bu ayrımı istiyorsa **veri kaybıdır**.
+
+| Input | Property | Runtime değer | Sonuç |
+| --- | --- | --- | --- |
+| `{}` | yok | undefined | MISSING |
+| `{nickname:null}` | var | null | CLEARED |
+| `{nickname:""}` | var | boş string | EMPTY |
+| `{nickname:"Ali"}` | var | string | Ali |
+
+**Hatalı alternatif:**
+
+```ts
+function wrongDisplay(p: Profile): string {
+  return p.nickname || "MISSING";
+}
+console.log(wrongDisplay({nickname:""})); // MISSING
+```
+
+Yanlış sürüm boş string, undefined ve null'u aynı fallback sonucuna indirger.
+
+### Debugging
+
+Kullanıcı nickname'i kasıtlı olarak boş bırakmış, ancak sistem “hiç girilmedi” diyor. Actual property var mı? `"nickname" in profile`, `typeof profile.nickname` ve gerçek değer ne? Hangi ayrımı gereksinim korumalı?
+
+### Yeni görev
+
+`retries?:number|null` alanı için eksik=3, null=0, zero=0, pozitif=sayı davranışını tasarla. Tek `??` ifadesi bütün bu farkı karşılayabilir mi?
+
+<details><summary>Kontrol</summary>
+
+Hayır. `null` için ayrı 0, `undefined` için 3 gerektiğinden açık null ve undefined branch'leri kullanmak gerekir.
+
+</details>
