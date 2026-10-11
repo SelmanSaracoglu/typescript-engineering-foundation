@@ -1,12 +1,4 @@
-# Bölüm 3 — JSON Boundary: Metinden Güvenilir TypeScript Verisine
-
-> **Öğrenme dizini:** [JavaScript / TypeScript modüler eğitim](../README.md)  
-> **Bölüm amacı:** Bir JSON metnini okumakla, uygulamanın güvenle kullanacağı veriyi elde etmek arasındaki farkı anlamak.
-
-## Önkoşullar ve birikimli bağlantı
-
-JSON syntax, serialize/parse davranışı bu bölümün yeni katkısıdır. `JSON.parse()` çıktısının doğrulanmamış değer olması ve doğru TypeScript modele taşınması için önce [07 — Safe Runtime Boundaries](../07-safe-runtime-boundaries/README.md) öğrenilmelidir. Burada validation açıklaması o bölümü uygulamaya bağlar, bağımsız ikinci bir type-validation müfredatı kurmaz.
-
+# 10 — JSON Boundary
 
 ## 1. Bu bölüm neyi çözüyor?
 
@@ -22,10 +14,10 @@ Bu geçerli JSON'dur ama beklediğimiz `Product` modelindeki `id` ve `price` ala
 
 | Sıra | Ders | Kazanım | Önkoşul |
 |---|---|---|---|
-| 14 | [JSON Fundamentals](./01-json-fundamentals.md) | JSON metni ile runtime object'i ayır; sözdizimini oku. | Object, array, primitive türler |
-| 15 | [JSON.stringify — Serialization](./02-json-stringify.md) | Metne dönüşümü, veri kaybını ve hata ihtimalini açıkla. | JSON Fundamentals |
-| 16 | [JSON.parse — Parsing](./03-json-parse.md) | Metni değere dönüştür; `SyntaxError`, `any` ve `unknown` ayrımını öğren. | JSON + serialization, try/catch |
-| 17 | [JSON Boundary & Validation](./04-json-boundary-validation.md) | Type/shape, iş kuralı ve kontrollü `Result` modelini birleştir. | Parsing, narrowing, union type |
+| 14 | JSON Fundamentals | JSON metni ile runtime object'i ayır; sözdizimini oku. | Object, array, primitive türler |
+| 15 | JSON.stringify — Serialization | Metne dönüşümü, veri kaybını ve hata ihtimalini açıkla. | JSON Fundamentals |
+| 16 | JSON.parse — Parsing | Metni değere dönüştür; `SyntaxError`, `any` ve `unknown` ayrımını öğren. | JSON + serialization, try/catch |
+| 17 | JSON Boundary & Validation | Type/shape, iş kuralı ve kontrollü `Result` modelini birleştir. | Parsing, narrowing, union type |
 
 **Önerilen kullanım:** İlk kez öğreniyorsan sırayla oku. Tek bir kavramı unuttuysan ilgili dersi aç. Mülakat için her dosyanın **Mülakat hazırlığı** bölümünü, pratik için **Pekiştirme** bölümünü kullan.
 
@@ -91,7 +83,7 @@ type Result =
 - `'{"id":1,"price":-1}'` → doğru syntax ve tip, yanlış iş kuralı.
 - `'{"id":1,"price":0}'` → **exact boundary**, geçerli.
 
-Bu akışın gerçek TypeScript implementation'ı ve açıklamalı kodu [Ders 17'de](./04-json-boundary-validation.md) bulunur.
+Bu akışın gerçek TypeScript implementation'ı ve açıklamalı kodu Ders 17'de bulunur.
 
 ## 6. Bölüm sonunda kendini sınama
 
@@ -137,7 +129,3 @@ Test seçimi **gözlenebilir dış davranışa** dayanmalıdır. Implementation 
 - **Narrowing:** Kontroller sonrasında TypeScript'in olası tipleri daraltması.
 - **Discriminated union:** `ok: true | false` gibi ayırt edici bir alanla türleri ayırma.
 - **Exact boundary:** `>= 0` için `0` gibi, kuralın tam sınırındaki değer.
-
-**Sonraki mühendislik adımı:** I4 teori bölümlerinden sonra mevcut repo üzerinde geliştirilen kod, gerçek typecheck/Vitest ve debugging ile yeterlilik gözlemi. Yeni repo, framework veya deployment kapsamı eklenmez.
-
-**Kanıt ve yardım seviyesi:** Bu belgeler öğretim materyalidir, bağımsız beceri kanıtı değildir. H0–H4 yalnız gerçek uygulama çıktısına göre değerlendirilir.
