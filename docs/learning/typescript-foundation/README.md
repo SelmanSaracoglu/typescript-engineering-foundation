@@ -17,12 +17,13 @@ Bu müfredat TypeScript ve JavaScript'in mühendislik temellerini **kavram → �
 | 09 | Modern Object & Array Syntax | 6 |
 | 10 | JSON Boundary | 4 |
 | 11 | Functions as Values & Callbacks | 5 |
-| **Toplam** | | **49** |
+| 12 | Closures & Captured State | 4 |
+| **Toplam** | | **53** |
 
 Her klasördeki `README.md` bölümün içerik dizinidir; ilgili ders dosyaları ayrıntılı konu anlatımlarını taşır. Örnekleri okurken ilk olarak sonucu tahmin etmek, ardından yürütmeyi adım adım açıklamak ve sınır durumunu sınamak esastır.
 
 ## İleride ele alınabilecek konular
 
-Closures & Captured State; Collections & Data Transformation; Async Foundations. Bu konular bu müfredattaki 49 dersin henüz işlenmiş kapsamına dahil değildir.
+Collections & Data Transformation; Async Foundations. Bu konular bu müfredattaki 53 dersin henüz işlenmiş kapsamına dahil değildir.
 
 Kavramsal ders notlarının bulunması, `src/` / `tests/` uygulamasının, typecheck/test sonucunun veya bağımsız mühendislik yetkinliğinin tamamlandığı anlamına gelmez.
