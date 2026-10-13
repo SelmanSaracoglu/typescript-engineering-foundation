@@ -1,6 +1,6 @@
 # Test Engineering Handbook — Engineering, Interviews & ISTQB CTFL
 
-> **Durum:** Epic 02 / I1 (Foundations & Test Design) yayımlandı. I2–I6 henüz hazırlanmadı.  
+> **Durum:** Epic 02 / I1 ve I2 dokümantasyonları yayımlandı. I3–I6 henüz hazırlanmadı.  
 > **Dil:** Türkçe anlatım, İngilizce teknik terimler ve mülakat cevapları.  
 > **Sınav referansı:** ISTQB Certified Tester Foundation Level (CTFL), İngilizce Syllabus **v4.0.1 (15.09.2024)**.
 
@@ -32,6 +32,21 @@ Bu alan, mevcut **typescript-foundation** dokümantasyonundan ayrıdır; uygulam
 
 **I1 toplamı: 10 konu dosyası + 1 genel README.** CTFL v4.0.1 Bölüm 4'ün white-box ve ATDD gereksinimlerini doğru kapsamak için başlangıçtaki 8 dosyaya 2 anlamlı konu dosyası eklenmiştir.
 
+## Önerilen okuma sırası — I2
+
+### 03 — Test Levels & Strategy
+
+CTFL Bölüm 2 ve 3 öğrenme hedeflerini izlemek için önce yaşam döngüsü ve review bağlamını oku, ardından seviyelere ve stratejiye geç.
+
+1. [SDLC, Test-first, DevOps & Maintenance](03-test-levels-and-strategy/05-sdlc-devops-and-maintenance-testing.md)
+2. [Static Testing, Reviews & Early Feedback](03-test-levels-and-strategy/06-static-testing-and-reviews.md)
+3. [Unit, Component, Integration, API & E2E — Levels and Types](03-test-levels-and-strategy/01-unit-component-integration-api-e2e.md)
+4. [Test Pyramid, Distribution & Agile Testing Quadrants](03-test-levels-and-strategy/02-test-pyramid-and-distribution.md)
+5. [Risk-based Test Strategy & Prioritization](03-test-levels-and-strategy/03-risk-based-test-strategy.md)
+6. [Regression, Confirmation, Smoke, Sanity & Exploration](03-test-levels-and-strategy/04-regression-smoke-sanity-and-exploration.md)
+
+**I2 toplamı:** 6 konu dosyası. Başlangıçtaki dört dosyalık `03` bölümüne, CTFL Bölüm 2'nin SDLC/maintenance hedeflerini ve Bölüm 3'ün static testing hedeflerini eksik bırakmamak için iki anlamlı dosya eklendi. Yeni repository, uygulama kodu veya alt klasör README oluşturulmadı.
+
 ## Bu kaynak nasıl kullanılmalı?
 
 1. Önce kuralı ve **test oracle**'ı oku; beklenen sonucu implementasyonun çıktısından türetme.
@@ -45,13 +60,23 @@ Bu alan, mevcut **typescript-foundation** dokümantasyonundan ayrıdır; uygulam
 | CTFL alanı | Durum | Handbook karşılığı |
 |---|---|---|
 | Chapter 1 — Fundamentals of Testing | **I1'de belgelenmiş** | 01 / üç dosya; test activities, roles, test principles, traceability |
-| Chapter 2 — Testing Throughout the SDLC | **Planlı — I2** | 03 / seviyeler ve yaşam döngüsü; şu an mevcut değil |
-| Chapter 3 — Static Testing | **Planlı — I2** | 03 kapsamına static testing/review başlığı eklenmeli; şu an mevcut değil |
+| Chapter 2 — Testing Throughout the SDLC | **I2'de belgelenmiş** | 03 / SDLC, test levels/types, confirmation/regression, maintenance |
+| Chapter 3 — Static Testing | **I2'de belgelenmiş** | 03 / static testing, review process/roles/types |
 | Chapter 4 — Test Analysis and Design | **I1'de belgelenmiş** | 02 / yedi dosya; siyah kutu, beyaz kutu, deneyime dayalı, ATDD |
-| Chapter 5 — Managing the Test Activities | **Planlı — I2, I3, I6 kapsamında tamamlanacak** | Test planning, risk, estimation, monitoring, CM, defect management henüz mevcut değil |
+| Chapter 5 — Managing the Test Activities | **Kısmi — I2** | FL-5.1.5–5.1.7 ve FL-5.2.1–5.2.4 belgelenmiş; FL-5.1.1–5.1.4, 5.3–5.5 planlı |
 | Chapter 6 — Test Tools | **Planlı — I4 / I6** | Araçların değeri ve otomasyon riskleri henüz mevcut değil |
 
 **Önemli:** Bu tablo yalnızca dokümantasyonda açıklanmış kapsamı gösterir, LO bazında bağımsız sınav başarısını değil. Final I6 kontrolünde her Learning Objective doğrulanmalıdır. Syllabus'ta Chapter 4 için **use-case testing** ayrı sınav tekniği değildir; mühendislik örneği olarak anılabilir.
+
+### I2 CTFL learning objective izi
+
+- **2.1:** FL-2.1.1–2.1.6 (K1/K2) → [SDLC, Test-first & DevOps](03-test-levels-and-strategy/05-sdlc-devops-and-maintenance-testing.md).
+- **2.2:** FL-2.2.1–2.2.2 (K2) → [Test Levels & Types](03-test-levels-and-strategy/01-unit-component-integration-api-e2e.md); FL-2.2.3 (K2) → [Regression / Confirmation](03-test-levels-and-strategy/04-regression-smoke-sanity-and-exploration.md).
+- **2.3:** FL-2.3.1 (K2) → [SDLC/Maintenance](03-test-levels-and-strategy/05-sdlc-devops-and-maintenance-testing.md).
+- **3.1–3.2:** FL-3.1.1–3.1.3 ve FL-3.2.1–3.2.5 (K1/K2) → [Static Testing & Reviews](03-test-levels-and-strategy/06-static-testing-and-reviews.md).
+- **5.1 (kısmi):** FL-5.1.5 (K3) → [Risk Prioritization](03-test-levels-and-strategy/03-risk-based-test-strategy.md); FL-5.1.6 (K1), FL-5.1.7 (K2) → [Test Pyramid & Quadrants](03-test-levels-and-strategy/02-test-pyramid-and-distribution.md).
+- **5.2:** FL-5.2.1–5.2.4 (K1/K2) → [Risk-based Test Strategy](03-test-levels-and-strategy/03-risk-based-test-strategy.md).
+- **Henüz belgelenmemiş CTFL objectives:** FL-5.1.1–5.1.4; FL-5.3.1–5.3.3; FL-5.4.1; FL-5.5.1; Bölüm 6. Bunlar gelecekteki Incrementlerde ele alınacak.
 
 ### I1 CTFL learning objective izi
 
@@ -65,7 +90,7 @@ Bu alan, mevcut **typescript-foundation** dokümantasyonundan ayrıdır; uygulam
 
 ## Bölüm şablonu
 
-Bütün I1 konu dosyaları **Technical Foundation → Engineering Perspective → Practical Scenario → Interview Preparation → CTFL Practice** akışını izler. K1 hatırlama, K2 anlama, K3 verilen duruma uygulama seviyesidir. Sorular bu handbook için özgün yazılmıştır; resmî ISTQB sınav soruları değildir.
+I1 ve I2 konu dosyaları **Technical Foundation → Engineering Perspective → Practical Scenario → Interview Preparation → CTFL Practice** akışını izler. K1 hatırlama, K2 anlama, K3 verilen duruma uygulama seviyesidir. Sorular bu handbook için özgün yazılmıştır; resmî ISTQB sınav soruları değildir.
 
 ## Kaynaklar ve kullanım
 
@@ -75,9 +100,9 @@ Bütün I1 konu dosyaları **Technical Foundation → Engineering Perspective �
 
 Metin, syllabus kavramlarının **özgün eğitim açıklaması**dır; resmî materyalin kopyası ya da akredite eğitim iddiası değildir. Sınava kayıt olurken sınav dili ve kabul edilen sürümü sınav sağlayıcısından teyit et.
 
-## Sonraki Incrementler (henüz açılmadı)
+## Increment durumu ve sonraki çalışmalar
 
-- **I2:** Test levels, SDLC, strategy ve CTFL static reviews boşlukları.
+- **I2 (tamamlandı):** Test levels, SDLC, strategy, static reviews ve Chapter 5'in belirtilen alt başlıkları.
 - **I3:** Test data, isolation, doubles; ilgili CTFL yönetim bağlantıları.
 - **I4:** Automation & BDD; CTFL test tools.
 - **I5:** API/UI test perspektifi, failure analysis, CI.
