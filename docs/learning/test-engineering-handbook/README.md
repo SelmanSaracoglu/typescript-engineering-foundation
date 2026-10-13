@@ -2,7 +2,7 @@
 
 **Yazılım test etmeyi kavramlardan gerçek mühendislik kararlarına doğru öğrenmek için hazırlanmış Türkçe teknik kaynak.**
 
-> **Okuma durumu — 13 Ekim 2026:** **I1–I5 pedagojik biçimde hazırlandı; kullanıcı incelemesine açık.** I6 henüz hazırlanmadı.
+> **Okuma durumu — 13 Ekim 2026:** **I1–I6 dokümantasyon ve indeksleri hazırlandı; kullanıcı incelemesine açık.** Bu, uygulamalı bağımsız yeterlilik veya tüm CTFL sınav hedeflerinin tamamlandığı anlamına gelmez.
 
 ## Nereden başlamalı?
 
@@ -156,6 +156,28 @@ I1'de test koşulunu, I2'de uygun sınırı, I3'te güvenilir veriyi, I4'te sür
 
 Ana dersler **problem → kavram → gerekçeli ve adım adım örnek → karşı örnek/kanıt sınırı → alıştırma** akışındadır. Mülakat ve sınav notları yalnız atölyede. API çağrıları, Cypress kodları ve CI çıktıları **öğretici örneklerdir**; gerçek çalışan servis/test veya başarılı CI kanıtı olarak sunulmaz. Yeni repo, framework, adapter ve deployment eklenmedi.
 
+## I6 — SDET, Security Connection & Final Review
+
+İlk beş Increment'te **doğru test koşulunu bulmayı, seviyesini seçmeyi, güvenilir otomasyonla doğrulamayı ve hatayı araştırmayı** öğrendik. I6 bu düşünmeyi güvenli tasarım, AppSec regresyonu ve olay kanıtıyla birleştiriyor.
+
+**Önerilen sıra: 7 ana ders → 1 uygulama atölyesi → 1 final kapsam denetimi.**
+
+| Sıra | Ders | Temel soru |
+|---|---|---|
+| 38 | [SDET Quality Engineering & Testability](08-sdet-security-and-checklists/01-sdet-quality-engineering-and-testability.md) | Test edilemeyen davranış hangi tasarım sorunlarını görünür kılar? |
+| 39 | [Security Requirements & Trust Boundaries](08-sdet-security-and-checklists/02-security-requirements-and-trust-boundaries.md) | Varlık, tehdit ve trust boundary'den test edilebilir gereksinim nasıl çıkar? |
+| 40 | [Identity, Authorization & Security Regression](08-sdet-security-and-checklists/03-identity-authorization-and-security-regression.md) | Yetki düzeltmesinin gerçek regresyon kanıtı nedir? |
+| 41 | [Input Validation, Output Encoding & Injection](08-sdet-security-and-checklists/04-input-validation-output-encoding-and-injection.md) | Veri nasıl güvenli doğrulanır, saklanır ve gösterilir? |
+| 42 | [Abuse Cases & Fail-safe Behavior](08-sdet-security-and-checklists/05-abuse-cases-fail-safe-and-exception-handling.md) | Hata ve kötüye kullanım sırasında hangi invariants korunur? |
+| 43 | [Security Observability, Audit & Secrets](08-sdet-security-and-checklists/06-security-observability-audit-and-secrets.md) | Bir erişim olayını gizli veri sızdırmadan nasıl gözleyebiliriz? |
+| 44 | [Security Regression & SDET Review Checklist](08-sdet-security-and-checklists/07-security-regression-and-sdet-review-checklists.md) | Risk, test, düzeltme ve kanıt nasıl tek karara bağlanır? |
+
+**[I6 Çalışma Atölyesi — Security regression vakası, bağımsız transfer, İngilizce mülakat ve isteğe bağlı sınav tekrar](08-sdet-security-and-checklists/08-i6-practice-and-interview-companion.md)**
+
+**[Handbook Final Review — Ders haritası, CTFL v4.0.1 kapsam eşlemesi ve açık eksikler](08-sdet-security-and-checklists/09-handbook-and-ctfl-coverage-audit.md)**
+
+**Önemli sınır:** OWASP ASVS 5.0.0 / WSTG / Top 10:2025 kaynakları Application Security öğretimini destekler. Bunları CTFL'ye zorla konu etiketi olarak dağıtmıyoruz. CTFL **Chapter 5/6 ve bazı Chapter 1 hedeflerinde kalan eksikler**, final denetim dosyasında açıkça gösteriliyor. Güvenlik, test ve SOC yetkinlikleri ayrı kanıtlanır.
+
 ## Nasıl çalışmalı?
 
 1. Bir dersin ilk örneğine bakıp sonucu **kendin tahmin et**.
@@ -175,12 +197,12 @@ Ana dersler **problem → kavram → gerekçeli ve adım adım örnek → karş�
 | **I3 — Data, Isolation & Doubles** | **Hazırlandı; incelemeye açık** | 6 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
 | **I4 — Automation & BDD** | **Hazırlandı; incelemeye açık** | 7 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
 | **I5 — API, UI & Failure Engineering** | **Hazırlandı; incelemeye açık** | 8 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
-| I6 — SDET, Security & Final Review | Planlı | Yeni ders yok |
+| **I6 — SDET, Security & Final Review** | **Hazırlandı; incelemeye açık** | 7 ders + uygulama atölyesi + final CTFL/kapsam denetimi |
 
-**CTFL hedefi:** Bu öğretim serisi sınav hazırlığını da destekler, ancak I1–I5 derslerini okumak CTFL müfredatının tamamını kapsamaz. I1 temel kavramlar ve test tasarımını; I2 yaşam döngüsü, test seviyeleri ve static testing'i ele alır. I3 test verisi, izolasyon, test doubles ve kanıt güvenilirliğine odaklanır; her I3 alt konusu CTFL'de bağımsız sınav hedefi değildir. I4 otomasyon tasarımını ve BDD/Cypress kavramlarını öğretir; tüm içerik CTFL'ye birebir sınav kazanımı olarak eşlenmez. I5 API/UI kanıtı ve failure engineering'i derinleştirir; bütün içeriği doğrudan CTFL sınav hedefi sayılmaz. Test management ve test tools konularının tamamı henüz bitmiş değildir. Sınav hazırlığını ayrı çalışma atölyesi ve nihai syllabus coverage kontrolünde takip edeceğiz. Resmî bilgi: [ISTQB CTFL](https://istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/) ve [Glossary](https://glossary.istqb.org/).
+**CTFL hedefi:** Bu öğretim serisi sınav hazırlığını da destekler, ancak I1–I6 derslerini okumak CTFL müfredatının tamamını kapsamaz. I1 temel kavramlar ve test tasarımını; I2 yaşam döngüsü, test seviyeleri ve static testing'i ele alır. I3 test verisi, izolasyon, test doubles ve kanıt güvenilirliğine odaklanır; her I3 alt konusu CTFL'de bağımsız sınav hedefi değildir. I4 otomasyon tasarımını ve BDD/Cypress kavramlarını öğretir; tüm içerik CTFL'ye birebir sınav kazanımı olarak eşlenmez. I5 API/UI kanıtı ve failure engineering'i derinleştirir; bütün içeriği doğrudan CTFL sınav hedefi sayılmaz. Özellikle test management, estimation, monitoring/control, configuration management ve test tool categories konularının bazı hedefleri eksiktir. **[Final kapsam denetimi](08-sdet-security-and-checklists/09-handbook-and-ctfl-coverage-audit.md)** bu boşlukları saklamadan gösterir. Sertifika hazırlığında resmî syllabus ve sample exams ile ayrıca bağımsız değerlendirme gerekir. Resmî bilgi: [ISTQB CTFL](https://istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/) ve [Glossary](https://glossary.istqb.org/).
 
 ## Repository sınırları
 
-Bu handbook, mevcut `docs/learning/typescript-foundation/` materyallerinden bağımsızdır. `src/`, `tests/`, mevcut TypeScript dersleri ve diğer Increment klasörleri bu I5 çalışmasında değiştirilmemiştir.
+Bu handbook, mevcut `docs/learning/typescript-foundation/` materyallerinden bağımsızdır. `src/`, `tests/`, mevcut TypeScript dersleri ve diğer Increment klasörleri bu I6 çalışmasında değiştirilmemiştir.
 
 **Bir genel README** vardır; alt klasörlerde README oluşturulmaz.
