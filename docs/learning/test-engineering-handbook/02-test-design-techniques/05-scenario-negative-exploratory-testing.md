@@ -16,7 +16,7 @@
 
 **Negative testing**, geçersiz, yetkisiz veya izin verilmeyen davranışta sistemin **beklenen güvenli tepkiyi** verip vermediğini kontrol etmektir. Yalnız boş input değildir.
 
-Örnekler: yanlış format, süresi dolmuş kupon, başka kullanıcının kaydına müdahale, yinelenen ödeme isteği, iptal edilmiş siparişe teslimat event'i. Negatif testin oraclean kabul edilebilir response, yan etki yokluğu ve gerekliyse log/audit davranışı bulunur.
+Örnekler: yanlış format, süresi dolmuş kupon, başka kullanıcının kaydına müdahale, yinelenen ödeme isteği, iptal edilmiş siparişe teslimat event'i. Negatif testin oracle'ı; kabul edilebilir response, yan etki yokluğu ve gerekliyse log/audit davranışı bulunur.
 
 ### Error Guessing
 
