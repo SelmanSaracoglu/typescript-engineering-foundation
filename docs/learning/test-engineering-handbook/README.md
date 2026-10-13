@@ -2,7 +2,7 @@
 
 **Yazılım test etmeyi kavramlardan gerçek mühendislik kararlarına doğru öğrenmek için hazırlanmış Türkçe teknik kaynak.**
 
-> **Okuma durumu — 13 Ekim 2026:** **I1, I2 ve I3 pedagojik biçimde hazırlandı; kullanıcı incelemesine açık.** I4–I6 henüz hazırlanmadı.
+> **Okuma durumu — 13 Ekim 2026:** **I1–I4 pedagojik biçimde hazırlandı; kullanıcı incelemesine açık.** I5 ve I6 henüz hazırlanmadı.
 
 ## Nereden başlamalı?
 
@@ -108,6 +108,26 @@ Bu bölüm bir kavram sözlüğü değil; birlikte ilerleyen altı ders ve ayrı
 
 Ana altı ders **kavram → gerekçe → açıklamalı örnek → karşı örnek → çözümlü transfer görevi** düzenini izler. Mocking framework kurulumu veya çalışan Cypress/Vitest kodu oluşturulmadı. CTFL ve mülakat tekrarları yalnız atölyede; I3'ün ileri test double konularının CTFL'de ayrı zorunlu öğrenme hedefleri olduğu iddia edilmez.
 
+## I4 — Automation & BDD
+
+I1'de **neyi**, I2'de **nerede ve ne zaman**, I3'te **nasıl güvenilir biçimde** test edeceğimizi öğrendik. I4'te artık şu kararı veriyoruz: **Hangi testi otomatikleştirmeye değer, test kodunu nasıl sürdürülebilir kurar ve iş davranışını Gherkin'den doğru otomasyon adımına nasıl taşırız?**
+
+Önerilen sıra 7 açıklamalı ders ve tek ayrı atölyedir:
+
+| Sıra | Ders | Temel soru |
+|---|---|---|
+| 23 | [Automation Candidates & Value](05-automation-and-bdd/01-automation-candidates-and-value.md) | Hangi testin otomasyonu gerçek değer üretir? |
+| 24 | [Automation Architecture & Maintainability](05-automation-and-bdd/02-automation-architecture-and-maintainability.md) | Test kodunu kopya ve sihirli helper'lardan nasıl koruruz? |
+| 25 | [Selectors & UI Contracts](05-automation-and-bdd/03-selectors-and-ui-contracts.md) | UI değiştiğinde doğru öğeyi güvenilir biçimde nasıl buluruz? |
+| 26 | [Cypress Command Queue, Retry & Waits](05-automation-and-bdd/04-cypress-command-queue-retry-and-waits.md) | Cypress niçin normal Promise/await gibi çalışmaz? |
+| 27 | [BDD & Gherkin](05-automation-and-bdd/05-bdd-gherkin-as-a-collaboration-language.md) | İş davranışını paydaşlarla ortak dilde nasıl ifade ederiz? |
+| 28 | [Step Definitions & Gherkin Integration](05-automation-and-bdd/06-step-definitions-and-gherkin-integration.md) | Senaryo cümlesi uygun test koduna nasıl bağlanır? |
+| 29 | [BDD Automation Review & Failure Diagnosis](05-automation-and-bdd/07-bdd-automation-review-and-failure-diagnosis.md) | Testin niyetini ve güvenilirliğini değişiklik boyunca nasıl koruruz? |
+
+**[I4 Çalışma Atölyesi — MiniShop vakası, bağımsız yeni görev, İngilizce mülakat ve isteğe bağlı ISTQB tekrar](05-automation-and-bdd/08-i4-practice-and-interview-companion.md)**
+
+Ana dersler **problem → kavram → gerekçeli örnek → sınırlar → alıştırma** düzenindedir. Mülakat ve sınav tekrarları tek atölyede. Cypress–Cucumber adapter sürümü doğrulanmadan import ve konfigürasyon uydurulmadı; framework/repo/deployment kapsamı eklenmedi.
+
 ## Nasıl çalışmalı?
 
 1. Bir dersin ilk örneğine bakıp sonucu **kendin tahmin et**.
@@ -125,14 +145,14 @@ Ana altı ders **kavram → gerekçe → açıklamalı örnek → karşı örnek
 | **I1 — Foundations & Test Design** | **Yeniden yazıldı; incelemeye açık** | 10 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
 | **I2 — Levels & Strategy** | **Yeniden yazıldı; incelemeye açık** | 6 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
 | **I3 — Data, Isolation & Doubles** | **Hazırlandı; incelemeye açık** | 6 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
-| I4 — Automation & BDD | Planlı | Yeni ders yok |
+| **I4 — Automation & BDD** | **Hazırlandı; incelemeye açık** | 7 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
 | I5 — API, UI & Failure Engineering | Planlı | Yeni ders yok |
 | I6 — SDET, Security & Final Review | Planlı | Yeni ders yok |
 
-**CTFL hedefi:** Bu öğretim serisi sınav hazırlığını da destekler, ancak I1–I3 derslerini okumak CTFL müfredatının tamamını kapsamaz. I1 temel kavramlar ve test tasarımını; I2 yaşam döngüsü, test seviyeleri ve static testing'i ele alır. I3 test verisi, izolasyon, test doubles ve kanıt güvenilirliğine odaklanır; her I3 alt konusu CTFL'de bağımsız sınav hedefi değildir. Test management ve test tools konularının tamamı henüz bitmiş değildir. Sınav hazırlığını ayrı çalışma atölyesi ve nihai syllabus coverage kontrolünde takip edeceğiz. Resmî bilgi: [ISTQB CTFL](https://istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/) ve [Glossary](https://glossary.istqb.org/).
+**CTFL hedefi:** Bu öğretim serisi sınav hazırlığını da destekler, ancak I1–I4 derslerini okumak CTFL müfredatının tamamını kapsamaz. I1 temel kavramlar ve test tasarımını; I2 yaşam döngüsü, test seviyeleri ve static testing'i ele alır. I3 test verisi, izolasyon, test doubles ve kanıt güvenilirliğine odaklanır; her I3 alt konusu CTFL'de bağımsız sınav hedefi değildir. I4 otomasyon tasarımını ve BDD/Cypress kavramlarını öğretir; tüm içerik CTFL'ye birebir sınav kazanımı olarak eşlenmez. Test management ve test tools konularının tamamı henüz bitmiş değildir. Sınav hazırlığını ayrı çalışma atölyesi ve nihai syllabus coverage kontrolünde takip edeceğiz. Resmî bilgi: [ISTQB CTFL](https://istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/) ve [Glossary](https://glossary.istqb.org/).
 
 ## Repository sınırları
 
-Bu handbook, mevcut `docs/learning/typescript-foundation/` materyallerinden bağımsızdır. `src/`, `tests/`, mevcut TypeScript dersleri ve diğer Increment klasörleri bu I3 çalışmasında değiştirilmemiştir.
+Bu handbook, mevcut `docs/learning/typescript-foundation/` materyallerinden bağımsızdır. `src/`, `tests/`, mevcut TypeScript dersleri ve diğer Increment klasörleri bu I4 çalışmasında değiştirilmemiştir.
 
 **Bir genel README** vardır; alt klasörlerde README oluşturulmaz.
