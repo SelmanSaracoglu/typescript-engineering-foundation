@@ -2,7 +2,7 @@
 
 **Yazılım test etmeyi kavramlardan gerçek mühendislik kararlarına doğru öğrenmek için hazırlanmış Türkçe teknik kaynak.**
 
-> **Okuma durumu — 13 Ekim 2026:** **I1 ve I2 pedagojik biçimde hazırlandı; kullanıcı incelemesine açık.** I3–I6 henüz açılmadı.
+> **Okuma durumu — 13 Ekim 2026:** **I1, I2 ve I3 pedagojik biçimde hazırlandı; kullanıcı incelemesine açık.** I4–I6 henüz hazırlanmadı.
 
 ## Nereden başlamalı?
 
@@ -89,6 +89,25 @@ Bu sıralama temel bir problemden başlayarak adım adım ilerler.
 
 Ana dersler önce **kavramı öğretir**; mülakat ve sınav çalışması sonradan yapılır. I2'de eski altı taslak dosyanın yerini **öğretim sırasına göre numaralanmış altı yeni ders** ve bir ayrı atölye aldı. Önceki dosyalar Git geçmişinde bulunabilir; önerilen rota bu yeni derslerdir.
 
+## I3 — Test Data, Isolation & Test Doubles
+
+I1'de **ne test ediyoruz?**, I2'de **nerede ve ne zaman test ediyoruz?** sorularını inceledik. I3'te test sonucunun **tekrar edilebilir ve güvenilir olması için başlangıç verisini, bağımlılıkları ve kanıtı** tasarlıyoruz.
+
+Bu bölüm bir kavram sözlüğü değil; birlikte ilerleyen altı ders ve ayrı uygulama atölyesidir.
+
+| Sıra | Ders | Temel soru |
+|---|---|---|
+| 17 | [Test Data Design & Lifecycle](04-test-data-isolation-and-doubles/01-test-data-design-and-lifecycle.md) | Testin doğru veri ve başlangıç state'iyle başladığını nasıl biliriz? |
+| 18 | [Deterministic & Repeatable Tests](04-test-data-isolation-and-doubles/02-deterministic-repeatable-tests.md) | Saat, rastgelelik ve asenkron çalışma sonucu neden değiştirebilir? |
+| 19 | [Test Isolation, Fixtures & Parallelism](04-test-data-isolation-and-doubles/03-test-isolation-fixtures-and-parallelism.md) | Testler neden sıraya ve birbirinin verisine bağımlı olmamalıdır? |
+| 20 | [Test Doubles: Dummy, Stub, Fake, Spy, Mock](04-test-data-isolation-and-doubles/04-test-doubles-dummy-stub-fake-spy-mock.md) | Gerçek dış bağımlılık olmadan neyi test edip neyi test etmemiş oluruz? |
+| 21 | [State vs Interaction & Over-mocking](04-test-data-isolation-and-doubles/05-state-vs-interaction-and-over-mocking.md) | Sonucu mu, çağrıyı mı doğrulamalıyız; fazla mock neyi gizler? |
+| 22 | [Assertions, Observability & Evidence](04-test-data-isolation-and-doubles/06-assertions-observability-and-evidence.md) | Pass sonucu hangi gerçek davranışı ve yan etkileri doğrular? |
+
+**[I3 Çalışma Atölyesi — Kupon izolasyonu, yeni problem, İngilizce mülakat ve isteğe bağlı sınav tekrarı](04-test-data-isolation-and-doubles/07-i3-practice-and-interview-companion.md)**
+
+Ana altı ders **kavram → gerekçe → açıklamalı örnek → karşı örnek → çözümlü transfer görevi** düzenini izler. Mocking framework kurulumu veya çalışan Cypress/Vitest kodu oluşturulmadı. CTFL ve mülakat tekrarları yalnız atölyede; I3'ün ileri test double konularının CTFL'de ayrı zorunlu öğrenme hedefleri olduğu iddia edilmez.
+
 ## Nasıl çalışmalı?
 
 1. Bir dersin ilk örneğine bakıp sonucu **kendin tahmin et**.
@@ -105,15 +124,15 @@ Ana dersler önce **kavramı öğretir**; mülakat ve sınav çalışması sonra
 |---|---|---|
 | **I1 — Foundations & Test Design** | **Yeniden yazıldı; incelemeye açık** | 10 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
 | **I2 — Levels & Strategy** | **Yeniden yazıldı; incelemeye açık** | 6 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
-| I3 — Data, Isolation & Doubles | Planlı | Yeni ders yok |
+| **I3 — Data, Isolation & Doubles** | **Hazırlandı; incelemeye açık** | 6 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
 | I4 — Automation & BDD | Planlı | Yeni ders yok |
 | I5 — API, UI & Failure Engineering | Planlı | Yeni ders yok |
 | I6 — SDET, Security & Final Review | Planlı | Yeni ders yok |
 
-**CTFL hedefi:** Bu öğretim serisi sınav hazırlığını da destekler, ancak I1 ve I2 derslerini okumak CTFL müfredatının tamamını kapsamaz. I1 temel kavramlar ve test tasarımını; I2 yaşam döngüsü, test seviyeleri ve static testing'i ele alır. Test management ve test tools konularının tamamı henüz bitmiş değildir. Sınav hazırlığını ayrı çalışma atölyesi ve nihai syllabus coverage kontrolünde takip edeceğiz. Resmî bilgi: [ISTQB CTFL](https://istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/) ve [Glossary](https://glossary.istqb.org/).
+**CTFL hedefi:** Bu öğretim serisi sınav hazırlığını da destekler, ancak I1–I3 derslerini okumak CTFL müfredatının tamamını kapsamaz. I1 temel kavramlar ve test tasarımını; I2 yaşam döngüsü, test seviyeleri ve static testing'i ele alır. I3 test verisi, izolasyon, test doubles ve kanıt güvenilirliğine odaklanır; her I3 alt konusu CTFL'de bağımsız sınav hedefi değildir. Test management ve test tools konularının tamamı henüz bitmiş değildir. Sınav hazırlığını ayrı çalışma atölyesi ve nihai syllabus coverage kontrolünde takip edeceğiz. Resmî bilgi: [ISTQB CTFL](https://istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/) ve [Glossary](https://glossary.istqb.org/).
 
 ## Repository sınırları
 
-Bu handbook, mevcut `docs/learning/typescript-foundation/` materyallerinden bağımsızdır. `src/`, `tests/`, mevcut TypeScript dersleri ve diğer Increment klasörleri bu I2 yeniden yazımında değiştirilmemiştir.
+Bu handbook, mevcut `docs/learning/typescript-foundation/` materyallerinden bağımsızdır. `src/`, `tests/`, mevcut TypeScript dersleri ve diğer Increment klasörleri bu I3 çalışmasında değiştirilmemiştir.
 
 **Bir genel README** vardır; alt klasörlerde README oluşturulmaz.
