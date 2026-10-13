@@ -2,7 +2,7 @@
 
 **Yazılım test etmeyi kavramlardan gerçek mühendislik kararlarına doğru öğrenmek için hazırlanmış Türkçe teknik kaynak.**
 
-> **Okuma durumu — 13 Ekim 2026:** **I1 baştan yazıldı; kullanıcı incelemesine açık.** I2'nin eski dosyaları repository'de korunuyor ancak pedagojik yeniden yazım yapılana kadar **onaylanmış ders materyali sayılmıyor**. I3–I6 henüz açılmadı.
+> **Okuma durumu — 13 Ekim 2026:** **I1 ve I2 pedagojik biçimde hazırlandı; kullanıcı incelemesine açık.** I3–I6 henüz açılmadı.
 
 ## Nereden başlamalı?
 
@@ -50,7 +50,7 @@ Bu ayrı dosyada:
 
 **Ana dersleri bölüp her sayfayı CTFL ve mülakat etiketleriyle doldurmuyoruz.** Önce kavramı öğren, sonra istersen sınav/konuşma pratiğine geç.
 
-## Pedagojik rota: Her adım neden bu sırada?
+## I1 için pedagojik rota: Her adım neden bu sırada?
 
 ~~~text
 Quality & Confidence
@@ -70,6 +70,25 @@ Entegre vaka → Yeni problem → Mülakat ve sınav tekrarı
 
 **Örnek dünyamız:** Sepet, kargo ücreti, kupon, sipariş state'i ve iade kuralları. Aynı iş alanını farklı tekniklerle ele almak, her derste sıfırdan yeni bir ürün öğrenme yükünü azaltır. Bütün örnek kurallar eğitim için oluşturulmuştur; gerçek bir sisteme ilişkin doğrulanmış ürün politikası değildir.
 
+## I2 — Test Levels & Strategy
+
+I1'de *hangi verileri test edeceğimizi* öğrendik. I2'de bunun üzerine şu soruyu kuruyoruz: **Bu testi geliştirme sürecinin hangi anında, sistemin hangi sınırında ve hangi riski azaltmak için yapmalıyız?**
+
+Bu sıralama temel bir problemden başlayarak adım adım ilerler.
+
+| Sıra | Ders | Temel soru |
+|---|---|---|
+| 11 | [SDLC, Test-first & Continuous Testing](03-test-levels-and-strategy/01-sdlc-test-first-and-continuous-testing.md) | Testing ne zaman başlar; yazılım yaşam döngüsünü nasıl etkiler? |
+| 12 | [Static Testing & Reviews](03-test-levels-and-strategy/02-static-testing-and-reviews.md) | Kod çalışmadan nasıl kusur ve belirsizlik buluruz? |
+| 13 | [Test Levels & Types](03-test-levels-and-strategy/03-test-levels-and-types.md) | Component, integration, system ve acceptance hangi sınırları ele alır? |
+| 14 | [Test Pyramid & Test Distribution](03-test-levels-and-strategy/04-test-pyramid-and-test-distribution.md) | Testleri hız, risk ve teşhis gücüne göre nasıl dağıtırız? |
+| 15 | [Confirmation, Regression & Maintenance](03-test-levels-and-strategy/05-confirmation-regression-and-maintenance.md) | Değişen üründe hangi kontrolleri yeniden çalıştırırız? |
+| 16 | [Risk-based Test Strategy](03-test-levels-and-strategy/06-risk-based-test-strategy-and-prioritization.md) | Kısıtlı zaman ve kaynakta hangi testi neden önce seçeriz? |
+
+**[I2 Çalışma Atölyesi — Entegre vaka, İngilizce mülakat ve isteğe bağlı CTFL tekrar](03-test-levels-and-strategy/07-i2-practice-and-interview-companion.md)**
+
+Ana dersler önce **kavramı öğretir**; mülakat ve sınav çalışması sonradan yapılır. I2'de eski altı taslak dosyanın yerini **öğretim sırasına göre numaralanmış altı yeni ders** ve bir ayrı atölye aldı. Önceki dosyalar Git geçmişinde bulunabilir; önerilen rota bu yeni derslerdir.
+
 ## Nasıl çalışmalı?
 
 1. Bir dersin ilk örneğine bakıp sonucu **kendin tahmin et**.
@@ -85,16 +104,16 @@ Entegre vaka → Yeni problem → Mülakat ve sınav tekrarı
 | Aşama | Durum | Açıklama |
 |---|---|---|
 | **I1 — Foundations & Test Design** | **Yeniden yazıldı; incelemeye açık** | 10 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
-| **I2 — Levels & Strategy** | **Eski taslak; yeniden yazılacak** | Önceden üretilen dosyalar silinmedi, henüz önerilen okuma rotasında değil |
+| **I2 — Levels & Strategy** | **Yeniden yazıldı; incelemeye açık** | 6 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
 | I3 — Data, Isolation & Doubles | Planlı | Yeni ders yok |
 | I4 — Automation & BDD | Planlı | Yeni ders yok |
 | I5 — API, UI & Failure Engineering | Planlı | Yeni ders yok |
 | I6 — SDET, Security & Final Review | Planlı | Yeni ders yok |
 
-**CTFL hedefi:** Bu öğretim serisi sınav hazırlığını da desteklemeyi hedefler, ancak tek başına 10 dersi okumak CTFL müfredatının tamamını kapsamaz. Sınav hazırlığını ayrı çalışma atölyesi ve nihai syllabus coverage kontrolünde takip edeceğiz. Resmî bilgi: [ISTQB CTFL](https://istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/) ve [Glossary](https://glossary.istqb.org/).
+**CTFL hedefi:** Bu öğretim serisi sınav hazırlığını da destekler, ancak I1 ve I2 derslerini okumak CTFL müfredatının tamamını kapsamaz. I1 temel kavramlar ve test tasarımını; I2 yaşam döngüsü, test seviyeleri ve static testing'i ele alır. Test management ve test tools konularının tamamı henüz bitmiş değildir. Sınav hazırlığını ayrı çalışma atölyesi ve nihai syllabus coverage kontrolünde takip edeceğiz. Resmî bilgi: [ISTQB CTFL](https://istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/) ve [Glossary](https://glossary.istqb.org/).
 
 ## Repository sınırları
 
-Bu handbook, mevcut `docs/learning/typescript-foundation/` materyallerinden bağımsızdır. `src/`, `tests/`, mevcut TypeScript dersleri ve diğer Increment klasörleri bu I1 yeniden yazımında değiştirilmemiştir.
+Bu handbook, mevcut `docs/learning/typescript-foundation/` materyallerinden bağımsızdır. `src/`, `tests/`, mevcut TypeScript dersleri ve diğer Increment klasörleri bu I2 yeniden yazımında değiştirilmemiştir.
 
 **Bir genel README** vardır; alt klasörlerde README oluşturulmaz.
