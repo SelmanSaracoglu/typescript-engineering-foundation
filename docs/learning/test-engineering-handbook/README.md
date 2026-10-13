@@ -2,7 +2,7 @@
 
 **Yazılım test etmeyi kavramlardan gerçek mühendislik kararlarına doğru öğrenmek için hazırlanmış Türkçe teknik kaynak.**
 
-> **Okuma durumu — 13 Ekim 2026:** **I1–I4 pedagojik biçimde hazırlandı; kullanıcı incelemesine açık.** I5 ve I6 henüz hazırlanmadı.
+> **Okuma durumu — 13 Ekim 2026:** **I1–I5 pedagojik biçimde hazırlandı; kullanıcı incelemesine açık.** I6 henüz hazırlanmadı.
 
 ## Nereden başlamalı?
 
@@ -128,6 +128,34 @@ I1'de **neyi**, I2'de **nerede ve ne zaman**, I3'te **nasıl güvenilir biçimde
 
 Ana dersler **problem → kavram → gerekçeli örnek → sınırlar → alıştırma** düzenindedir. Mülakat ve sınav tekrarları tek atölyede. Cypress–Cucumber adapter sürümü doğrulanmadan import ve konfigürasyon uydurulmadı; framework/repo/deployment kapsamı eklenmedi.
 
+## I5 — API, UI & Failure Engineering
+
+I1'de test koşulunu, I2'de uygun sınırı, I3'te güvenilir veriyi, I4'te sürdürülebilir otomasyonu öğrendik. I5 bu temeli **gerçek HTTP sözleşmesi, authorization, kalıcı state, browser davranışı ve kanıta dayalı hata araştırma** zincirinde birleştirir.
+
+Önerilen sıra **8 açıklamalı ders** ve **1 ayrı uygulama atölyesi**:
+
+### 06 — API & UI Testing
+
+| Sıra | Ders | Temel soru |
+|---|---|---|
+| 30 | [HTTP API Contract & Observable Behavior](06-api-and-ui-testing/01-http-api-contract-and-observable-behavior.md) | HTTP 200 doğru iş davranışını garanti eder mi? |
+| 31 | [API Positive, Negative & Contract Tests](06-api-and-ui-testing/02-api-positive-negative-and-contract-tests.md) | Bozuk input ve response schema nasıl sistematik test edilir? |
+| 32 | [Authentication, Authorization & State](06-api-and-ui-testing/03-api-authentication-authorization-and-state.md) | Kimlik, izin ve kaynak state'i nasıl birlikte test edilir? |
+| 33 | [Idempotency, Retries & Concurrency](06-api-and-ui-testing/04-api-idempotency-retries-and-concurrency.md) | Timeout ve eşzamanlı işlem çift tahsilata nasıl yol açabilir? |
+| 34 | [UI Workflows, Browser State & Network](06-api-and-ui-testing/05-ui-workflows-browser-state-and-network.md) | Browser, API ve gerçek veri hangi farklı kanıtları sağlar? |
+
+### 07 — Failure Debugging & CI
+
+| Sıra | Ders | Temel soru |
+|---|---|---|
+| 35 | [Flaky Tests & Failure Classification](07-failure-debugging-and-ci/01-flaky-tests-and-failure-classification.md) | Aynı test neden bazen PASS bazen FAIL olur? |
+| 36 | [Debugging, Triage & Root Cause](07-failure-debugging-and-ci/02-debugging-triage-and-root-cause.md) | Gözlem, hipotez ve kök nedeni nasıl ayırırız? |
+| 37 | [CI Failure Analysis & Diagnostics](07-failure-debugging-and-ci/03-ci-failure-analysis-and-diagnostics.md) | Local PASS / CI FAIL farkı hangi kanıtla araştırılır? |
+
+**[I5 Çalışma Atölyesi — MiniShop vakası, yeni problem, İngilizce mülakat ve isteğe bağlı CTFL tekrar](07-failure-debugging-and-ci/04-i5-practice-and-interview-companion.md)**
+
+Ana dersler **problem → kavram → gerekçeli ve adım adım örnek → karşı örnek/kanıt sınırı → alıştırma** akışındadır. Mülakat ve sınav notları yalnız atölyede. API çağrıları, Cypress kodları ve CI çıktıları **öğretici örneklerdir**; gerçek çalışan servis/test veya başarılı CI kanıtı olarak sunulmaz. Yeni repo, framework, adapter ve deployment eklenmedi.
+
 ## Nasıl çalışmalı?
 
 1. Bir dersin ilk örneğine bakıp sonucu **kendin tahmin et**.
@@ -146,13 +174,13 @@ Ana dersler **problem → kavram → gerekçeli örnek → sınırlar → alış
 | **I2 — Levels & Strategy** | **Yeniden yazıldı; incelemeye açık** | 6 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
 | **I3 — Data, Isolation & Doubles** | **Hazırlandı; incelemeye açık** | 6 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
 | **I4 — Automation & BDD** | **Hazırlandı; incelemeye açık** | 7 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
-| I5 — API, UI & Failure Engineering | Planlı | Yeni ders yok |
+| **I5 — API, UI & Failure Engineering** | **Hazırlandı; incelemeye açık** | 8 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
 | I6 — SDET, Security & Final Review | Planlı | Yeni ders yok |
 
-**CTFL hedefi:** Bu öğretim serisi sınav hazırlığını da destekler, ancak I1–I4 derslerini okumak CTFL müfredatının tamamını kapsamaz. I1 temel kavramlar ve test tasarımını; I2 yaşam döngüsü, test seviyeleri ve static testing'i ele alır. I3 test verisi, izolasyon, test doubles ve kanıt güvenilirliğine odaklanır; her I3 alt konusu CTFL'de bağımsız sınav hedefi değildir. I4 otomasyon tasarımını ve BDD/Cypress kavramlarını öğretir; tüm içerik CTFL'ye birebir sınav kazanımı olarak eşlenmez. Test management ve test tools konularının tamamı henüz bitmiş değildir. Sınav hazırlığını ayrı çalışma atölyesi ve nihai syllabus coverage kontrolünde takip edeceğiz. Resmî bilgi: [ISTQB CTFL](https://istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/) ve [Glossary](https://glossary.istqb.org/).
+**CTFL hedefi:** Bu öğretim serisi sınav hazırlığını da destekler, ancak I1–I5 derslerini okumak CTFL müfredatının tamamını kapsamaz. I1 temel kavramlar ve test tasarımını; I2 yaşam döngüsü, test seviyeleri ve static testing'i ele alır. I3 test verisi, izolasyon, test doubles ve kanıt güvenilirliğine odaklanır; her I3 alt konusu CTFL'de bağımsız sınav hedefi değildir. I4 otomasyon tasarımını ve BDD/Cypress kavramlarını öğretir; tüm içerik CTFL'ye birebir sınav kazanımı olarak eşlenmez. I5 API/UI kanıtı ve failure engineering'i derinleştirir; bütün içeriği doğrudan CTFL sınav hedefi sayılmaz. Test management ve test tools konularının tamamı henüz bitmiş değildir. Sınav hazırlığını ayrı çalışma atölyesi ve nihai syllabus coverage kontrolünde takip edeceğiz. Resmî bilgi: [ISTQB CTFL](https://istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/) ve [Glossary](https://glossary.istqb.org/).
 
 ## Repository sınırları
 
-Bu handbook, mevcut `docs/learning/typescript-foundation/` materyallerinden bağımsızdır. `src/`, `tests/`, mevcut TypeScript dersleri ve diğer Increment klasörleri bu I4 çalışmasında değiştirilmemiştir.
+Bu handbook, mevcut `docs/learning/typescript-foundation/` materyallerinden bağımsızdır. `src/`, `tests/`, mevcut TypeScript dersleri ve diğer Increment klasörleri bu I5 çalışmasında değiştirilmemiştir.
 
 **Bir genel README** vardır; alt klasörlerde README oluşturulmaz.
