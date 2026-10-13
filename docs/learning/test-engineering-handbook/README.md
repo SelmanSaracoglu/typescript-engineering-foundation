@@ -1,111 +1,100 @@
-# Test Engineering Handbook — Engineering, Interviews & ISTQB CTFL
+# Test Engineering Handbook
 
-> **Durum:** Epic 02 / I1 ve I2 dokümantasyonları yayımlandı. I3–I6 henüz hazırlanmadı.  
-> **Dil:** Türkçe anlatım, İngilizce teknik terimler ve mülakat cevapları.  
-> **Sınav referansı:** ISTQB Certified Tester Foundation Level (CTFL), İngilizce Syllabus **v4.0.1 (15.09.2024)**.
+**Yazılım test etmeyi kavramlardan gerçek mühendislik kararlarına doğru öğrenmek için hazırlanmış Türkçe teknik kaynak.**
 
-## Amaç ve sınırlar
+> **Okuma durumu — 13 Ekim 2026:** **I1 baştan yazıldı; kullanıcı incelemesine açık.** I2'nin eski dosyaları repository'de korunuyor ancak pedagojik yeniden yazım yapılana kadar **onaylanmış ders materyali sayılmıyor**. I3–I6 henüz açılmadı.
 
-Bu handbook üç ihtiyacı birlikte karşılar: (1) gereksinimden gerekçeli test kararı çıkaran **Test Engineering** bilgisi, (2) Software Tester / Test Automation Engineer / SDET **teknik mülakatlarına** hazırlık, (3) **ISTQB CTFL** müfredatına göre sistematik çalışma.
+## Nereden başlamalı?
 
-Sadece terim ezberi veya soru bankası değildir. Örneklerin çoğu eğitim amaçlı tasarlanmış sentetik ürün kurallarıdır. İngilizce cevaplar kişisel deneyim iddiası değil, teknik cevap örneğidir. Bölümün yazılmış olması uygulamalı yeterlilik, sınava hazır olma veya sertifika kazanma kanıtı değildir.
+**[Ders 1 — Yazılım kalitesi, test etme ve güven](01-foundations/01-quality-testing-and-confidence.md)**
 
-Bu alan, mevcut **typescript-foundation** dokümantasyonundan ayrıdır; uygulama kodu veya otomasyon framework'ü içermez.
+Bu kaynak hızlı tanım listesi değil. Her bölümde sırasıyla:
 
-## Önerilen okuma sırası — I1
+**Bir problem gör → kavramı anla → neden gerekli olduğunu sorgula → açıklamalı örneği takip et → karşı örneği incele → yeni küçük problemi kendin çöz.**
 
-### 01 — Foundations
+Bölümler birbirine bağlıdır. Tekniklerin adlarını öğrenmek hedef değil; **hangi iş kuralından, hangi risk nedeniyle, neden o testin seçildiğini anlatabilmek** hedeftir.
 
-1. [Quality, Testing & Confidence](01-foundations/01-quality-testing-and-confidence.md)
-2. [Verification, Validation & Risk](01-foundations/02-verification-validation-and-risk.md)
-3. [Requirements, Expected Behavior & Evidence](01-foundations/03-requirements-expected-behavior-and-evidence.md)
+## I1 — Foundations & Test Design
 
-### 02 — Test Design Techniques
+### Birinci bölüm: Testçi nasıl düşünür?
 
-1. [Equivalence Partitioning](02-test-design-techniques/01-equivalence-partitioning.md)
-2. [Boundary Value Analysis](02-test-design-techniques/02-boundary-value-analysis.md)
-3. [Decision Table Testing](02-test-design-techniques/03-decision-table-testing.md)
-4. [State Transition Testing](02-test-design-techniques/04-state-transition-testing.md)
-5. [Scenario, Negative & Experience-based Testing](02-test-design-techniques/05-scenario-negative-exploratory-testing.md)
-6. [White-box: Statement & Branch Coverage](02-test-design-techniques/06-white-box-statement-and-branch-testing.md)
-7. [Collaboration-based: User Stories, AC & ATDD](02-test-design-techniques/07-collaboration-user-stories-and-atdd.md)
+Bu üç dersi sırayla oku; ikinci bölümde bütün teknikler bunların üstüne inşa ediliyor.
 
-**I1 toplamı: 10 konu dosyası + 1 genel README.** CTFL v4.0.1 Bölüm 4'ün white-box ve ATDD gereksinimlerini doğru kapsamak için başlangıçtaki 8 dosyaya 2 anlamlı konu dosyası eklenmiştir.
-
-## Önerilen okuma sırası — I2
-
-### 03 — Test Levels & Strategy
-
-CTFL Bölüm 2 ve 3 öğrenme hedeflerini izlemek için önce yaşam döngüsü ve review bağlamını oku, ardından seviyelere ve stratejiye geç.
-
-1. [SDLC, Test-first, DevOps & Maintenance](03-test-levels-and-strategy/05-sdlc-devops-and-maintenance-testing.md)
-2. [Static Testing, Reviews & Early Feedback](03-test-levels-and-strategy/06-static-testing-and-reviews.md)
-3. [Unit, Component, Integration, API & E2E — Levels and Types](03-test-levels-and-strategy/01-unit-component-integration-api-e2e.md)
-4. [Test Pyramid, Distribution & Agile Testing Quadrants](03-test-levels-and-strategy/02-test-pyramid-and-distribution.md)
-5. [Risk-based Test Strategy & Prioritization](03-test-levels-and-strategy/03-risk-based-test-strategy.md)
-6. [Regression, Confirmation, Smoke, Sanity & Exploration](03-test-levels-and-strategy/04-regression-smoke-sanity-and-exploration.md)
-
-**I2 toplamı:** 6 konu dosyası. Başlangıçtaki dört dosyalık `03` bölümüne, CTFL Bölüm 2'nin SDLC/maintenance hedeflerini ve Bölüm 3'ün static testing hedeflerini eksik bırakmamak için iki anlamlı dosya eklendi. Yeni repository, uygulama kodu veya alt klasör README oluşturulmadı.
-
-## Bu kaynak nasıl kullanılmalı?
-
-1. Önce kuralı ve **test oracle**'ı oku; beklenen sonucu implementasyonun çıktısından türetme.
-2. Her teknik için örneği çöz, kapsama öğelerini (coverage items) ve dışarıda kalan riski göster.
-3. **Interview Preparation** bölümündeki İngilizce cevapları kendi gerekçenle yeniden ifade et.
-4. **CTFL Practice** özgün sorularında cevap anahtarını görmeden karar ver; yanlış seçeneklerin gerekçelerini incele.
-5. Gerekiyorsa [resmî örnek sınavları](https://www.istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/) ayrı ve süreli çöz.
-
-## CTFL v4.0.1 kapsam izlemesi
-
-| CTFL alanı | Durum | Handbook karşılığı |
+| Sıra | Ders | Burada öğreneceğin temel soru |
 |---|---|---|
-| Chapter 1 — Fundamentals of Testing | **I1'de belgelenmiş** | 01 / üç dosya; test activities, roles, test principles, traceability |
-| Chapter 2 — Testing Throughout the SDLC | **I2'de belgelenmiş** | 03 / SDLC, test levels/types, confirmation/regression, maintenance |
-| Chapter 3 — Static Testing | **I2'de belgelenmiş** | 03 / static testing, review process/roles/types |
-| Chapter 4 — Test Analysis and Design | **I1'de belgelenmiş** | 02 / yedi dosya; siyah kutu, beyaz kutu, deneyime dayalı, ATDD |
-| Chapter 5 — Managing the Test Activities | **Kısmi — I2** | FL-5.1.5–5.1.7 ve FL-5.2.1–5.2.4 belgelenmiş; FL-5.1.1–5.1.4, 5.3–5.5 planlı |
-| Chapter 6 — Test Tools | **Planlı — I4 / I6** | Araçların değeri ve otomasyon riskleri henüz mevcut değil |
+| 1 | [Quality, Testing & Confidence](01-foundations/01-quality-testing-and-confidence.md) | Bir testin geçmesi neyi **kanıtlar**, neyi kanıtlamaz? |
+| 2 | [Verification, Validation & Risk](01-foundations/02-verification-validation-and-risk.md) | Bir yazılım şartnameye uyup kullanıcı için yine de başarısız olabilir mi? |
+| 3 | [Requirements, Test Oracle & Evidence](01-foundations/03-requirements-expected-behavior-and-evidence.md) | **Doğru sonucu** nereden biliyoruz; hangi kanıt yeterli? |
 
-**Önemli:** Bu tablo yalnızca dokümantasyonda açıklanmış kapsamı gösterir, LO bazında bağımsız sınav başarısını değil. Final I6 kontrolünde her Learning Objective doğrulanmalıdır. Syllabus'ta Chapter 4 için **use-case testing** ayrı sınav tekniği değildir; mühendislik örneği olarak anılabilir.
+### İkinci bölüm: Testleri nasıl tasarlarız?
 
-### I2 CTFL learning objective izi
+| Sıra | Ders | Burada öğreneceğin temel soru |
+|---|---|---|
+| 4 | [Equivalence Partitioning](02-test-design-techniques/01-equivalence-partitioning.md) | Sınırsız girdiden anlamlı örnekleri nasıl seçeriz? |
+| 5 | [Boundary Value Analysis](02-test-design-techniques/02-boundary-value-analysis.md) | Sınırdaki yanlış operatörü nasıl görünür yaparız? |
+| 6 | [Decision Table Testing](02-test-design-techniques/03-decision-table-testing.md) | Birlikte çalışan koşulları nasıl sistematik test ederiz? |
+| 7 | [State Transition Testing](02-test-design-techniques/04-state-transition-testing.md) | Aynı işlem neden farklı durumlarda farklı sonuç üretir? |
+| 8 | [Scenario, Negative & Exploratory Testing](02-test-design-techniques/05-scenario-negative-exploratory-testing.md) | Yazılmamış ama gerçek riskleri nasıl araştırırız? |
+| 9 | [White-box Testing](02-test-design-techniques/06-white-box-statement-and-branch-testing.md) | Kodun tüm satırlarını çalıştırmak yeterli midir? |
+| 10 | [User Stories, Acceptance Criteria & ATDD](02-test-design-techniques/07-collaboration-user-stories-and-atdd.md) | Test edilebilir beklentiyi koddan **önce** nasıl netleştiririz? |
 
-- **2.1:** FL-2.1.1–2.1.6 (K1/K2) → [SDLC, Test-first & DevOps](03-test-levels-and-strategy/05-sdlc-devops-and-maintenance-testing.md).
-- **2.2:** FL-2.2.1–2.2.2 (K2) → [Test Levels & Types](03-test-levels-and-strategy/01-unit-component-integration-api-e2e.md); FL-2.2.3 (K2) → [Regression / Confirmation](03-test-levels-and-strategy/04-regression-smoke-sanity-and-exploration.md).
-- **2.3:** FL-2.3.1 (K2) → [SDLC/Maintenance](03-test-levels-and-strategy/05-sdlc-devops-and-maintenance-testing.md).
-- **3.1–3.2:** FL-3.1.1–3.1.3 ve FL-3.2.1–3.2.5 (K1/K2) → [Static Testing & Reviews](03-test-levels-and-strategy/06-static-testing-and-reviews.md).
-- **5.1 (kısmi):** FL-5.1.5 (K3) → [Risk Prioritization](03-test-levels-and-strategy/03-risk-based-test-strategy.md); FL-5.1.6 (K1), FL-5.1.7 (K2) → [Test Pyramid & Quadrants](03-test-levels-and-strategy/02-test-pyramid-and-distribution.md).
-- **5.2:** FL-5.2.1–5.2.4 (K1/K2) → [Risk-based Test Strategy](03-test-levels-and-strategy/03-risk-based-test-strategy.md).
-- **Henüz belgelenmemiş CTFL objectives:** FL-5.1.1–5.1.4; FL-5.3.1–5.3.3; FL-5.4.1; FL-5.5.1; Bölüm 6. Bunlar gelecekteki Incrementlerde ele alınacak.
+### Üçüncü adım: Birleştir, uygula, sonra sınava hazırlan
 
-### I1 CTFL learning objective izi
+**[I1 Çalışma Atölyesi — Uygulama, İngilizce mülakat ve isteğe bağlı ISTQB tekrar](02-test-design-techniques/08-i1-practice-and-interview-companion.md)**
 
-- **1.1–1.3:** FL-1.1.1–1.1.2; FL-1.2.1–1.2.3; FL-1.3.1 → 01/01 ve 01/02.
-- **1.4–1.5:** FL-1.4.1–1.4.5; FL-1.5.1–1.5.3 → 01/01 ve 01/03.
-- **4.1:** FL-4.1.1 → 02/05 ve 02/06.
-- **4.2:** FL-4.2.1–4.2.4 (K3) → 02/01–04.
-- **4.3:** FL-4.3.1–4.3.3 (K2) → 02/06.
-- **4.4:** FL-4.4.1–4.4.3 (K2) → 02/05.
-- **4.5:** FL-4.5.1–4.5.2 (K2), FL-4.5.3 (K3) → 02/07.
+Bu ayrı dosyada:
+- Bir senaryo üzerinden EP, BVA, decision table, state, negative ve risk düşüncesi bir arada;
+- Daha önce görmediğin bir gereksinim için **çözümlü transfer görevi**;
+- İngilizce, teknik mülakatlarda kullanılabilecek **10 örnek soru/cevap**;
+- **12 özgün CTFL Foundation** tarzı soru ve gerekçeli cevap anahtarı bulunur.
 
-## Bölüm şablonu
+**Ana dersleri bölüp her sayfayı CTFL ve mülakat etiketleriyle doldurmuyoruz.** Önce kavramı öğren, sonra istersen sınav/konuşma pratiğine geç.
 
-I1 ve I2 konu dosyaları **Technical Foundation → Engineering Perspective → Practical Scenario → Interview Preparation → CTFL Practice** akışını izler. K1 hatırlama, K2 anlama, K3 verilen duruma uygulama seviyesidir. Sorular bu handbook için özgün yazılmıştır; resmî ISTQB sınav soruları değildir.
+## Pedagojik rota: Her adım neden bu sırada?
 
-## Kaynaklar ve kullanım
+~~~text
+Quality & Confidence
+        ↓
+Verification / Validation / Risk
+        ↓
+Requirement → Test condition → Expected result → Evidence
+        ↓
+EP → BVA → Decision table → State transition
+        ↓
+Negative / Exploratory → White-box
+        ↓
+Acceptance Criteria & ATDD
+        ↓
+Entegre vaka → Yeni problem → Mülakat ve sınav tekrarı
+~~~
 
-- [ISTQB CTFL v4.0.1 — resmî syllabus (PDF)](https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf)
-- [ISTQB CTFL — resmî örnek sınav indirmeleri](https://www.istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/)
-- [ISTQB Glossary](https://glossary.istqb.org/)
+**Örnek dünyamız:** Sepet, kargo ücreti, kupon, sipariş state'i ve iade kuralları. Aynı iş alanını farklı tekniklerle ele almak, her derste sıfırdan yeni bir ürün öğrenme yükünü azaltır. Bütün örnek kurallar eğitim için oluşturulmuştur; gerçek bir sisteme ilişkin doğrulanmış ürün politikası değildir.
 
-Metin, syllabus kavramlarının **özgün eğitim açıklaması**dır; resmî materyalin kopyası ya da akredite eğitim iddiası değildir. Sınava kayıt olurken sınav dili ve kabul edilen sürümü sınav sağlayıcısından teyit et.
+## Nasıl çalışmalı?
 
-## Increment durumu ve sonraki çalışmalar
+1. Bir dersin ilk örneğine bakıp sonucu **kendin tahmin et**.
+2. Açıklamayı okuyup nedenini anlayarak tabloyu yeniden kur.
+3. **Alıştırma** bölümünü örnek çözüme bakmadan çöz.
+4. Kendi çözümünle farkları karşılaştır; beklenen sonucun kaynağını ve kalan riski açıklamaya çalış.
+5. Bölümü bitirince bir sonraki derse geç. Mülakat veya sınav sorularını **zorunlu önkoşul** yapma.
 
-- **I2 (tamamlandı):** Test levels, SDLC, strategy, static reviews ve Chapter 5'in belirtilen alt başlıkları.
-- **I3:** Test data, isolation, doubles; ilgili CTFL yönetim bağlantıları.
-- **I4:** Automation & BDD; CTFL test tools.
-- **I5:** API/UI test perspektifi, failure analysis, CI.
-- **I6:** SDET/security/checklists ve tam CTFL LO coverage final kontrolü.
+İleride canlı eğitim/pratik oturumlarında bağımsız çalışma ve debugging ayrıca gözlenir. **AI tarafından yazılmış dokümanların varlığı, öğrencinin bağımsız SDET yetkinliği kanıtı değildir.**
 
-**Dokümantasyon tamamlandı ≠ bağımsız teknik mastery veya sınav hazır oluşu kanıtlandı.**
+## Kapsam, durum ve sonraki adımlar
+
+| Aşama | Durum | Açıklama |
+|---|---|---|
+| **I1 — Foundations & Test Design** | **Yeniden yazıldı; incelemeye açık** | 10 açıklamalı ders + 1 bütünleştirici çalışma atölyesi |
+| **I2 — Levels & Strategy** | **Eski taslak; yeniden yazılacak** | Önceden üretilen dosyalar silinmedi, henüz önerilen okuma rotasında değil |
+| I3 — Data, Isolation & Doubles | Planlı | Yeni ders yok |
+| I4 — Automation & BDD | Planlı | Yeni ders yok |
+| I5 — API, UI & Failure Engineering | Planlı | Yeni ders yok |
+| I6 — SDET, Security & Final Review | Planlı | Yeni ders yok |
+
+**CTFL hedefi:** Bu öğretim serisi sınav hazırlığını da desteklemeyi hedefler, ancak tek başına 10 dersi okumak CTFL müfredatının tamamını kapsamaz. Sınav hazırlığını ayrı çalışma atölyesi ve nihai syllabus coverage kontrolünde takip edeceğiz. Resmî bilgi: [ISTQB CTFL](https://istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/) ve [Glossary](https://glossary.istqb.org/).
+
+## Repository sınırları
+
+Bu handbook, mevcut `docs/learning/typescript-foundation/` materyallerinden bağımsızdır. `src/`, `tests/`, mevcut TypeScript dersleri ve diğer Increment klasörleri bu I1 yeniden yazımında değiştirilmemiştir.
+
+**Bir genel README** vardır; alt klasörlerde README oluşturulmaz.

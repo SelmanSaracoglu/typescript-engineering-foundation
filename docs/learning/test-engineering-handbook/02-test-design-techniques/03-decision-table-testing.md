@@ -1,92 +1,169 @@
-# Decision Table Testing
+# 6. Decision Table Testing — Koşullar birlikte karar veriyorsa
 
-**Amaç:** Birden fazla iş koşulunun farklı kombinasyonlarını sistematik test etmek.
-**ISTQB CTFL v4.0.1:** FL-4.2.3 (**K3**).
+> **Bu bölümün sorusu:** İki koşulu ayrı ayrı test etmek, bunların birlikte doğru çalıştığını gösterir mi?
 
-## 1. Technical Foundation
+## 6.1 Bir kuralı parçalayalım
 
-Bir **decision table**, koşulların ve bu koşullara bağlı eylemlerin farklı kurallarını gösterir. **Bir sütun = bir karar kuralı.** Limited-entry tabloda koşullar genelde **T** (true), **F** (false), **–** (irrelevant/don't care), **N/A** (feasible değil) ile ifade edilir. Eylem için **X** uygulanacağını, boş hücre uygulanmayacağını gösterebilir.
+Alışveriş sistemimizde şu iş kuralı var:
 
-Kural: “Müşteri **aktif üyeyse** ve sepet tutarı **100 € veya üstüyse**, standart kargo ücretsizdir. Diğer durumlarda ücretlidir.”
+> **S-01:** Ücretsiz **standart** kargo, yalnızca **aktif üyeler** için ve **sepet toplamı 100 € veya üzerindeyse** uygulanır. Diğer durumlarda standart kargo ücretlidir.
 
-| Koşul / Action | R1 | R2 | R3 | R4 |
+İki koşulu fark edelim:
+
+1. Kullanıcı aktif üye mi?
+2. Sepet toplamı 100 € veya üzeri mi?
+
+“Ücretsiz kargo özelliği çalışıyor mu?” diye yalnız aktif-120 € testi yapmak yeterli değildir. Mesela pasif-120 € için kod yanlışlıkla ücretsiz kargo verebilir.
+
+**Decision Table Testing**, koşul kombinasyonlarının hangi iş sonucunu üretmesi gerektiğini **tam görünür** kılar.
+
+## 6.2 İlk tabloyu birlikte üretelim
+
+Her koşulun iki olası değeri var: **Evet/Hayır**. Dolayısıyla teorik olarak **2 × 2 = 4** kombinasyon oluşur.
+
+| Kural | Aktif üye? | Toplam ≥100 €? | Beklenen |
+|---|---|---|---|
+| R1 | Evet | Evet | FREE |
+| R2 | Evet | Hayır | PAID |
+| R3 | Hayır | Evet | PAID |
+| R4 | Hayır | Hayır | PAID |
+
+Bunu test case'e çevirmek kolay:
+
+| Test | Üyelik | Tutar | Beklenen |
+|---|---|---:|---|
+| TC1 | ACTIVE | 120 € | FREE |
+| TC2 | ACTIVE | 80 € | PAID |
+| TC3 | INACTIVE | 120 € | PAID |
+| TC4 | INACTIVE | 80 € | PAID |
+
+**Bir satırdaki bütün koşulların birlikte sağlanmasına** odaklanıyoruz.
+
+### Neden bu, EP'den farklı?
+
+EP bize “active/inactive” ve “100 altı/üstü” sınıflarını gösterir. Ama şu iki testten ibaret bir set:
+
+- ACTIVE + 120;
+- INACTIVE + 80;
+
+iki parametrenin tüm değerlerini temsil ederken **ACTIVE + 80** ve **INACTIVE + 120** kararlarını denememiş olur. Koşulların birlikte işlediği mantık için tablo gerekir.
+
+## 6.3 Aynı kararı sütunlu tabloda göstermek
+
+Aynı tablo sıkça koşulların **satır**, karar kurallarının **sütun** olduğu biçimde gösterilir:
+
+| Condition / Action | R1 | R2 | R3 | R4 |
 |---|---|---|---|---|
-| Üyelik aktif mi? | T | T | F | F |
-| Sepet ≥ 100 € mi? | T | F | T | F |
+| Active? | T | T | F | F |
+| Total ≥100? | T | F | T | F |
 | FREE shipping | X |  |  |  |
 | PAID shipping |  | X | X | X |
 
-Bütün dört kombinasyon bu örnekte **feasible** olsun. Test cases:
+Burada:
+- **T/F:** Condition true/false;
+- **X:** İlgili action uygulanır;
+- **R1–R4:** Dört ayrı karar kuralı (coverage item).
 
-| Test | Üyelik | Tutar | Expected |
-|---|---|---:|---|
-| TC1 | aktif | 120 | FREE |
-| TC2 | aktif | 80 | PAID |
-| TC3 | pasif | 120 | PAID |
-| TC4 | pasif | 80 | PAID |
+İki gösterim **aynı mantığı** anlatır. Tabloyu yatay-dikey biçimiyle ezberlemek yerine **her kombinasyona karşılık bir oracle** yazmayı öğren.
 
-**Coverage = işletilen uygulanabilir karar sütunları / toplam uygulanabilir sütunlar × 100.** Yalnız TC1–TC3 çalıştırıldıysa **3/4 = %75**. Kaç satır veya kaç assertion olduğu bu payda değildir.
+## 6.4 Yeni kural ekleyince ne değişir?
 
-### Tam kombinasyon, imkânsız ve önemsiz koşullar
+Product owner yeni koşul ekliyor:
 
-Üç bağımsız Boolean koşulun teorik sayısı **2³=8**. Ancak bazı kombinasyonlar iş kurallarına göre imkânsız olabilir: siparişin aynı anda “iptal edilmiş” ve “teslim edilmiş” olması gibi. Bunlar **N/A** olabilir, feasible coverage paydasına konmaz. Sonucu etkilemeyen koşul **–** ile gösterilerek birden fazla sütun birleştirilebilir; fakat kararların gerçekten aynı sonuç verdiğine emin olmadan sadeleştirme yapılmaz.
+> **S-02:** Express shipping **her zaman ücretlidir**, aktif üyeler de dahil.
 
-**Extended-entry decision table** sadece Boolean değil, çok değerli koşullar da barındırabilir: BASIC/PREMIUM, 0–99/100+, vb.
+Artık üçüncü koşulumuz var: “Express mi?”
 
-## 2. Engineering Perspective
+Üç bağımsız Boolean koşul için tam tablo **2³=8** satır üretir.
 
-**Ne zaman uygun?** Authorization role × ownership, kampanya planı × süre × tutar, iade tipi × sipariş state'i, riskli backend iş kuralları.
+| Active? | Total ≥100? | Express? | Beklenen |
+|---|---|---|---|
+| T | T | F | FREE |
+| T | F | F | PAID |
+| F | T | F | PAID |
+| F | F | F | PAID |
+| T | T | T | PAID |
+| T | F | T | PAID |
+| F | T | T | PAID |
+| F | F | T | PAID |
 
-**Ne zaman gereksiz?** Tek bir sayısal aralıkta BVA çoğu zaman daha ekonomiktir; event sırası önemliyse state transition gerekir. Decision table kod branch coverage yerine geçmez; kural kombinasyonlarını test eder.
+Önemli gözlem: **Express=T olduğunda** diğer iki koşul artık sonuca etki etmiyor. Bu yüzden karar tablosu şöyle **sadeleştirilebilir**:
 
-**Yaygın hatalar:**
-- Her koşulu yalnız tek başına test edip etkileşimleri atlamak.
-- Feasible olmayan satırları körlemesine test etmek.
-- Yetkisiz varyasyonların state yan etkisini kontrol etmemek.
-- Tüm kombinasyonları azaltırken kritik bir iş kuralını birleştirmek.
-- Belirsiz bir sonuç sütununda expected result'ı mevcut koddan çıkarmak.
+| Kural | Express? | Active? | Total ≥100? | Beklenen |
+|---|---|---|---|---|
+| R1 | T | — | — | PAID |
+| R2 | F | T | T | FREE |
+| R3 | F | T | F | PAID |
+| R4 | F | F | — | PAID |
 
-### Risk kararı
+**— (don't care)** işareti, bu kural için koşulun sonuca etki etmediğini ifade eder. “Bilmiyoruz” veya “hatalı veri” demek değildir.
 
-10 koşul varsa teorik 1.024 kombinasyon mümkündür. Hepsini çalıştırmadan önce uygulanamazları çıkar, aynı sonuca giden koşulları gerekçeli birleştir, kalan kombinasyonlarda risk temelli öncelik uygula. “Her şeyi test ettim” iddiası kurma.
+Bu sadeleştirme, iş kuralları gerçekten aynı sonucu veriyorsa geçerlidir. Eğer Express için ayrı vergi veya üyelik ücreti hesaplanıyorsa “PAID” sonucuna bakıp bütün davranışların eşdeğer olduğunu varsaymak yeterli olmayabilir.
 
-## 3. Practical Scenario — yeni kural geldi
+### “Impossible combination” ile “don't care” farklıdır
 
-Yeni şart: “**Express shipping** her durumda ücretli.”
+Diyelim tek seçimli bir kargo tipinde hem STANDARD hem EXPRESS aynı anda seçilemez. Böyle bir koşul **infeasible/N/A** olabilir: Gerçek dünyada oluşturulabilen bir iş durumu değildir.
 
-Bir üçüncü koşul ekle: Express? **T** ise üyelik ve tutar ne olursa olsun PAID, **F** ise eski dört sütunun sonucu geçerli. Tam tablo sekiz feasible kombinasyona genişleyebilir. Express=T için iki diğer koşul sonuç açısından önemsiz olduğundan gerekçeli biçimde **tek don't-care sütunu** ile gösterebilirsin.
+**Don't care** ise iş durumu mümkündür, sadece **o kuralın sonucunu değiştirmez**.
 
-Buna rağmen yüksek riskli kullanıcı tipleri için bağımsız doğrulama isteyebilirsin. Test teknikleri risk kabulünün yerine geçmez.
+Bu iki işaretin farkını bilmek yanlış test sayısı ve hatalı coverage hesaplarını önler.
 
-## 4. Interview Preparation
+## 6.5 Decision table coverage hesabı
 
-**Q1: When do you use decision table testing?**  
-**A:** “When behavior depends on combinations of business conditions. Decision tables expose missing or contradictory rules and provide systematic test cases for feasible combinations.”
+İlk iki koşullu tam tabloda dört feasible karar sütunu vardı.
 
-**Q2: What do a dash and N/A mean?**  
-**A:** “A dash means that the condition does not affect the outcome for that rule. N/A means the combination is infeasible. They are not interchangeable.”
+Dört kuraldan üçünü test ettiysek:
 
-**Q3: How would you reduce a large decision table?**  
-**A:** “I would remove impossible combinations, merge rules only when a condition is irrelevant, and prioritize remaining combinations by risk while documenting the gaps.”
+**Coverage = 3/4 = %75**.
 
-## 5. CTFL Practice — özgün sorular
+Sadeleştirilmiş tabloda coverage paydası, **tanımlı feasible karar kurallarıdır**. Ancak “—” ile birleştirdiğimiz bir sütunun tüm varyasyonları hakkında aynı derinlikte kanıt ürettiğimizi iddia etmeyiz. Yüksek risk varsa birleşmiş gruptan ek temsilci seçebiliriz.
 
-**S1 (K3):** Dört feasible kuraldan üçü test edildi. Coverage?  
-A) %25 · B) %50 · C) %75 · D) %100  
-**Yanıt: C.** 3/4; koşul sayısı değil kural sütunu sayılır.
+## 6.6 Tester'ın asıl katkısı: eksik kuralı fark etmek
 
-**S2 (K2):** Decision table'da “–” ne demektir?  
-A) Kural imkânsız · B) Bu koşul sonuca etkisiz · C) Başarısız test · D) Veri yok ve geçersiz  
-**Yanıt: B.** İmkânsız durum için N/A kullanılır.
+Şu yeni durumda mevcut requirements eksik:
 
-**S3 (K3):** Aktif üye ve ≥100 € ücretsiz kargo kuralında hangi set dört kombinasyonu test eder?  
-A) aktif-120, aktif-130, pasif-140, pasif-150 · B) aktif-120, aktif-80, pasif-120, pasif-80 · C) aktif-80, pasif-80 · D) aktif-120, pasif-80  
-**Yanıt: B.** İki Boolean koşulun TT/TF/FT/FF kombinasyonları temsil edilir.
+> “Kupon tanımlı; toplam 100 € ve üstü; müşteri aktif; ancak kupon geçersiz olduğunda ücretsiz kargo hesabı neye göre yapılır?”
 
-## Sonuç
+Burada **kupon sonrası mı, önceki toplam mı** kullanıldığı belirlenmemiş olabilir.
 
-Decision table, “her koşulu denedim” değil **uygulanabilir koşul kombinasyonlarını gözlenebilir sonuçlarla eşleştirdim** demektir.
+Zayıf yaklaşım: Sistemi çalıştır, ne yaptıysa expected kabul et.
 
-Devam: [EP](01-equivalence-partitioning.md), [State Transition](04-state-transition-testing.md), [ATDD](07-collaboration-user-stories-and-atdd.md).
+Mühendislik yaklaşımı: Belirsiz kombinasyonu tabloda görünür yap, product owner'a somut alternatifleri sor, onaylı kararı test oracle'a dönüştür.
 
-[ISTQB CTFL v4.0.1 §4.2.3](https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf).
+Decision table yalnız test case üretmez, **requirements review** için de güçlü bir araçtır.
+
+## 6.7 Hangi durumlarda doğru teknik değildir?
+
+- Tek sayısal eşikte geçişi araştırıyorsan önce **BVA**.
+- Aynı olayın önceki işlemlere göre farklı sonuç verdiği bir sistemde **State Transition**.
+- Uygulamanın iç kod dallarını sayıyorsan **White-box/branch testing**.
+- Kullanıcının beklenmedik davranışlarını keşfediyorsan **Exploratory testing**.
+
+Testler kombinasyon patlamasına uğrarsa “2¹⁰=1.024, hepsini çalıştırmalıyım” sonucu çıkarmak doğru değildir. Önce geçersiz kombinasyonları, önemsiz koşulları, riskli durumları ayır.
+
+## 6.8 Alıştırma
+
+**Kural:** Bir kullanıcı belgeyi indirebilir, eğer **hesap aktif** ve (**belge sahibi** veya **admin**) ise.
+
+**Görev:** Active, Owner, Admin koşulları için erişime izin verilen kombinasyonları düşün. Pasif admin indirebilir mi?
+
+**Örnek çözüm:**
+
+| Active | Owner | Admin | Beklenen |
+|---|---|---|---|
+| T | T | F | ALLOW |
+| T | F | T | ALLOW |
+| T | F | F | DENY |
+| F | T | F | DENY |
+| F | F | T | DENY |
+| T | T | T | ALLOW |
+| F | T | T | DENY |
+| F | F | F | DENY |
+
+Pasif adminin reddedilmesi, “active” koşulunun **zorunlu** olmasından gelir. Uygulamada admin istisnası isteniyorsa **iş kuralı değişmelidir**; tester sessizce istisna uydurmaz.
+
+## Sonraki bölüm
+
+Şimdi iş koşullarının **aynı anda** nasıl çalıştığını anladık. Bir sonraki teknikte karar, yalnız anlık koşullara değil **sistemin geçmişte hangi olayları yaşadığına** bağlı olacak.
+
+→ [7. State Transition Testing](04-state-transition-testing.md)

@@ -1,97 +1,157 @@
-# Requirements, Expected Behavior & Evidence
+# 3. Gereksinimden kanıta: Test case nasıl doğar?
 
-**Amaç:** Test basis → test condition → test case → observation → evidence zincirini kurmak; uygulamanın mevcut çıktısını sorgusuz expected result saymamak.  
-**CTFL:** FL-1.4.1–1.4.5 (K2), FL-1.5.1–1.5.3 (K1/K2); 4.5.2 acceptance criteria ayrıntısı [ATDD](../02-test-design-techniques/07-collaboration-user-stories-and-atdd.md) içinde.
+> **Bu bölümün sorusu:** Sistemin verdiği sonucun doğru olup olmadığını nereden biliriz?
 
-## 1. Technical Foundation
+## 3.1 Testin başlangıç noktası: test basis
 
-### Kavramlar ve test süreci
+Yeni bir kural düşün:
 
-- **Test basis:** Testin dayandığı gereksinim, risk kaydı, user story, arayüz sözleşmesi, tasarım veya düzenleme.
-- **Test condition:** Neyi doğrulayacağız? Örnek: “14. günde iade kabul edilir.”
-- **Test case:** Başlangıç koşulu, girdi/eylem ve **beklenen sonuç** ile tanımlı özel kontrol.
-- **Test oracle:** Doğru sonucun ne olması gerektiğini belirleyen bağımsız dayanak: onaylı şartname, açık iş kuralı, doğrulanmış sözleşme, alan uzmanı kararı. “Sistem böyle yapıyor” oracle değildir.
-- **Testware:** Plan, test koşulu, test data, test case, charter, script, test result ve rapor gibi test faaliyetlerinin çıktıları.
-- **Evidence:** Gerçek gözlem, zaman, ortam, veri, log, response, ekran kaydı ve test sonucu; tek başına “Pass” yazısı yetmeyebilir.
-- **Traceability:** Test basis ile koşullar, testler, sonuçlar ve ilgili defectler arasında izlenebilir bağlantı.
+> **R-01:** Teslim edilmiş bir sipariş için müşteri, teslimat gününden itibaren 14 takvim günü içinde (**14. gün dahil**) iade talebi oluşturabilir. Teslim edilmemiş siparişler için talep reddedilir.
 
-CTFL test faaliyetleri: **planning; monitoring & control; analysis; design; implementation; execution; completion.** Bunlar bir projede katı bir şelale olmak zorunda değildir; yinelemeli ve paralel çalışır. Test **analysis** “what to test?”, **design** “how to test?” sorusunu yanıtlar. Implementation veri/prosedür/ortamı hazırlar; execution beklenen-gerçek sonucu karşılaştırır; completion kalan işleri ve öğrenilenleri kaydeder.
+Buradaki R-01 bir **test basis** örneğidir: testin dayandığı yetkili kaynak. Test basis her zaman resmî PDF şartnamesi olmak zorunda değildir; onaylı user story, iş kuralı, API contract, tasarım kararı veya ilgili yasal yükümlülük olabilir.
 
-**Rol ayrımı:** Test management rolü planlama, izleme, kontrol ve tamamlanma odaklıdır; testing rolü analiz, tasarım, uygulama ve yürütme odaklıdır. Aynı insan küçük takımda ikisini de yapabilir. Whole-team iş birliği test bağımsızlığını dışlamaz.
+**Hata:** Uygulamayı açıp “Bugün 15. gün ama kabul etti; demek ki kural böyleymiş” diye expected result üretmek. Bu, implementasyonun yanlışını testin standardına dönüştürür.
 
-### Gereksinim kalitesi: ambiguity, assumption, contradiction
+Bir tester “Doğru davranışın kaynağı neresi?” diye sorar.
 
-- **Ambiguity:** “Hızlı yanıt” — kaç saniye, hangi veri ve yükte?
-- **Assumption:** “Gün = UTC günü” — paydaş onaylamadıysa gizli varsayım.
-- **Contradiction:** Bir doküman “14 gün dahil” der, diğeri “14. gün hariç” der.
-- **Missing requirement:** İade başvurusunda zaman dilimi hiç yazılmamış.
+## 3.2 Test condition, test case ve test data
 
-Çözüm, geliştiricinin mevcut çıktısını “doğru” olarak kabul etmek değil; çelişkiyi açık soruya dönüştürmek ve karar veren kişiyi belirlemektir.
+Bunları aynı şeymiş gibi kullanmak test tasarımını zayıflatır:
 
-## 2. Engineering Perspective — izlenebilir bir örnek
+- **Test condition:** Neyi kontrol edeceğiz? — “14. günde iade kabul edilir.”
+- **Test case:** Hangi başlangıç şartı, adım, veri ve beklenen sonuçla kontrol edeceğiz?
+- **Test data:** İade denemesi için gerekli sipariş, tarih, kullanıcı ve ürün bilgileri.
+- **Test procedure:** Testlerin ve hazırlık/temizleme adımlarının hangi sırayla yapılacağı.
+- **Test result:** Çalıştırmada ne gözledik?
 
-**Onaylı kural R-17:** Sipariş durumu **DELIVERED** ve teslim tarihinden itibaren **0–14 takvim günü (iki uç dahil)** ise iade başvurusu kabul edilir; aksi halde reddedilir. Saat dilimi ve gün hesabı için ürün kararı ayrıca kaydedilmiş olsun.
+Bir test case'i birlikte yazalım.
 
-| Test basis | Risk | Test condition | Örnek veri | Expected result | Evidence |
-|---|---|---|---|---|---|
-| R-17 | Haklı iadeyi reddetmek | 14. gün kabul | DELIVERED, day=14 | ACCEPT | response + kayıt durumu |
-| R-17 | Geç iadeyi kabul etmek | 15. gün ret | DELIVERED, day=15 | REJECT, state değişmez | response + state |
-| R-17 | Teslim edilmemiş sipariş | Geçersiz durumdan iade | CREATED, day=2 | REJECT | response + state |
+### TC-01 — 14. günde iade
 
-Bu tabloda **beklenti kuraldan** gelir. Örneğin API day=15 için ACCEPT döndürdüğünde testimizi ACCEPT'e çevirmek değil, failure/defect adayını araştırmak gerekir.
+**Test basis:** R-01  
+**Test condition:** Son geçerli günde iade  
+**Preconditions:** Kullanıcı sipariş sahibi; sipariş DELIVERED; geçerli iade zaten yok  
+**Test data:** Teslim zamanı örnek olarak 2026-10-01 10:00; değerlendirme zamanı ve takvim günü kurala uygun **14. gün** olarak ayarlanmış  
+**Action:** Kullanıcı iade talebi gönderir  
+**Expected result:** Başvuru kabul edilir; bir adet iade kaydı oluşturulur  
+**Observation:** HTTP yanıtı, arayüz mesajı ve iade kaydı durumu kontrol edilir  
+**Cleanup:** Test kaydı temizlenir veya izole veri alanında bırakılır
 
-### Coverage kavramları
+**Saat/tarih uyarısı:** R-01 “teslimat gününden itibaren” derken iş gününü, UTC'yi veya yerel takvim gününü tam açıklamıyorsa örnekteki tarih saat **henüz güvenilir oracle değildir**. Ürün kararı gelmeden “14×24 saat” varsayımı yapmamalıyız.
 
-- **Requirement coverage:** Her gereksinimin en az bir testle bağlantılı olması (genişlik göstergesi).
-- **Condition/partition/branch coverage:** Belirli bir test tekniğinin kapsama öğelerinin işletilme oranı.
-- **Risk coverage:** Yüksek öncelikli risklerin uygun senaryolarla ele alınma durumu.
+### TC-02 — 15. gün
 
-**%100 requirement coverage ≠ doğru oracle, yeterli boundary veya güvenlik testi.** Çok sayıda testle aynı basit şartı tekrar edip kritik senaryoyu kaçırmak mümkündür. Coverage metriğinde **pay, payda ve hangi öğelerin sayıldığı** belirtilmeli.
+Aynı başlangıç koşulları, sadece talep zamanı 15. güne taşınır. Beklenen: **REJECT** ve **hiçbir yeni iade kaydı oluşmaması**.
 
-### Kanıt kalitesi
+### TC-03 — Teslim edilmemiş sipariş
 
-Yeniden üretilebilir kanıt örneği: sürüm/commit, ortam, test veri kimliği (kişisel veri olmadan), başlangıç state'i, aksiyon, beklenen-gerçek, timestamp, artefact bağlantısı, gerekli temizleme notu. Screenshot tek başına backend state'i kanıtlamaz.
+Sipariş durumu CREATED iken, teslim günü hesabı ne olursa olsun talep reddedilir. Bu test “gün” kontrolünden **farklı bir iş kuralını** hedefler.
 
-**Önerilen QA alışkanlığı:** Bir defect raporunun yeniden üretim adımlarını başka bir mühendisin uygulayabilmesini hedefle.
+İyi test case'in bütün alanlarını ezberden doldurmak gerekmez. Ama bağımsız tekrar üretim için **başlangıç, işlem, doğru sonuç ve gözlem** anlaşılır olmalı.
 
-## 3. Practical Scenario — kupon kuralını netleştirme
+## 3.3 Test oracle nedir?
 
-User story: “Üye kullanıcı olarak kampanya kuponumu sepetimde kullanmak istiyorum.”
+**Test oracle**, beklenen sonucu belirlemeye yarayan güvenilir bilgi kaynağıdır.
 
-Sorulacaklar: Kupon aynı anda kaç kez kullanılabilir? Süresi hangi timezone'da biter? Sepet alt limiti indirim öncesi mi sonrası mı? Kullanıcı kuponu art arda uygularsa ne olur? Kupon diğer indirimle birleşir mi?
+Örnek oracle'lar:
 
-Bu sorular yanıtlanmadan “geçerli kupon çalışır” testinin **expected result**'ı zayıftır. Ürün sahibiyle açık örnek ve karar tablosu oluşturulmalı. Gereksinim değişirse test basis ve ilgili testler izlenebilir biçimde güncellenir.
+- Product owner tarafından onaylanmış iş kuralı;
+- Gereksinime uygun API şeması/sözleşmesi;
+- Hesaplama formülü ve örneklerle doğrulanmış spesifikasyon;
+- Alan uzmanının yazılı olarak netleştirdiği karar;
+- Tutarlı ve geçerli referans sistem (bu kaynağın da güvenilirliği doğrulanmalı).
 
-## 4. Interview Preparation
+**Yanlış oracle:** “Developer böyle yazmış”, “şu anda sistem bunu yapıyor”, “geçen hafta ekran bu rengi gösteriyordu” — bunlar gözlem olabilir ama tek başına **doğru davranışın normu** değildir.
 
-**Q1 (Foundation): What is a test oracle?**  
-**A:** “A test oracle is a source used to determine the expected result. It can be an approved requirement, contract or validated domain rule. I avoid copying the current implementation's output as the expected value.”
+Oracle belirsizse testin sonucu bazen **blocked / unresolved** olabilir. Yanlış tanımlanmış expected result ile sahte Pass üretmekten iyidir.
 
-**Q2 (Mid): How do you test ambiguous acceptance criteria?**  
-**A:** “I record the ambiguity, propose concrete examples and clarify them with the accountable stakeholder. I make assumptions explicit and only then derive expected results and test cases.”  
-**Follow-up:** What if no stakeholder is available? **Document assumptions and block or limit claims about correctness.**
+## 3.4 Belirsizlik ile karşılaşınca ne yaparız?
 
-**Q3 (Advanced): Why maintain traceability if you already have many automated tests?**  
-**A:** “Test counts do not tell us which requirements and risks are supported. Traceability helps impact analysis, review of gaps and communication when a rule changes.”
+Gereksinim: “Kullanıcılar siparişlerini kısa sürede kolayca iade eder.”
 
-## 5. CTFL Practice — özgün sorular
+Birden fazla sorun var:
 
-**S1 (K2):** “Bir siparişin son gününde iade kabulü” ifadesinden spesifik girdili örnek oluşturma hangi adımla en çok ilişkilidir?  
-A) Test design · B) Test completion · C) Configuration management · D) Release deployment  
-**Yanıt: A.** Analizde koşul belirlenir; tasarımda test case oluşturulur.
+| Sorun | Tester'ın somut sorusu |
+|---|---|
+| **Ambiguity** — “kısa sürede” | En fazla kaç saniyelik işlem süresi? Hangi adım? |
+| **Missing requirement** | Hangi sipariş statüleri iade edilebilir? |
+| **Assumption** | “14 gün = 336 saat” varsayımını kim onayladı? |
+| **Contradiction** | Web dokümanında 14 gün, uygulama kuralında 30 gün görünüyor; hangisi yetkili? |
 
-**S2 (K2):** Hangi kayıt traceability'nin doğrudan örneğidir?  
-A) Her test dosyasının alfabetik sırası · B) R-17 → TC-14 → Run-82 → Defect-4 bağlantısı · C) Selenium sürümünün kaydı · D) Tester'ın toplantı sayısı  
-**Yanıt: B.** Test basis ve ilgili çıktıların ilişkisini açıklar; diğerleri ilişki kurmaz.
+Yanıt beklerken test yazılamaz mı? Bazı bağımsız parçalar çalışılabilir; ancak **karar verilmemiş davranış için kesin başarı iddiası** kurulmamalıdır. Assumption belgelenebilir, uygun kişi doğrulamadan “yeni requirement” sayılamaz.
 
-**S3 (K2):** Spec “en fazla 14 gün” diyor, implementasyon 15 günü kabul ediyor. Test oracle için ilk tercih nedir?  
-A) Mevcut kod çıktısı · B) Onaylı kuralın açıklaştırılmış yorumu · C) En sık görülen UI sonucu · D) Geliştiricinin tahmini  
-**Yanıt: B.** Oracle bağımsız ve yetkili dayanak olmalıdır.
+## 3.5 Testing faaliyetleri birbirine nasıl bağlanır?
 
-## Sonuç ve bağlantılar
+Testing yalnız execution değildir. Pratikte faaliyetler birbirini besler:
 
-İyi test: **neyi neden ölçtüğünü, doğru sonucun kaynağını ve gerçekte ne gözlediğini** ayırır.
+1. **Planning:** Hedef, kapsam, risk ve kaynaklar.
+2. **Monitoring and control:** Planlananla gerçekleşeni karşılaştırıp yön verme.
+3. **Test analysis:** Test basis'ten **neyi test edeceğimizi** çıkarma.
+4. **Test design:** **Nasıl test edeceğimizi** belirleme; durum/veri/expected results.
+5. **Test implementation:** Veri, script, prosedür ve ortamı çalıştırılabilir hale getirme.
+6. **Test execution:** Testi çalıştırıp expected ile actual'ı karşılaştırma.
+7. **Test completion:** Sonuçları, kalan riski, öğrenilenleri ve materyalleri devretme.
 
-Devam: [Equivalence Partitioning](../02-test-design-techniques/01-equivalence-partitioning.md) ve [Collaboration/ATDD](../02-test-design-techniques/07-collaboration-user-stories-and-atdd.md).
+Bunlar yaşam döngüsünde tamamen ayrı, yalnız bir kez gerçekleşen basamaklar değildir. Bir bug bulduğumuzda analysis/design'e geri dönebiliriz.
 
-**Kaynak:** [ISTQB CTFL v4.0.1, §§1.4–1.5](https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf).
+**Örnek:** R-01 için “son gün” koşulunu **analysis** aşamasında görürüz; day 14/day 15 örneklerini **design** aşamasında seçeriz; gerekli tarih/veri kurulumunu **implementation** aşamasında hazırlarız; sonucu **execution** aşamasında gözleriz.
+
+## 3.6 Traceability ve coverage: Aynı mı?
+
+**Traceability**, gereksinim ile ona bağlı test ve bulguların izlenebilir bağlantısıdır.
+
+| Gereksinim | Risk | Test koşulu | Test case | Gözlem |
+|---|---|---|---|---|
+| R-01 | Geçerli iadenin haksız reddi | Son gün kabul | TC-01 | ACCEPT |
+| R-01 | Geç iade kabulü | İlk geçersiz gün ret | TC-02 | REJECT |
+| R-01 | Geçersiz state'ten iade | Teslim edilmemiş | TC-03 | REJECT |
+
+Traceability değişiklikte önem kazanır: “14 gün → 30 gün” kararı verilirse hangi testlerin etkilenebileceğini hızlı görürüz.
+
+**Coverage** ise belirli bir ölçüte göre *kaç öğenin* çalıştırıldığını gösterir. Örneğin tanımladığımız üç condition'ın ikisi test edilmişse **2/3** condition coverage. Fakat testin oracle'ı yanlışsa %100 coverage da yanlış güven yaratabilir.
+
+**Requirement coverage** ile **boundary / branch / state coverage** farklı paydalara sahiptir; oranları birbirine karıştırma.
+
+## 3.7 Test evidence nasıl değerlendirilir?
+
+“Pass” kelimesi tek başına zayıf kanıttır.
+
+Daha yararlı bilgi:
+- Build/sürüm ve ortam;
+- Test condition ve başlangıç verisinin kimliği;
+- Gerçek işlem;
+- Beklenen ve gözlenen sonuç;
+- Zaman bilgisi;
+- Gerekliyse response, log, transaction/state görüntüsü;
+- Sonucun tekrar üretilmesini sağlayacak yeterli ayrıntı.
+
+Kişisel müşteri verilerini, şifreleri veya oturum token'larını rapora gereksiz kopyalamamak gerekir.
+
+### Örnek failure kaydı
+
+**TC-02 failed:** 15. gün iade başvurusu kabul edildi.  
+**Expected:** REJECT, yeni iade kaydı yok (R-01).  
+**Actual:** ACCEPT, yeni iade kaydı oluştu.  
+**Koşullar:** Sipariş DELIVERED, izolasyon sağlanmış test hesabı, tanımlı takvim zamanı.  
+**Şüphe:** Son gün operatörü veya gün hesabı.  
+**Sonraki adım:** Oracle'daki gün yorumunu doğrula ve aynı veride tekrar üret.
+
+Burada kodu okumadan **kök neden budur** demiyoruz; failure ile hipotezi ayırıyoruz.
+
+## 3.8 Alıştırma — bir kuraldan test çıkar
+
+**R-02:** Ücretsiz standart kargo yalnız aktif üyeler için ve sepet tutarı **100 € veya daha yüksekse** uygulanır.
+
+**Görev:** R-02'den iki test condition çıkar; her biri için bir test data ve expected result yaz.
+
+**Örnek çözüm:**
+1. Aktif üye, toplam **100 €** → **FREE** (eşik dahil).
+2. Aktif üye, toplam **99 €** → **PAID** (eşik altı).
+
+**Eksik kalan nokta:** Pasif üyenin 120 € sepeti. Sonraki test tasarımı bölümlerinde koşul kombinasyonlarını sistematik biçimde göreceğiz.
+
+## Sonraki bölüm
+
+Neyi test edeceğimizi ve beklenen sonucu biliyoruz. Şimdi çok geniş bir veri alanından **hangi birkaç örneğin anlamlı olduğunu** öğreneceğiz:
+
+→ [4. Equivalence Partitioning](../02-test-design-techniques/01-equivalence-partitioning.md)

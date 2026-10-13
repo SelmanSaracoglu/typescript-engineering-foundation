@@ -1,86 +1,156 @@
-# Boundary Value Analysis (BVA)
+# 5. Boundary Value Analysis — Sınırdaki hataları aramak
 
-**Amaç:** Sıralı değer kümelerinde sınırların dahil edilip edilmediğine ilişkin off-by-one kusurlarını yakalamak.  
-**ISTQB CTFL v4.0.1:** FL-4.2.2 (**K3**), **2-value** ve **3-value** BVA tanımları.
+> **Bu bölümün sorusu:** 18–65 yaş aralığını bir geçerli değerle test ettik. Peki 18'in **dahil** olduğundan nasıl emin olacağız?
 
-## 1. Technical Foundation
+## 5.1 EP'den BVA'ya neden geçiyoruz?
 
-BVA, **ordered partitions** (sıralı ve aralık davranışı tanımlı sınıflar) için kullanılır. Bir partition'ın ilk/son elemanı sınır değeridir. Komşu partition'a geçişte yanlış karşılaştırma ve yanlış yuvarlama gibi kusurlar sıktır.
+Önceki bölümde 18–65 dahil tam sayı kuralı için üç sınıf tanımladık:
 
-Kural: “Sipariş miktarı **10–20 dahil**, yalnız tam sayı olabilir.”
+- 18'den küçük → REJECT;
+- 18–65 → ACCEPT;
+- 65'ten büyük → REJECT.
 
-| Partition | Değerler | Beklenti |
-|---|---|---|
-| P1 | ..., 8, 9 | REJECT |
-| P2 | 10, 11, ..., 19, 20 | ACCEPT |
-| P3 | 21, 22, ... | REJECT |
+EP temsilcilerimiz 12, 34, 71 idi. Üç test de geçebilir; ama geliştirici yanlışlıkla **age > 18** yazmışsa **18** reddedilir. 34'ü test etmek bu hatayı yakalamaz.
 
-**2-value BVA:** Her sınır değeri ve **komşu partition'daki en yakın değeri**. İki geçiş için **9,10,20,21**.  
-**3-value BVA:** Her sınır değeriyle birlikte **iki komşusu**. İki geçiş için **9,10,11,19,20,21**.
+Kusurlar, özellikle **sınırların dahil/haric olmasında**, karşılaştırma operatörlerinde, indeks ve tarih hesaplarında görülür. **Boundary Value Analysis (BVA)** sıralı değer grupları arasındaki **geçiş noktalarını** hedefler.
 
-Sıralı tam sayılarda komşu nettir. Ondalıklı veya sürekli domain'de hassasiyet ve en küçük adım belirsizse “10'un hemen altı” test verisi üretilmeden önce netleştirilmelidir. Bir tarih aralığında timezone, saat ve takvim günü politikası da aynı şekilde tanımlanmalıdır.
+## 5.2 Sınır nasıl bulunur?
 
-### CTFL coverage hesabı
+Kuralı dikkatle okuyalım:
 
-- 2-value için payda, modelin **tanımlanmış boundary + adjacent partition neighbor** öğeleridir. Yukarıdaki örnekte 4 test öğesi vardır.
-- 3-value için payda, **boundary + iki neighbor** öğeleridir. Yukarıdaki örnekte 6 öğe vardır.
-- 3-value setinden 9,10,11,19 işletildiğinde 4/6 = **%66,7**.
+> Minimum 18, maksimum 65 ve **iki uç da dahil**.
 
-Yalnız 10 ve 20'yi test etmek bu CTFL tanımıyla **tam 2-value coverage değildir**. 2-value ve 3-value farklı ölçütlerdir; sayıları aynı payda ile karşılaştırma.
+Bu durumda iki geçiş vardır:
 
-## 2. Engineering Perspective
+~~~text
+... 16  17 | 18  19 ... 64  65 | 66  67 ...
+  REDDEDİLİR |   KABUL EDİLİR   | REDDEDİLİR
+~~~
 
-**Uygun:** Minimum/maksimum uzunluk, yaş, tutar, stok, indirim üst sınırı, fatura tarihi, süre veya hesaplama eşiği.
+Alt geçişte 17 ve 18; üst geçişte 65 ve 66 dikkat çekiyor.
 
-**Yetersiz:** DE/FR/NL gibi doğal aralık geçişi bulunmayan kategoriler (EP daha uygundur); iş koşulu kombinasyonları (decision table); işlem geçmişine bağlı davranış (state transition); yanlış veri tipi ve format kontrolü (ek negatif test).
+**2-value BVA** için asgari anlamlı set:
 
-**Yaygın hatalar:** Yalnız geçerli uçları çalıştırmak; min=10 için 9'u atlamak; aralık dahil mi sorusunu netleştirmemek; 100% BVA sonucunu tüm ürüne genellemek; para ve tarih hassasiyetini görmezden gelmek.
+**17, 18, 65, 66**
 
-## 3. Practical Scenario — kusuru yakala
+Buradaki “iki değer”, her sınırın kendisi ve komşu sınıftaki en yakın değerdir; toplamda mutlaka iki test demek değildir.
 
-Beklenen kural: **10 ≤ miktar ≤ 20**. Hatalı kod: **10 < miktar ≤ 20**.
+**3-value BVA** için her sınıra komşu iki değeri de ekleriz:
 
-| Input | Expected | Hatalı sonuç | Defect saptandı mı? |
+**17, 18, 19, 64, 65, 66**
+
+Bu üçüncü değer bazı “yalnız ilk geçerli değer düzgün işleniyor” türü kusurları da ortaya çıkarabilir.
+
+### Neden test sayısı farklı?
+
+| Teknik | Alt geçiş | Üst geçiş | Toplam benzersiz değer |
+|---|---|---|---:|
+| 2-value | 17, 18 | 65, 66 | 4 |
+| 3-value | 17, 18, 19 | 64, 65, 66 | 6 |
+
+Geniş aralıklarda setler böyle ayrılır. Çok dar aralıklarda komşuluk pencereleri örtüşürse tekrar eden sayıları tekilleştiririz.
+
+## 5.3 Bir kusuru adım adım bulalım
+
+Onaylı kural:
+
+~~~text
+18 <= age <= 65
+~~~
+
+Hatalı implementasyon:
+
+~~~typescript
+function isEligible(age: number): boolean {
+  return age > 18 && age <= 65;
+}
+~~~
+
+Burada alt sınır yanlışlıkla dışlanmış.
+
+| Age | Beklenen | Kodun ürettiği | Sonuç |
 |---:|---|---|---|
-| 9 | REJECT | REJECT | Hayır |
-| 10 | ACCEPT | REJECT | **Evet** |
-| 11 | ACCEPT | ACCEPT | Hayır |
-| 20 | ACCEPT | ACCEPT | Hayır |
-| 21 | REJECT | REJECT | Hayır |
+| 17 | false | false | PASS |
+| **18** | **true** | **false** | **FAIL** |
+| 19 | true | true | PASS |
+| 65 | true | true | PASS |
+| 66 | false | false | PASS |
 
-Başka bir hata “sadece miktar=10 ise kabul et” olsaydı, 9 ve 10 testi tek başına hatayı kaçırabilirdi; **11** içeren 3-value alt sınır dizisi yakalayabilirdi.
+**18** testi kusuru görünür kıldı. Ama sadece “FAIL” deyip bırakmayız; beklenen değerin kaynağının iş kuralı olduğunu doğrular, sonra kodu ve giriş dönüşümünü araştırırız.
 
-**Debugging yaklaşımı:** Önce failure'ı tekrar üret, expected-result'ın iş kuralını doğrula, sonra koşuldaki operatörü ve input dönüşümünü incele. Hatalı sonucu “yeni expected” olarak kaydetme.
+### BVA ile EP neyi farklı yapıyor?
 
-## 4. Interview Preparation
+**EP:** Hangi farklı davranış grupları var?  
+**BVA:** Bu grupların **tam geçişinde** sonuç doğru mu?
 
-**Q1: What is boundary value analysis?**  
-**A:** “It tests values at the edges of ordered equivalence partitions. It is effective for inclusive/exclusive and off-by-one mistakes.”
+BVA, EP'nin yerine geçmez; **EP'den türetilen sıralı sınıfların riskli kenarlarını** inceler.
 
-**Q2: How do 2-value and 3-value BVA differ in CTFL?**  
-**A:** “Two-value BVA checks the boundary value and its closest neighbor in the adjacent partition. Three-value BVA also checks the neighboring value on the other side, which can reveal additional defects.”
+## 5.4 “Her sınır için ±1” her zaman doğru mu?
 
-**Q3: Why is BVA not enough for a payment amount?**  
-**A:** “I would also verify input types, currency precision, cross-field business conditions, and failure responses. Boundary tests answer only a subset of the risks.”
+Hayır. “Bir eksik, bir fazla” yalnız **ayrık ve adımı tanımlı** sayısal domain'de doğrudur.
 
-## 5. CTFL Practice — özgün sorular
+### Örnek A — Karakter uzunluğu
 
-**S1 (K3):** 30–50 dahil tam sayı kuralı için 2-value BVA tam seti?  
-A) {30,50} · B) {29,30,50,51} · C) {29,31,49,51} · D) {30,31,49,50}  
-**Yanıt: B.** Her iki geçişte sınır ve dış komşu gerekir. A/C/D bu öğelerden bazılarını içermez.
+Parola uzunluğu **8–20 karakter dahil**. Uzunluk bir tam sayı olduğu için 7,8,9 ve 19,20,21 doğaldır. Ancak karakter sayısı Unicode code point mi, grapheme cluster mı? Sistem farklı sayım yapıyorsa bu karar da önemlidir.
 
-**S2 (K3):** Aynı domain için 3-value BVA tam seti?  
-A) {29,30,31,49,50,51} · B) {29,30,50,51} · C) {30,31,49,50} · D) {30,40,50}  
-**Yanıt: A.** İki sınırın kendisi ve hem iç hem dış komşuları vardır.
+### Örnek B — Para
 
-**S3 (K2):** Neden ülke kodu alanına yaş gibi BVA uygulanmaz?  
-A) Ülke kodları sıralı aralıkla tanımlanan iş davranışı içermeyebilir · B) BVA sadece API'de çalışır · C) Ülke kodları daima doğru · D) EP yasaktır  
-**Yanıt: A.** Doğal order/boundary modeli yoksa partition bazlı teknik daha anlamlıdır.
+“100 € ve üzeri ücretsiz kargo” kuralı var. Para **iki ondalık basamak** olarak modelleniyorsa:
 
-## Sonuç
+- 99,99 € → ücretli;
+- 100,00 € → ücretsiz;
+- 100,01 € → ücretsiz.
 
-BVA sadece “uç değer yazmak” değildir: **iş kuralına dayalı partition geçişi ve seçilen 2-/3-value coverage kriterini** açıklamaktır.
+Eğer yazılım ondalık hassasiyeti kısıtlamıyorsa 99.999 gibi değerlerin nasıl ele alınacağı ayrıca tanımlanmalıdır. **Üretim parasında floating-point hassasiyeti** ile iş kuralını karıştırmak kolaydır.
 
-Devam: [EP](01-equivalence-partitioning.md), [Decision Table](03-decision-table-testing.md).
+### Örnek C — 14 gün
 
-[ISTQB CTFL v4.0.1 §4.2.2](https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf).
+“Teslimden sonraki 14 takvim günü” için komşu değer yalnız “13,14,15” değildir. **Saat dilimi**, gün başlangıcı ve leap day gibi özellikler sınırın ne olduğunu değiştirebilir. Önce ürünün takvim politikası netleştirilir, sonra doğru komşular tasarlanır.
+
+**Genel ilke:** Sınır değerinin **domain içindeki gerçekten en yakın geçerli/komşu değeri** neyse onu seç.
+
+## 5.5 Kapsamı nasıl ölçeriz?
+
+Coverage ölçütünü açık yazmalıyız:
+
+- 2-value modelde yukarıda 4 boundary/komşu öğesi var.
+- 3-value modelde 6 öğe var.
+
+Örneğin 3-value setinden **17,18,19,64** test edildi, 65 ve 66 edilmedi.
+
+Coverage = **4 / 6 = %66,7**.
+
+Bu, **3-value BVA coverage** değeridir. Sistemdeki kusurların %66,7'sini yakaladığımız anlamına gelmez.
+
+## 5.6 BVA'nın işe yaramadığı durumlar
+
+Bir kullanıcının ülkesi DE/FR/NL ise bunlar arasında iş kuralınca tanımlı bir komşu sınır yoktur. Bu alan için önce **EP** veya kombinasyona dayalı teknik gerekir.
+
+Ayrıca BVA tek başına şunları cevaplamaz:
+
+- Üyelik aktif değilse 100 € eşiği uygulanır mı?
+- Sipariş iptal edilmişse iade istenir mi?
+- Bir kupon iki kez kullanılırsa ne olur?
+- Başka kullanıcının kaydına erişim engelleniyor mu?
+
+İlk soru **karar kombinasyonu**, ikinci ve üçüncü **durum geçmişi**, dördüncü **yetkilendirme** riskidir.
+
+## 5.7 Alıştırma — bağımsız transfer
+
+**Yeni kural:** Bir API, `quantity` alanında **3–8 dahil tam sayıları** kabul eder.
+
+**Görev A:** 2-value ve 3-value BVA setlerini oluştur.  
+**Görev B:** Kod `quantity >= 3 && quantity < 8` kullanıyorsa hangi test defect'i açıkça gösterir?
+
+**Örnek çözüm:**
+- **2-value:** 2,3,8,9.
+- **3-value:** 2,3,4,7,8,9.
+- **Defect:** 8 için beklenen ACCEPT, gerçek REJECT olur. **8** sınır testi problemi yakalar.
+
+Yanlış `< 8` operatörünü düzeltmek coding/debugging işidir; BVA'nın katkısı **hatayı yakalamaya uygun input'u seçmesidir**.
+
+## Sonraki bölüm
+
+Şimdi tek bir sayısal kuralı iyi sınayabiliyoruz. Fakat gerçek iş kararları çoğunlukla **birden çok koşulun birleşimine** bağlıdır.
+
+→ [6. Decision Table Testing](03-decision-table-testing.md)

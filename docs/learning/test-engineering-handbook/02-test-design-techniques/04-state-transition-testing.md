@@ -1,89 +1,176 @@
-# State Transition Testing
+# 7. State Transition Testing — Geçmişin önemli olduğu sistemler
 
-**Amaç:** Aynı olayın sistemin mevcut durumuna göre farklı sonuç vermesini modellemek ve geçerli/geçersiz geçişleri test etmek.
-**CTFL v4.0.1:** FL-4.2.4 (**K3**).
+> **Bu bölümün sorusu:** Aynı “iptal et” isteği neden bir durumda kabul, başka bir durumda reddedilir?
 
-## 1. Technical Foundation
+## 7.1 Şimdiye kadar neyi test ettik?
 
-**State (durum):** Sistemin belirli bir andaki işsel hali. **Event:** Durum geçişini başlatan olay. **Guard:** Olayın geçişe izin vermesi için gereken koşul. **Action:** Geçişin yan etkisi.
+Önceki teknikler bize farklı sorular sordurdu:
 
-Örnek sipariş akışı:
+- **EP:** Girdi hangi davranış grubuna ait?
+- **BVA:** Grupların tam sınırında ne oluyor?
+- **Decision table:** Koşullar birlikteyken hangi karar veriliyor?
 
-- CREATED → ödeme başarılı → PAID
-- PAID → kargoya ver → SHIPPED
-- SHIPPED → teslim et → DELIVERED
-- CREATED → iptal et → CANCELLED
-- PAID → iptal et → CANCELLED (geri ödeme kuralı ayrıca açık olmalı)
+Ama bazı sistemlerde aynı input **farklı zamanlarda** farklı sonuç üretir.
 
-State modelinde **aynı “cancel” olayı** SHIPPED durumunda geçersizken CREATED durumunda geçerlidir. Bir test yalnız girdiye değil başlangıç state'ine dayanır.
+Örnek: Sipariş “henüz hazırlanıyor” durumundayken iptal edilebilir; “teslim edildi” durumundayken aynı iptal isteği reddedilir. Buradaki belirleyici bilgi yalnız input değil, **mevcut state** ve o state'e nasıl gelindiğidir.
 
-### Durum tablosu
+Bu tür sistemlerde **State Transition Testing** kullanırız.
+
+## 7.2 Modeli kurmak: state, event ve transition
+
+Örnek sipariş süreci:
+
+~~~text
+CREATED --pay--> PAID --ship--> SHIPPED --deliver--> DELIVERED
+   |                |
+ cancel           cancel
+   v                v
+CANCELLED <---------+
+~~~
+
+Dört kavramı ayıralım:
+
+- **State:** Sistemin iş bakımından anlamlı mevcut durumu; örn. PAID.
+- **Event:** Sisteme gelen olay/istek; örn. cancel.
+- **Transition:** Bir event sonunda bir state'ten başka state'e geçilmesi; örn. PAID → CANCELLED.
+- **Guard / condition:** Geçişe izin veren ek kural; örn. “kargo çıkmamış olmalı”.
+- **Action:** Event sonucunda oluşan yan etki; örn. geri ödeme işlemi veya audit kaydı.
+
+Sistem state'i kalıcı veri tabanında tutuyor olabilir; bazen hesaplanan bir durumdur. Tester açısından önemli olan **gözlenebilir davranışın mevcut state'e bağlı olmasıdır**.
+
+## 7.3 State table çıkarma
+
+Önce örneğe ait **onaylı kuralları** sabitleyelim:
+
+- CREATED durumunda pay veya cancel izinli.
+- PAID durumunda ship veya cancel izinli.
+- SHIPPED durumunda deliver izinli.
+- DELIVERED ve CANCELLED terminal state'ler.
+- Diğer event'ler reddedilir; state değişmez.
 
 | Current state | pay | ship | deliver | cancel |
 |---|---|---|---|---|
-| CREATED | PAID | — | — | CANCELLED |
-| PAID | — | SHIPPED | — | CANCELLED |
-| SHIPPED | — | — | DELIVERED | — |
-| DELIVERED | — | — | — | — |
-| CANCELLED | — | — | — | — |
+| CREATED | PAID | REJECT | REJECT | CANCELLED |
+| PAID | REJECT | SHIPPED | REJECT | CANCELLED |
+| SHIPPED | REJECT | REJECT | DELIVERED | REJECT |
+| DELIVERED | REJECT | REJECT | REJECT | REJECT |
+| CANCELLED | REJECT | REJECT | REJECT | REJECT |
 
-**—** burada bu senaryo modelinde **geçersiz geçiş** anlamındadır; “yeni iş kuralı yok” anlamına gelmez. Geçersiz event yanıtının hata tipi ve state'in değişmemesi uygulama sözleşmesinde ayrıca tanımlanır.
+**Not:** Gerçek e-ticaret sistemlerinde ödeme iadesi, kısmi teslimat ve geri gönderim çok daha karmaşıktır. Bu tablo öğretim için tanımladığımız **basit modelin sözleşmesidir**; evrensel sistem davranışı değildir.
 
-### CTFL coverage ölçütleri
+## 7.4 Testleri sadece butona göre değil, başlangıç state'ine göre yaz
 
-- **All states coverage:** Ziyaret edilen state / toplam state. Beş state'in dördü test edilmişse **4/5 = %80**.
-- **Valid transitions coverage / 0-switch:** İşletilen geçerli tekil geçiş / tüm geçerli tekil geçiş. Bu tabloda **5 geçerli geçiş** var: CREATED→PAID, CREATED→CANCELLED, PAID→SHIPPED, PAID→CANCELLED, SHIPPED→DELIVERED. Dördü test edilmişse **4/5 = %80**.
-- **All transitions coverage:** Tablodaki **geçerli ve geçersiz** durum-event çiftleri / toplam çift. Burada beş state × dört event = **20 hücre**, bunların 5'i valid, 15'i invalid. Örneğin 5 valid ve 8 invalid denenmişse **13/20 = %65**.
+“Cancel butonu çalışıyor mu?” yetersizdir. Daha iyi sorular:
 
-Bir test dizisi birden fazla geçiş işletebilir: CREATED → pay → PAID → ship → SHIPPED → deliver → DELIVERED. Ancak bu, CREATED→CANCELLED veya PAID→CANCELLED geçişlerini test etmez. Bazı geçersiz olayları aynı testte art arda denemek defect masking doğurabilir; ayrı değerlendirmek daha güvenlidir.
+1. **CREATED → cancel:** CANCELLED olur mu?
+2. **PAID → cancel:** CANCELLED olur mu; refund süreci doğru tetiklenir mi? (Bu modelde yan etki sözleşmesi ayrıca tanımlanmalı.)
+3. **SHIPPED → cancel:** Beklenen ret geliyor mu?
+4. **DELIVERED → cancel:** State değişmeden kalıyor mu?
+5. **CANCELLED → cancel:** İkinci istek reddediliyor mu? Yoksa idempotent success mi bekleniyor? Bu, **onaylı API sözleşmesine** bağlıdır.
 
-**Kapsam ilişkisi:** %100 all-transitions ⇒ %100 valid-transitions ve all-states. Tersi genel olarak geçerli değildir. CTFL'nin state tablosundaki kapsam öğelerini açık tanımlamadan yüzde hesaplama.
+Beş testin hepsinde “cancel” var ama **beş farklı state koşulu** sınanıyor.
 
-## 2. Engineering Perspective
+### Negative transition'da yalnız response yetmez
 
-**Uygun:** Sipariş, hesap kilitleme, ödeme, onay akışı, oturum yaşam döngüsü, cihaz bağlantısı, incident durumu. Event zamanlaması ve izin denetimi state'e bağlıysa özellikle güçlüdür.
+SHIPPED siparişi cancel etmeyi denedik ve HTTP 409 döndü (bu response'u ürün sözleşmesinin seçtiğini varsayalım).
 
-**Yetersiz:** Sadece yaş aralığı gibi stateless alanlar için BVA daha basittir; çok sayıda bağımsız Boolean iş koşulunda decision table yararlıdır. State sayısı patlıyorsa önce test kapsamını anlamlı iş durumlarına daralt; keyfî UI detaylarını ayrı state yapma.
+Test tamam mı? Hayır. Sistemin yanlışlıkla **CANCELLED** state'ini kaydedip yalnız kullanıcıya hata göstermediğini nasıl biliyoruz?
 
-**Yaygın hatalar:** Başlangıç state'ini belirtmeden test yazmak; yalnız mutlu yolu çalıştırıp “tüm durumlar test edildi” demek; geçersiz event sonrasında DB state'ini doğrulamamak; transition coverage ile state coverage'ı karıştırmak.
+Beklenen çift kanıt:
+- Ret yanıtı;
+- Siparişin **SHIPPED** kalması ve yasak yan etkinin oluşmaması.
 
-## 3. Practical Scenario — Account lock
+Bu, stateful sistemlerde temel bir test alışkanlığıdır.
 
-Varsayılan ve bu örneğe özel iş kuralı: ACTIVE hesaba üç ardışık başarısız girişten sonra LOCKED; LOCKED iken doğru parola bile giriş sağlamaz; admin unlock ile ACTIVE olur. Bu, her gerçek sistemin zorunlu davranışı değildir.
+## 7.5 State coverage ile transition coverage neden farklı?
 
-Test zinciri: ACTIVE → fail 1 → ACTIVE → fail 2 → ACTIVE → fail 3 → LOCKED → valid login → LOCKED + DENY → admin unlock → ACTIVE.
+Basitleştirilmiş modelde beş state var:
 
-Burada yalnız ACTIVE/LOCKED state'lerine ulaşmak yeterli değildir. Yanlış parolaların sayılması, kilit sonrası doğru parolanın reddi ve unlock sonrası normal giriş ayrı **transition/guard** kontrolleridir.
+CREATED, PAID, SHIPPED, DELIVERED, CANCELLED.
 
-## 4. Interview Preparation
+Bir test dizisi şu dört state'i ziyaret ediyor:
 
-**Q1: When do you use state transition testing?**  
-**A:** “When behavior depends on the current state and a sequence of events, such as an order or account lifecycle. I test valid paths and invalid transitions, including persistence of state.”
+~~~text
+CREATED → PAID → SHIPPED → DELIVERED
+~~~
 
-**Q2: What is the difference between all-states and valid-transitions coverage?**  
-**A:** “All-states coverage visits each state, whereas valid-transitions coverage exercises each allowed transition. Visiting every state may still miss transitions between states.”
+**State coverage = 4 / 5 = %80.** CANCELLED hiç ziyaret edilmedi.
 
-**Q3: How do you test an invalid transition?**  
-**A:** “I establish the initial state, trigger the disallowed event, assert the expected rejection and verify that the state and any side effects remain correct.”
+Şimdi CANCELLED'ı da görmek için CREATED → CANCELLED testi ekledik. Beş state'e eriştik: **%100 state coverage**.
 
-## 5. CTFL Practice — özgün
+Peki tüm **geçerli geçişleri** test ettik mi?
 
-**S1 (K3):** Yukarıdaki tabloda CREATED→PAID, PAID→SHIPPED, SHIPPED→DELIVERED yolu yürütüldü. Geçerli geçiş coverage oranı kaçtır?  
-A) 3/5 = %60 · B) 3/4 = %75 · C) 4/5 = %80 · D) %100  
-**Yanıt: A.** Beş geçerli geçişten üçü işletildi. Diğer iki iptal geçişi eksiktir.
+Hayır. PAID → CANCELLED geçişi hâlâ eksik.
 
-**S2 (K2):** Tüm state'lerin ziyaret edilmiş olması neyi garanti etmez?  
-A) Her state'in en az bir kez görüldüğünü · B) Her geçerli transition'ın çalıştırıldığını · C) State modelinin varlığını · D) State sayısının bilindiğini  
-**Yanıt: B.** State coverage, transition coverage'dan zayıftır.
+Bu modelde geçerli geçişler:
 
-**S3 (K3):** Beş state ve dört event içeren örnek tablodaki tüm geçerli/geçersiz çiftler toplamı?  
-A) 5 · B) 9 · C) 15 · D) 20  
-**Yanıt: D.** 5×4=20; 5 valid, 15 invalid.
+1. CREATED → PAID
+2. CREATED → CANCELLED
+3. PAID → SHIPPED
+4. PAID → CANCELLED
+5. SHIPPED → DELIVERED
 
-## Sonuç ve kaynak
+Dördü işletildiyse **valid-transition coverage = 4/5 = %80**.
 
-State transition testing **geçmiş + mevcut durum + olay** ilişkisini test eder. Bir state'e erişmek o state'ten çıkan bütün geçişleri doğrulamak değildir.
+**Çıkarım:** Bütün state'leri görmek, bütün geçişlerin çalıştığını **garanti etmez**.
 
-Devam: [Decision Table Testing](03-decision-table-testing.md), [Experience-based Testing](05-scenario-negative-exploratory-testing.md).
+Ayrıca invalid event'lerin reddi de ayrı bir risk alanıdır. Bunları kapsarken kullandığın metriğin yalnız **valid transitions** mı, yoksa tanımlı **valid + invalid** state-event çiftleri mi içerdiğini açık yaz. Örneğin tablodaki 20 hücrenin 5'i valid, 15'i invalid'dir; yalnız geçerli geçiş kapsamını tüm davranış kapsamı diye sunma.
 
-[ISTQB CTFL v4.0.1, §4.2.4](https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf).
+## 7.6 Bir akışta birden çok transition olabilir
+
+CREATED → pay → PAID → ship → SHIPPED → deliver → DELIVERED
+
+Tek test koşusu üç farklı geçişi işletir. Ancak bir hata çıktığında hangi adımın sorun yarattığını teşhis etmek zorlaşabilir. Bu nedenle:
+
+- küçük state transitions'ları uygun sınırda ayrı doğrula;
+- az sayıda kritik uzun iş akışını uçtan uca koru;
+- her adımın state'ini ve yan etkilerini gözlenebilir kıl.
+
+Bu yaklaşım daha sonra test seviyeleri ve otomasyon mimarisiyle birleşecektir.
+
+## 7.7 Başka bir örnek: hesap kilitleme
+
+Bu örnek için kurallar:
+
+- ACTIVE hesapta üç **ardışık** yanlış şifre denemesi sonrası LOCKED;
+- Başarılı giriş sayacı sıfırlar;
+- LOCKED hesapta doğru şifre bile giriş sağlamaz;
+- Yetkili unlock işlemi LOCKED → ACTIVE yapar.
+
+Şimdi “üç yanlış giriş” yalnız üç adet input değil, **olay dizisidir**. Araya bir doğru giriş girerse sayaç sıfırlanabilir. Bunları yalnız EP veya BVA ile açıklamak zorlaşır; sayacın ve state'in modelini test etmek gerekir.
+
+Test:
+
+~~~text
+ACTIVE → wrong → ACTIVE(count=1)
+       → wrong → ACTIVE(count=2)
+       → correct → ACTIVE(count=0)
+       → wrong → ACTIVE(count=1)
+       → wrong → ACTIVE(count=2)
+       → wrong → LOCKED
+~~~
+
+**Kritik nokta:** Model ve lock threshold ürün gereksinimi olarak onaylı olmalı; her login sistemi böyle davranır diye varsayma.
+
+## 7.8 Alıştırma
+
+**Yeni model:** Taslak belge DRAFT → gönder → SUBMITTED → onayla → APPROVED. SUBMITTED → geri çek → DRAFT mümkündür. APPROVED terminaldir.
+
+**Görev:** Şu üç testi sınıflandır: Geçerli mi, geçersiz mi? Expected state nedir?
+
+1. DRAFT durumunda “approve”.
+2. SUBMITTED durumunda “withdraw”.
+3. APPROVED durumunda “withdraw”.
+
+**Örnek çözüm:**
+1. Invalid, DRAFT kalmalı.
+2. Valid, DRAFT'a dönmeli.
+3. Invalid, APPROVED kalmalı.
+
+Bu üç testte de, onaylı kurallara göre yan etki oluşmaması/oluşması ayrıca değerlendirilebilir.
+
+## Sonraki bölüm
+
+Artık kural temelli teknikler için iyi bir omurgamız var. Ancak gerçek projelerde her risk önceden yazılmış bir requirement olarak gelmez.
+
+→ [8. Scenario, Negative & Exploratory Thinking](05-scenario-negative-exploratory-testing.md)

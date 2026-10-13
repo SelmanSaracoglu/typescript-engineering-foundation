@@ -1,89 +1,198 @@
-# White-box Testing — Statement & Branch Coverage
+# 9. White-box Testing — Kodun hangi yolları çalıştı?
 
-**Amaç:** Kodun çalıştırılan yapısal yollarını ölçmek, bu ölçümün neleri söyleyemediğini açıklamak.
-**CTFL v4.0.1:** FL-4.3.1–4.3.3 (**K2**) ve FL-4.1.1 (K2).
+> **Bu bölümün sorusu:** Kodun bütün satırlarını çalıştırdıysak bütün davranışlarını sınamış olur muyuz?
 
-## 1. Technical Foundation
+## 9.1 İki farklı bakış açısı
 
-**White-box (structure-based) testing:** Test tasarımının implementasyon veya iç yapı bilgisine dayandığı yöntemdir. **Black-box** beklenen davranışı dış sözleşmeden türetirken white-box hangi kod yapılarının işletildiğini gösterir; ikisi tamamlayıcıdır.
+Bir fonksiyonu düşünelim: `shippingFee`. İş kuralımız “aktif üyeye 100 € ve üzeri standart sepette ücretsiz kargo”.
 
-### Statement coverage
+**Black-box bakış:** Kodu görmek zorunda değilim; 99, 100, 101 €, aktif/pasif ve Express koşulları için **beklenen iş davranışını** doğrularım.
 
-**Ölçü:** En az bir kez çalıştırılan **executable statements** / toplam executable statements × 100.
+**White-box bakış:** Kodun içindeki kararların, dalların ve deyimlerin hangi testlerle çalıştırıldığını incelerim.
 
-Örnek sözde kod:
+Bu iki yaklaşım birbirinin alternatifi değil: biri **doğruluğun dış ölçütünü**, diğeri **yapının hangi bölümlerinin çalıştığını** görünür kılar.
 
-~~~text
-function shipping(total):
-    fee = 5
-    if total >= 100:
-        fee = 0
-    return fee
+## 9.2 Küçük bir kodu birlikte okuyalım
+
+Bu örnek için gereksinim yalnız şudur: Sepet tutarı 100 € veya üstüyse kargo ücretsiz; aksi halde 5 €.
+
+~~~typescript
+function shippingFee(total: number): number {
+  let fee = 5;
+
+  if (total >= 100) {
+    fee = 0;
+  }
+
+  return fee;
+}
 ~~~
 
-Bu örnekte amaç kod dosyasına otomasyon eklemek değil, kontrol akışını düşünmektir. Test **total=120** ile tüm gösterilen executable statement'lar çalışabilir; ama **total=20** için koşulun false tarafı denenmemiş olur. Araçların source-map, statement sayma ve branch metrikleri farklı olabilir; örnek yalnız zihinsel modeldir.
+Kodda şu davranışları gözleyebiliriz:
 
-### Branch coverage
+1. `fee` başlangıçta 5 olur.
+2. `total >= 100` doğruysa `fee = 0` çalışır.
+3. Değilse bu atama atlanır.
+4. Son değer döndürülür.
 
-**Ölçü:** En az bir kez işletilen control-flow **branches** / toplam branches × 100. CTFL'de branch kavramı yalnız if'in true/false sonucu ile sınırlı değildir; control-flow graph'taki koşullu/koşulsuz geçişlerdir. Temel if örneğinde kararın **true** ve **false** yönlerini düşünmek yeterli bir başlangıçtır.
+**Neden iki test düşünmeliyiz?**
 
-Yukarıdaki örnek:
-- **total=120:** koşul true → fee=0.
-- **total=20:** koşul false → fee=5.
+- `total = 120` → condition **true**, sonuç 0;
+- `total = 20` → condition **false**, sonuç 5.
 
-İki test beraber kararın iki yönünü de işletir. Yalnız total=120, **statement coverage %100'e ulaşsa bile** branch açısından eksik kalabilir. Yalnız bir branch işletilmişse bu basitleştirilmiş karar için **1/2=%50**, ikisiyle **2/2=%100** olur; gerçek araç toplam branch ölçümünü kendi CFG'sine göre yapar.
+Bir test tek başına bütün karar yönlerini işletmiyor olabilir.
 
-**Önemli ilişki:** CTFL v4.0.1'e göre **%100 branch coverage ⇒ %100 statement coverage**; tersi doğru değildir. Fakat **%100 branch coverage da** bütün iş kurallarının, veri kombinasyonlarının, path'lerin ve hataların test edildiğini **kanıtlamaz**.
+## 9.3 Statement coverage nedir?
 
-### Coverage ve correctness birbirinden farklıdır
+**Statement (executable statement)**, çalıştırılabilir bir kod deyimidir. *Statement coverage* çalıştırılan deyimlerin toplam yürütülebilir deyimlere oranını ölçer.
 
-Örnek hatalı kural: Sistem “100 € ve üzeri ücretsiz kargo” istiyor, implementasyon “100 € üstü” yapıyor.
+**Temel düşünce:** `total=120` ile kodun gösterilen çalıştırılabilir deyimlerinin hepsine ulaşılabilir; çünkü ücretsiz kargo dalı da yürütülür. Böylece statement coverage %100 olabilir.
 
-total=120 ve total=20 testleri iki branch'i de çalıştırır, fakat **100** sınırını kaçırabilir. **BVA** eklemek gerekir. Diğer örnek: Ücretsiz kargo özelliği hiç implement edilmemişse bir kodun %100 statement ve branch çalıştırılması **missing requirement**'ı saptamayabilir.
+Ama bu, `total=20` davranışının doğru olduğunu göstermeyebilir; çünkü **false yönünü hiç denemedik**.
 
-## 2. Engineering Perspective
+**Hassasiyet:** Gerçek coverage aracı farklı derleme/source-map ve dil yapılarını farklı sayabilir. Buradaki amaç belirli bir aracın sayaç formatı değil, **deyim yürütme ile karar yönlerini ayırabilmektir**.
 
-**Ne zaman kullanılır?** Küçük domain fonksiyonları, karmaşık conditional, hata yolları, refactoring sırasında gözlenmemiş branch'leri bulma; branch coverage raporu yeni test fikirleri üretebilir.
+## 9.4 Branch coverage nedir?
 
-**Ne zaman yetersiz?** Gereksinim eksikliği, yanlış oracle, erişim politikası, veri bütünlüğü, performans ve kullanıcı ihtiyacı gibi riskler yapısal ölçümden doğrudan çıkmaz.
+**Branch**, kontrol akışının ayrıldığı yoldur. Bu basit `if` için iki önemli sonuç düşünelim:
 
-**Riskli davranış:** “Coverage %100 olsun” diye assert içermeyen veya değeri kontrol etmeyen test yazmak; koşulu çalıştırmak onun doğru çıktıyı verdiği anlamına gelmez. Coverage yüksekliği **gerekli ama tek başına yeterli olmayan** bazı kalite göstergelerinden biridir.
+- condition true;
+- condition false.
 
-## 3. Practical Scenario — kritik eksik koşul
+| Test | Condition | Çalışan davranış |
+|---|---|---|
+| total=120 | true | fee=0 |
+| total=20 | false | fee=5 |
 
-Policy: “Ücretsiz kargo sadece **aktif üyeye** ve **total ≥100** olduğunda.”
+Sadece total=120 denenmişse bu basit kararın **1/2 yönü** işletilmiştir: %50. Her ikisiyle **2/2**: %100.
 
-Kod yalnız total'ı kontrol edip üyelik koşulunu **hiç içermiyorsa**, mevcut kodun tamamı 100% covered olabilir. Bu **defect of omission** için solution: [Decision Table](03-decision-table-testing.md) ile aktif/pasif × eşik kombinasyonlarını onaylı kuraldan türet. Sonra uygulama kodu branch analizini ekle.
+Branch coverage genel anlamda kontrol akışındaki dalları sayar; bütün dil yapıları sadece if'in iki yönüne indirgenemez. Ancak başlangıç için doğru zihinsel model budur.
 
-## 4. Interview Preparation
+**Kritik ilişki:** %100 **branch coverage**, yürütülebilir statement'ların da kapsanmasını sağlar; fakat %100 **statement coverage**, bütün branch'lerin işletildiğini garanti etmez.
 
-**Q1: What is the difference between statement and branch coverage?**  
-**A:** “Statement coverage checks which executable statements ran. Branch coverage checks which control-flow branches ran. Full branch coverage subsumes statement coverage, but the reverse is not true.”
+## 9.5 %100 branch coverage neden güvence değil?
 
-**Q2: Does 100% code coverage mean defect-free software?**  
-**A:** “No. A test can execute code without asserting the correct behavior, and missing requirements may not exist in the implementation at all. I combine structural coverage with requirement-based testing.”
+Kodu hafifçe yanlış yazalım:
 
-**Q3: How would you use a coverage report effectively?**  
-**A:** “I inspect uncovered decision paths, assess their risk, add assertions and relevant data, and avoid optimizing the metric without improving the behavior we verify.”
+~~~typescript
+function shippingFee(total: number): number {
+  let fee = 5;
+  if (total > 100) { // yanlış: 100 dahil olmalıydı
+    fee = 0;
+  }
+  return fee;
+}
+~~~
 
-## 5. CTFL Practice — özgün
+Şu testler çalışıyor:
 
-**S1 (K2):** Bir test tüm executable statements'ları işletiyor, ancak if'in false sonucu hiç yaşanmıyor. En doğru ifade?  
-A) Statement %100 olabilir, branch %100 olmayabilir · B) Branch mutlaka %100 · C) Test gereksiz · D) Product risk kalmaz  
-**Yanıt: A.** Her statement'ın çalışması tüm yolların çalışmasını gerektirmez.
+- 120 → 0 (true dalı);
+- 20 → 5 (false dalı).
 
-**S2 (K2):** CTFL'ye göre hangi kapsama ilişkisi doğrudur?  
-A) %100 statement ⇒ %100 branch · B) %100 branch ⇒ %100 statement · C) %100 branch ⇒ %100 requirements · D) %100 branch ⇒ sıfır defect  
-**Yanıt: B.** Branch daha güçlü yapısal ölçüttür; diğer iddialar yanlıştır.
+**Her iki branch çalıştı**, hatta assertion'larımız geçti. Ama **100** hiç denenmedi. Koddaki `>` yerine `>=` olmalıydı.
 
-**S3 (K2):** Kodda hiç bulunmayan gereksinim için en uygun ek kontrol?  
-A) Aynı statement testini 20 kez tekrar etmek · B) Sözleşmeden black-box test türetmek · C) Test sayısını gizlemek · D) Sadece log formatını değiştirmek  
-**Yanıt: B.** Missing-functionality riskini şartnameye karşı test etmeliyiz.
+Yani **%100 branch coverage olsa da sınır kusuru saklanabilir**.
 
-## Sonuç
+Çözüm? Kodu rastgele daha fazla çalıştırmak değil; **onaylı gereksinime göre BVA testi** eklemek:
 
-**Code coverage = nerenin yürütüldüğüne dair gözlem. Behavior correctness = neyin doğru olduğuna dair doğrulama.** İkisini karıştırma.
+- 99 → 5;
+- **100 → 0**;
+- 101 → 0.
 
-Devam: [EP](01-equivalence-partitioning.md), [BVA](02-boundary-value-analysis.md), [Decision Table](03-decision-table-testing.md).
+100 testi başarısız olacak, defect görünür hale gelecek.
 
-[ISTQB CTFL v4.0.1 §§4.1, 4.3](https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf).
+### Daha ciddi bir sorun: eksik iş kuralı
+
+Asıl kural “yalnız aktif üye, 100 € ve üzeri, standart kargo” ise, yukarıdaki fonksiyonda **üyelik ve kargo tipi kontrolü hiç yok**. Var olan kodun %100 çalıştırılması, olmayan bir şartın doğrulandığını kanıtlamaz.
+
+Bu yüzden **requirement-based test** ve **structure-based test** birbirini tamamlar.
+
+## 9.6 Coverage ile assertion'ı ayır
+
+Şu test iyi görünmez:
+
+~~~typescript
+test("shippingFee executes", () => {
+  shippingFee(120); // hiçbir expected result kontrolü yok
+});
+~~~
+
+Bu test kodu çalıştırabilir; ama sonuç yanlış olsa bile sessizce geçebilir.
+
+Daha anlamlı:
+
+~~~typescript
+test("100 EUR qualifies for free shipping", () => {
+  expect(shippingFee(100)).toBe(0);
+});
+~~~
+
+**Birinci kontrol:** Test kodu bir yeri **yürüttü mü?**  
+**İkinci kontrol:** Doğru sonucu **doğruladı mı?**
+
+Sadece metrik için test yazmak kötü optimizasyondur. Aynı zamanda assertion olması testin oracle'ının doğru olduğunu otomatik garanti etmez; beklenen 0'ın kaynağı kural olmalıdır.
+
+## 9.7 Karar sayısı büyürse
+
+Örneğin:
+
+~~~typescript
+function canEdit(active: boolean, owner: boolean): boolean {
+  if (!active) return false;
+  if (!owner) return false;
+  return true;
+}
+~~~
+
+Üç pratik test tasarlayalım:
+
+| active | owner | Expected | Neden önemli? |
+|---|---|---|---|
+| false | true | false | İlk guard |
+| true | false | false | İkinci guard |
+| true | true | true | İzin verilen yol |
+
+Böylece kodun iki `if` kararının true/false olabildiğini gözleriz. Ancak `false,false` kombinasyonu ayrıca iş kuralı açısından önemli olabilir. Branch coverage'ın tüm Boolean kombinasyonları otomatik kapsadığını iddia etmeyiz.
+
+Bu farkı [Decision Table](03-decision-table-testing.md) bölümündeki koşul kombinasyonu mantığıyla bağla.
+
+## 9.8 Nerede ne kadar kullanılır?
+
+**White-box bilgisi faydalıdır**:
+- yeni eklenen koşulların hiç test edilmediğini görmek için;
+- refactoring sırasında eksik error path'leri belirlemek için;
+- kaynak kodun karmaşık kısmında riskli kontrol akışını anlamak için.
+
+**Tek başına yetersizdir**:
+- kullanıcı beklentisini doğrulamak;
+- yetki ve gizlilik sınırlarını kapsamlı ölçmek;
+- ürünün dış sistemle doğru çalıştığını göstermek;
+- performans, kullanılabilirlik veya gerçek kullanım kalitesini değerlendirmek için.
+
+Bu bölümün amacı Vitest/Cypress konfigürasyonu kurmak değildir. O araçlarla gerçek coverage raporu üretme daha sonraki kod pratiğinde ele alınır.
+
+## 9.9 Alıştırma
+
+~~~typescript
+function access(active: boolean, admin: boolean): string {
+  if (!active) return "DENY";
+  if (admin) return "ADMIN";
+  return "USER";
+}
+~~~
+
+**Görev:**
+1. Hangi üç input çifti üç farklı sonucu görür?
+2. `active=false, admin=true` için sonuç nedir?
+3. Üç farklı sonucu görmek tüm kombinasyonları kapsamak mıdır?
+
+**Örnek çözüm:**
+1. (false,false) → DENY; (true,true) → ADMIN; (true,false) → USER.
+2. DENY; ilk guard işlemi bitirir.
+3. Hayır. `(false,true)` kombinasyonu denenmedi; iş riskine göre ayrıca test edilebilir.
+
+## Sonraki bölüm
+
+Kodun iç kontrol akışını görebiliyoruz. Son önemli düşünce: Doğru iş beklentisini **kod yazılmadan önce ekipçe** nasıl ortaklaştırırız?
+
+→ [10. User Stories, Acceptance Criteria & ATDD](07-collaboration-user-stories-and-atdd.md)

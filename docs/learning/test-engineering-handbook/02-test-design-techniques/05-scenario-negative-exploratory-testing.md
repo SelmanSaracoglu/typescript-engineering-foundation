@@ -1,101 +1,158 @@
-# Scenario, Negative & Experience-based Testing
+# 8. Scenario, Negative ve Exploratory Testing
 
-**Amaç:** Biçimsel tekniklerin kaçırabileceği gerçek kullanım, hata ve istismar biçimlerini anlamlı test hipotezleriyle araştırmak.
-**CTFL v4.0.1:** FL-4.1.1 (K2), FL-4.4.1–4.4.3 (K2). **Not:** Use-case testing CTFL v4.0.1'in ayrı bir test tekniği değildir; aşağıda genel mühendislik yaklaşımı olarak yer alır.
+> **Bu bölümün sorusu:** Gereksinimde yazmayan ama gerçek kullanıcı davranışında ortaya çıkabilecek sorunları nasıl buluruz?
 
-## 1. Technical Foundation
+## 8.1 Yapılandırılmış teknikler yeterli mi?
 
-### Test tasarım tekniklerini ayırmak
+Bir kupon servisi düşünelim. Önceki bölümlerde şunları yapabildik:
 
-- **Black-box:** Sistemin dış davranışına ve beklenen sözleşmesine dayanır: EP, BVA, decision table, state transition.
-- **White-box:** Kodun/akışın iç yapısını inceler: statement, branch coverage. [Ayrı bölüm](06-white-box-statement-and-branch-testing.md).
-- **Experience-based:** Testçinin alan, geçmiş kusur ve hata örüntüsü bilgisine dayanır: **error guessing**, **exploratory testing**, **checklist-based testing**. Bu teknikler diğerlerinin **tamamlayıcısıdır**.
-- **Scenario/use-case journey:** Gerçek bir hedefe ulaşmak için kullanıcı adımlarını uçtan uca anlamlandırma. CTFL'nin §4.4'ündeki resmî üç teknikle karıştırma.
+- EP ile geçerli/geçersiz kupon tiplerini ayırdık;
+- BVA ile minimum sepet tutarının kenarını test ettik;
+- Decision table ile kullanıcı tipi ve kupon koşullarını birleştirdik;
+- State transition ile tek kullanımlık kuponun tekrar kullanımını sınadık.
 
-### Negative testing nedir?
+Peki kullanıcı **öde** butonuna iki kez art arda basarsa? İnternet kesilirse? Geri tuşuna basıp sipariş sayfasına dönerse? İki tarayıcı sekmesinde işlem yaparsa?
 
-**Negative testing**, geçersiz, yetkisiz veya izin verilmeyen davranışta sistemin **beklenen güvenli tepkiyi** verip vermediğini kontrol etmektir. Yalnız boş input değildir.
+Bunların hepsi açık gereksinimde yazmıyor olabilir. Bu, bunları test etmeyeceğimiz anlamına gelmez. Testçiler **ürünün nasıl kullanılacağını ve nasıl yanlış gidebileceğini düşünerek** yeni hipotezler üretir.
 
-Örnekler: yanlış format, süresi dolmuş kupon, başka kullanıcının kaydına müdahale, yinelenen ödeme isteği, iptal edilmiş siparişe teslimat event'i. Negatif test için oracle; beklenen yanıtı, istenmeyen yan etkilerin bulunmamasını ve gerektiğinde log/audit davranışını açıkça tanımlamalıdır.
+## 8.2 Scenario-based düşünmek
 
-### Error Guessing
+**Scenario**, bir aktörün belirli bir hedefe ulaşmak için içinde bulunduğu başlangıç durumunu, eylemleri ve sonucu anlatır.
 
-Geçmiş üretim hatalarından, teknoloji ve insan hata eğilimlerinden yararlanarak şüpheli koşulları tahmin etme: UTC/local time karışması, iki kez tıklama, boş string ile null farkı, eski oturumun yeniden kullanılması.
+“Kupon alanına geçerli kod gir” bir adım olabilir. **Gerçek kullanıcı senaryosu** daha geniştir:
 
-Gücü uzman sezgisidir; sınırı sezginin sınırlı, sistematik coverage ölçümünün zayıf olmasıdır.
+1. Aktif kullanıcı ürünleri sepete ekler.
+2. Kuponunu uygular.
+3. Güncellenen toplamı görür.
+4. Ödeme yapar.
+5. Sipariş onayını alır.
 
-### Exploratory Testing
+Bu yolculuk, ayrı sistem parçalarının birlikte doğru çalışıp çalışmadığı konusunda soru sordurur. Ancak her ayrıntıyı pahalı bir UI E2E testiyle tekrar etmek zorunlu değildir. **Scenario kullanıcı amacını anlatır; test seviyesi daha sonra risk ve maliyete göre seçilir.**
 
-**Eşzamanlı öğrenme, test tasarlama ve yürütmedir.** “Rastgele tıklamak” değildir.
+### Ana akış ve alternatif akış
 
-Örnek **charter**: “20 dakika içinde kuponun hata mesajlarını, hızlı tekrar gönderimi ve mobil geri navigasyonu araştır; bulgu, gözlem ve yeni soru kaydet.”  
-Elde edilen kanıt: kullanılan build, başlangıç data/state, denenen varyasyonlar, gözlemler, defect adayı ve sonraki hipotez. Önceki senaryodan yeni şüphe doğdukça tasarım değişir.
+- **Main success path:** Kupon geçerli, ödeme başarılı.
+- **Alternative path:** Kupon süresi dolmuş; kullanıcı açıklayıcı ret görür.
+- **Failure path:** Ödeme sağlayıcısı yanıt vermez; müşteri iki kez tahsil edilmemelidir.
 
-### Checklist-based Testing
+Ana akışın sorunsuz çalışması alternatifleri otomatik doğrulamaz.
 
-Önceki deneyimden türetilmiş **kontrol maddeleri** ile test yürütme: zorunlu alanlar, hata mesajları, yetki, erişilebilirlik, tarih, tekrar istek, gizli veri, recovery.
+## 8.3 Negative testing yalnız hatalı input değildir
 
-Liste odak sağlar ancak **her ürün için aynı checklist yeterli değildir**; eski veya belirsiz maddeler güncellenmelidir. Checklist, katı adım-adım test case ile aynı değildir.
+**Negative testing**, yasaklanan, geçersiz veya başarısızlık içeren bir durum karşısında sistemin **doğru ve güvenli** davranmasını kontrol etmektir.
 
-## 2. Engineering Perspective
+Örnekler:
+- Gerekli alan boş gönderildi.
+- Ödeme isteği ikinci kez gönderildi.
+- Kullanıcı başkasına ait siparişi açmayı denedi.
+- CANCELLED siparişe ship olayı gönderildi.
+- Ödeme anında network bağlantısı koptu.
 
-| Problem | İlk güçlü yaklaşım | Tamamlayıcı |
-|---|---|---|
-| Yaş aralığı | EP + BVA | Hatalı format, null |
-| Kupon şartlarının kombinasyonu | Decision table | Error guessing: eşzamanlı uygulama |
-| Sipariş lifecycle | State transition | Exploratory: geri navigasyon |
-| Kodda beklenmeyen dal | White-box | Black-box gereksinim kontrolü |
-| Yeni UI akışı | Senaryo tabanlı | Exploratory + checklist |
+Her durumda beklenen yanıtın kaynağı **gereksinim / kontrat** olmalıdır. “Negative” her zaman 400 dönecek demek değildir; API status, state, audit ve kullanıcı mesajı sözleşmeye göre değişir.
 
-**Önemli:** Her şeyi E2E üzerinden test etmek pahalı ve kök neden teşhisini zorlaştırabilir. Senaryo doğru bağlamı kurar; detaylı seviye seçimi I2'nin konusudur.
+### Yan etkileri neden kontrol ediyoruz?
 
-### False positive / false negative düşüncesi
+Kupon ikinci kullanımda “Bu kupon kullanılmış” mesajı gösteriyor olsun. Ama veri tabanında indirim tutarı yanlışlıkla ikinci kez yazılmış.
 
-Gözlenen kusur adayı bazen test verisi veya ortam farkından kaynaklanır; her başarısızlık ürün kusuru değildir. Öte yandan eski testler yeni iş kuralını hiç kontrol etmiyorsa sessiz false confidence oluşur. Hipotezi, kanıtı ve doğrulanamayan kısmı ayır.
+UI mesajı doğru olsa da **business state yanlış**. Negatif senaryolarda mümkünse şu ikisini birlikte doğrula:
 
-## 3. Practical Scenario — kuponu keşfetme
+1. Yasak işlem reddedildi mi?
+2. Yasak işlemin yan etkisi **oluşmadı mı**?
 
-Kural: “Tek kullanımlık kupon yalnız ödeme yapılmamış sepette kullanılabilir.”
+Bu SDET açısından güçlü test düşüncesidir.
 
-**Senaryo A (nominal):** Geçerli kupon → fiyat güncellenir → ödeme tamamlanır → sipariş tek indirimle kaydedilir.
+## 8.4 Error guessing: Deneyimden hipotez üretmek
 
-**Negatif B:** Aynı kupon başka siparişte yeniden kullanılır → REJECT, indirim/kayıt oluşmaz.
+**Error guessing**, tester'ın geçmiş hata örüntülerine, domain bilgisine ve teknoloji risklerine dayanarak olası kusurları öngörmesidir.
 
-**Exploratory C:** Kullanıcı hızlı çift tıklar, geri gider, sekmeyi kopyalar, oturum yenilenir, düşük internet hızında tekrar dener. Beklenti net değilse bunları product sahibine açık soru olarak döndür.
+Bir takımın yaşadığı hatalar:
+- null yerine boş string geldi;
+- UTC ile yerel saat karıştı;
+- double-click iki istek üretti;
+- eski token kullanımına izin verildi;
+- decimal rounding farklı çıktı.
 
-**Checklist D:** State değişimi, error message, idempotency/retry, ownership, audit, mobil network, erişilebilirlik, para yuvarlama.
+Benzer yeni özelliği test ederken bu şüphelerden yola çıkmak mantıklıdır.
 
-“Yalnız API 400 döndü” kanıtı yeterli olmayabilir: başarısız işlemin DB'de indirim yaratmadığını da incelemek gerekir (bu inceleme sonraki uygulama Epiclerine aittir).
+**Sınırlama:** Deneyimin olmadığı yerde tahminler eksik olabilir. Error guessing, EP/BVA/decision table gibi sistematik teknikleri **ikame etmez**, tamamlar. İyi tester “buna neden şüphelendim?” sorusunu açıklayabilir.
 
-## 4. Interview Preparation
+## 8.5 Exploratory testing: Plan yok mu?
 
-**Q1: What is exploratory testing?**  
-**A:** “It combines learning, designing and executing tests. I work with a time-boxed charter, take notes on observations and risks, and follow useful clues rather than clicking randomly.”
+En çok karıştırılan nokta burası. **Exploratory testing rastgele tıklamak değildir.** Öğrenme, test tasarlama ve yürütme **birbirini besleyerek aynı çalışma sırasında gelişir**.
 
-**Q2: How is negative testing different from entering invalid text?**  
-**A:** “Negative testing covers any disallowed or failure condition, including unauthorized access, invalid state transitions, duplicate operations and system errors. I also verify the absence of unintended side effects.”
+### 20 dakikalık örnek charter
 
-**Q3: How do you use error guessing without relying only on intuition?**  
-**A:** “I derive heuristics from past defects and architecture risks, combine them with structured techniques, and keep evidence of what was explored and what remains uncovered.”
+**Hedef:** Kupon tekrar kullanımı ve sepet state tutarlılığı hakkında bilinmeyenleri ortaya çıkarmak.
 
-## 5. CTFL Practice — özgün
+**Kapsam:** Aynı kuponla ikinci sipariş, hızlı tekrar gönderimi, iki sekme, geri navigasyon.
 
-**S1 (K2):** Tester geçmişte çoklu ödeme hatası gördüğü için yeni checkout'ta hızlı çift tıklamayı deniyor. Hangi CTFL tekniği?  
-A) Equivalence partitioning · B) Error guessing · C) Statement testing · D) State coverage  
-**Yanıt: B.** Önceki kusur örüntüsüne dayanıyor. Diğer tekniklerde farklı coverage öğeleri kullanılır.
+**Kısıt:** Yalnız izole test hesapları; gerçek ödeme yapılmaz.
 
-**S2 (K2):** Keşif oturumunda tester hipotezi değiştirerek yeni adımları aynı anda tasarlayıp uyguluyor.  
-A) Exploratory testing · B) Sabit scripted testing · C) Branch testing · D) Test completion  
-**Yanıt: A.** Tasarım ve yürütme birlikte gelişir; plansızlık anlamına gelmez.
+**Kaydedilecek:** Başlangıç state'i, izlenen adımlar, beklenen/gerçek, belirsiz sorular, defect adayları ve tekrarlanabilir deliller.
 
-**S3 (K2):** Checklist yaklaşımının sınırlaması nedir?  
-A) Yalnız otomasyonla uygulanabilir · B) Maddeler güncellenmezse yeni riski atlayabilir · C) Risk düşüncesini tamamen kaldırır · D) Doğru sonuç gerektirmez  
-**Yanıt: B.** Liste yararlı fakat bağlam ve güncellik gerektirir.
+Çalışırken yeni bir gözlem geliyor:
 
-## Sonuç ve kaynak
+> “Kullanıcı iki sekmede aynı kuponu uygularsa ikisinde de yeşil mesaj görünüyor.”
 
-Struktürel test teknikleri **neyi kapsadığını**, deneyime dayalı yaklaşım **hangi beklenmedik durumun akla gelebileceğini** destekler; ikisi birbirinin yerine geçmez.
+Buradan yeni bir hipotez doğar: “Kupon kullanımı checkout tamamlanana kadar kilitleniyor mu?” Sonraki deneyi bu hipoteze göre seçersin. **Exploration'ın değeri budur.**
 
-Devam: [White-box](06-white-box-statement-and-branch-testing.md), [State Transition](04-state-transition-testing.md).
+### Exploratory ile adım adım scripted testing karşılaştırması
 
-[ISTQB CTFL v4.0.1 §§4.1, 4.4](https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf).
+| Scripted | Exploratory |
+|---|---|
+| Adımlar ve beklenen sonuç önceden daha nettir | Test boyunca öğrenilen bilgi tasarımı değiştirir |
+| Aynı kontrolü tekrar etmek kolaydır | Beklenmedik davranışları araştırma esnekliği yüksektir |
+| Regression için çok uygundur | Yeni/az anlaşılan alanlarda güçlüdür |
+| Önceden bilinmeyen sorunu kaçırabilir | Yetersiz kayıt varsa tekrar üretim zorlaşır |
+
+İkisi rakip değil; birlikte kullanılır.
+
+## 8.6 Checklist-based testing nasıl yarar sağlar?
+
+Checklist, tekrar unutulan önemli soruları hatırlatır:
+
+- Her gerekli alan boş/null durumunda doğru davranıyor mu?
+- Minimum/maksimum sınırlar açık mı?
+- Erişim kontrolü backend'de var mı?
+- Aynı istek tekrarlanırsa veri tutarlı mı?
+- İşlem failure sonrası düzelebiliyor mu?
+- Gizli bilgi log veya response'ta sızıyor mu?
+- Tarih ve currency hesaplarında boundary tanımlı mı?
+
+Listeyi körlemesine uygulamak yerine **hangi kontrolün bu ürün için anlamlı olduğunu** seç. Geçmişe takılı kalan bir checklist yeni riskleri kaçırabilir.
+
+## 8.7 Çalışılmış örnek: checkout'ta çift tıklama
+
+Test hipotezi: “Kullanıcı ödeme butonuna iki defa basınca en fazla bir charge oluşur.”
+
+**Hazırlık:** Sahte/izole ödeme ortamı, bilinen sepet ve tek kullanımlık sipariş kimliği.
+
+**İşlem:** Aynı kullanıcı iki kez ödeme tetikler.
+
+**Beklenen:** Ürün kontratına göre ikinci isteğin reddi veya aynı sonucun güvenli tekrarı; **birden fazla tahsilat yok**.
+
+**Gözlemler:** UI onayı, ödeme sağlayıcı işlemleri, sipariş state'i ve audit kaydı.
+
+**Ek belirsizlik:** Sistem timeout sonrasında isteği yeniden gönderdiğinde aynı garantiyi sağlıyor mu? Bu yeni bir test koşuludur.
+
+Bu örnekte test fikrinin kaynağı formal decision table değil, **gerçek kullanım/hata örüntüsüdür**.
+
+## 8.8 Alıştırma — küçük keşif tasarla
+
+Özellik: Kullanıcı hesabındaki adresi değiştirebiliyor.
+
+**Görev:** Bir scripted happy-path, iki negative test ve 15 dakikalık exploratory charter öner.
+
+**Örnek çözüm:**
+- Scripted: Kullanıcı geçerli adres kaydeder; sonraki sayfa yüklemede yeni adres görünür.
+- Negative 1: Yanlış ülke/posta kodu formatı reddedilir; eski adres korunur (ürün kuralı onaylıysa).
+- Negative 2: A kullanıcısı B'nin adresini değiştiremez; B'nin verisi değişmez.
+- Charter: “Oturum süresi dolması, geri/ileri navigasyon ve aynı kaydı iki sekmeden değiştirme durumlarında adres tutarlılığını araştır.”
+
+Böylece **aynı özelliği üç ayrı düşünme biçimiyle** değerlendirmiş olduk.
+
+## Sonraki bölüm
+
+Şimdi dış davranış ve deneyim üzerinden test tasarlıyoruz. Peki kodun iç yapısını biliyorsak hiç çalışmayan yolları nasıl görebiliriz?
+
+→ [9. White-box Testing](06-white-box-statement-and-branch-testing.md)

@@ -1,119 +1,193 @@
-# Collaboration-based Testing — User Stories, Acceptance Criteria & ATDD
+# 10. User Stories, Acceptance Criteria ve ATDD
 
-**Amaç:** Tester, geliştirici ve iş paydaşının ortak dil geliştirip test edilebilir kabul örneklerini implementasyondan önce belirlemesi.
-**CTFL v4.0.1:** FL-4.5.1 **K2**, FL-4.5.2 **K2**, FL-4.5.3 **K3**.
+> **Bu bölümün sorusu:** Testçinin en değerli katkısı bazen neden henüz kod yazılmadan önce ortaya çıkar?
 
-## 1. Technical Foundation
+## 10.1 Bir hikâye ile başlayalım
 
-### User story ve 3C
+Ürün sahibi şunu yazıyor:
 
-User story çoğunlukla “**As a [role], I want [goal], so that [benefit]**” biçimindedir; kısa hikâye tek başına tam requirement değildir.
+> “Bir müşteri olarak sepetimdeki ücretsiz kargo hakkımı görmek istiyorum; böylece sipariş vermeden önce masrafımı bilirim.”
 
-**3C (Card, Conversation, Confirmation):**
-- **Card:** İş hedefinin kısa ifadesi.
-- **Conversation:** Ürün sahibi, developer ve tester'ın örnek/istisna konuşması.
-- **Confirmation:** Kabul koşullarının doğrulanabilir hale gelmesi.
+Bu bir **user story** örneğidir. Kullanıcının **kim olduğunu**, **neyi yapmak istediğini** ve **neden istediğini** anlatır. Ama tek başına şu soruları yanıtlamaz:
 
-Tester'ın rolü yalnız story'ye test case yazmak değildir. Belirsizliği ve karşı örnekleri erken ortaya çıkarır.
+- Ücretsiz kargo hangi tutarda başlar?
+- Sepet toplamı vergi ve kupon öncesi mi sonrası mı?
+- Üyelik gerekiyor mu?
+- Express kargoda da ücretsiz mi?
+- Kullanıcı oturum açmadan sepeti görüyorsa ne olur?
 
-### Acceptance Criteria (AC)
+Bu sorular cevaplanmadığında hem developer hem tester farklı kurallar varsayabilir. **Aynı yanlış varsayım üzerinde çalışan kod ve testler yeşil olabilir.**
 
-AC, user story'nin kabul edilmesi için gerekli koşullardır. İki yaygın biçim:
-1. **Rule-oriented:** İş kuralları/bullet veya karar tablosu. Örn. “Active member and cart ≥100 → free shipping.”
-2. **Scenario-oriented:** **Given / When / Then** ile somut örnek. Örn. “Given active member and cart 120; When checkout is calculated; Then shipping fee is zero.”
+## 10.2 Story bir sözleşmenin tamamı değildir
 
-Bu biçimler alternatif sunumdur; ikisi de açık, test edilebilir, çelişkisiz olmalı. Given/When/Then tek başına Cucumber veya otomasyon zorunluluğu yaratmaz.
+Yaygın user story kalıbı:
 
-### Acceptance Test-driven Development (ATDD)
+**As a [role], I want [goal], so that [value].**
 
-ATDD, **önce kabul testlerini tanımlayan, sonra geliştirmeyi bu ortak örneklere göre yöneten** test-first yaklaşımıdır:
+Bu bir konuşma **başlangıcıdır**. Gereksinimin tamamını tek satıra sığdırma zorunluluğu yoktur.
 
-1. Bir story, ilgili paydaşlarla tartışılır.
-2. Pozitif, negatif ve sınır örneklerinden somut acceptance tests türetilir.
-3. Beklenen sonuçlar **kod yazılmadan önce** netleştirilir.
-4. Uygulama bu örnekleri karşılayacak şekilde geliştirilir.
-5. Değişiklik olduğunda kabul örnekleri yeniden ele alınır.
+“3C” yaklaşımı bu yüzden yararlıdır:
 
-**Farklar:** TDD genelde küçük kod davranışlarını testle yönlendirir; ATDD iş kabulünü ortak örneklerle tanımlar. BDD davranışın anlaşılır senaryo dilini vurgular. Bunlar ilişkili ama birebir aynı süreç değildir.
+1. **Card:** İş hedefini kısa ifade et.
+2. **Conversation:** Tester, developer ve product owner örneklerle kapsamı konuşur.
+3. **Confirmation:** Hangi davranışlarla kabul edileceğinde uzlaşılır.
 
-## 2. Engineering Perspective
+Tester'ın görevi yalnız “story hazır olduğunda test case yazmak” değildir. Belirsizliği **erken** ortaya çıkarmaktır.
 
-### İyi story / AC nasıl görünür?
+## 10.3 Acceptance criteria nasıl somutlaşır?
 
-İyi AC belirli actor/permission, başlangıç state'i, input, eşik, expected outcome ve gerektiğinde side effect'i açıklar. “İşlem hızlı olacak” tek başına ölçülebilir değildir; “95. yüzdelikte 2 s, X yük/ortam koşulu” gibi onaylı, doğrulanabilir kural gerekebilir.
+Örneğimiz için product owner şu kararları onayladı:
 
-### Mühendislik değeri
+**AC-1:** Kullanıcı ACTIVE üyeyse, standart kargoda sepet toplamı **100 € veya üstünde** ücretsiz kargo uygulanır.
 
-- Kusur oluşmadan önce yanlış varsayımları tespit etmek (**shift-left**).
-- Test oracle'ı bağımsız bir anlaşmaya dayandırmak.
-- Sorumluluklar arasında ortak örnek/veri dili oluşturmak.
-- Story değiştiğinde test impact analizini kolaylaştırmak.
+**AC-2:** Diğer durumlarda standart kargo ücretlidir.
 
-**Sınır:** AC listesi her güvenlik/performans riskinin tamamı değildir. AC kabul için gereklidir; bağımsız risk ve exploratory testing hâlâ değerlidir.
+**AC-3:** Express kargo, sepet tutarı ve üyelikten bağımsız ücretlidir.
 
-## 3. Practical Scenario — ATDD ile test türetme
+Bu üç ifade **rule-oriented acceptance criteria** örneğidir. İş kuralı doğrudan yazılmıştır.
 
-**Story:** “Bir müşteri olarak sepetimdeki ürünler için ücretsiz kargo hakkımı görmek istiyorum.”
+Tester bunları daha somut örneklere dönüştürebilir:
 
-**Üzerinde anlaşılan kural:** Sadece ACTIVE üye için, sepet toplamı **100 € veya üstü** ise ücretsiz kargo. Express teslimat ücretsiz kargo kapsamında değildir.
-
-**Acceptance examples:**
-
-| ID | Active? | Total | Express? | Expected shipping |
+| Örnek | Üye | Sepet | Tip | Expected |
 |---|---|---:|---|---|
-| AT1 | Y | 120 | N | FREE |
-| AT2 | Y | 99 | N | PAID |
-| AT3 | Y | 100 | N | FREE |
-| AT4 | N | 120 | N | PAID |
-| AT5 | Y | 120 | Y | PAID |
+| A1 | ACTIVE | 100 € | STANDARD | FREE |
+| A2 | ACTIVE | 99 € | STANDARD | PAID |
+| A3 | INACTIVE | 120 € | STANDARD | PAID |
+| A4 | ACTIVE | 120 € | EXPRESS | PAID |
 
-Burada **AT3** inclusive boundary'yi; **AT4** kimlik/üyelik istisnasını; **AT5** express override'ını sınar. Çıktı yanlışsa mevcut kodun yaptığına göre beklentiyi düzeltme; kararlaştırılan kuralı kontrol et.
+Tabloda üç önceki teknik birden karşımıza çıktı:
+- **BVA:** 99/100 sınırı;
+- **Decision table:** üye × tutar × kargo tipi;
+- **Negative:** ücretsiz kargoya uygun olmayan durumun doğru reddi.
 
-**Given/When/Then örneği:**
+**Pedagojik sonuç:** Teknikler ayrı ezber kutuları değildir; aynı iş kuralında birbirini tamamlarlar.
+
+## 10.4 Given / When / Then ne işe yarar?
+
+Bir kabul örneğini iş dilinde şöyle yazabiliriz:
 
 ~~~gherkin
-Scenario: Active member qualifies for free standard shipping
+Scenario: Active member receives free standard shipping
   Given an active member has a basket total of 100 EUR
-  And standard shipping is selected
-  When shipping is calculated
+  And standard delivery is selected
+  When shipping cost is calculated
   Then the shipping fee is 0 EUR
 ~~~
 
-Bu, iş davranışını anlatır. CSS selector, buton koordinatı veya uygulama iç method adlarını test kabul cümlesine gömmek gerekmez.
+- **Given:** Başlangıç bağlamı, önkoşullar.
+- **When:** Kullanıcının yaptığı işlem veya gerçekleşen olay.
+- **Then:** Gözlenebilir beklenen iş sonucu.
 
-### Açık soru örnekleri
+Bu, otomasyon gerektiren bir kod parçası olmak zorunda değildir. Amaç **iş davranışını insanların aynı şekilde anlayacağı** bir örneğe dönüştürmektir.
 
-Vergi ve kupon öncesi/sonrası sepet tutarı hangisi? Üyelik checkout sırasında değişirse? İndirim sonradan iade edilirse? Bu sorular için onay gelmeden yeni expected result **uydurma**.
+### Kötü ve iyi ifade farkı
 
-## 4. Interview Preparation
+**Kötü:**
 
-**Q1: How do you contribute to writing user stories?**  
-**A:** “I work with product and engineering stakeholders to clarify behavior through examples, edge cases and business rules. We turn the discussion into testable acceptance criteria.”
+~~~gherkin
+Given I click button id #shippingCalc
+When I wait 5 seconds
+Then I see text in div:nth-child(3)
+~~~
 
-**Q2: What is ATDD?**  
-**A:** “ATDD is a test-first collaborative approach. We agree on concrete acceptance examples before implementation, and those examples guide development and validation.”
+Bu, teknik implementasyon ve UI ayrıntısını iş kabul diliyle karıştırır.
 
-**Q3: What makes acceptance criteria testable?**  
-**A:** “They describe observable behavior, clear conditions and expected outcomes. I avoid subjective wording and ask for decisions on ambiguities before deriving tests.”
+**Daha iyi:**
 
-## 5. CTFL Practice — özgün
+~~~gherkin
+Given an active member has a basket worth 100 EUR
+When standard shipping is selected
+Then shipping is free
+~~~
 
-**S1 (K2):** “Given/When/Then ile senaryo” hangi acceptance criteria biçiminin örneğidir?  
-A) Rule-oriented · B) Scenario-oriented · C) Code-oriented only · D) Statement coverage  
-**Yanıt: B.** İş senaryosu anlatımıdır; mutlaka otomasyon scripti değildir.
+İş kuralı korunur; selector ve bekleme ayrıntıları otomasyon katmanına bırakılır.
 
-**S2 (K3):** “Aktif kullanıcı 100 € ve üzeri standart kargoda ücretsiz” AC'si için alt eşikte hangisi en anlamlı çift?  
-A) 99 → PAID, 100 → FREE · B) 1 → FREE, 500 → FREE · C) 100 → FREE, 200 → FREE · D) 99 → FREE, 100 → PAID  
-**Yanıt: A.** Şartnamenin inclusive threshold kuralını ayırır. B ve C alt sınırda değişen sonucu test etmez; D yanlış oracle'dır.
+## 10.5 ATDD: Önce ortak örnek, sonra implementasyon
 
-**S3 (K2):** ATDD'de testin temel çıkış noktası nedir?  
-A) Çalışan kodun o anki çıktısı · B) Önceden konuşulup üzerinde uzlaşılan kabul örnekleri · C) Test framework'ünün default ayarı · D) Sadece branch coverage  
-**Yanıt: B.** ATDD iş kabulünü implementasyondan önce belirler.
+**Acceptance Test-driven Development (ATDD)** bir iş birliği yaklaşımıdır: Kabul davranışını geliştirme başlamadan **önce** örneklerle netleştiririz.
 
-## Sonuç ve kaynak
+Basit akış:
 
-**İyi kabul testi uygulamayı taklit etmez, uzlaşılan iş davranışını ifade eder.** İleri BDD/Cucumber otomasyon tasarımı I4 konusudur.
+1. Product owner iş hedefini anlatır.
+2. Tester sınır, alternatif ve hata senaryolarını sorar.
+3. Developer uygulama sınırlarını ve olası teknik etkileşimleri açıklar.
+4. Üç taraf **beklenen örneklerde** uzlaşır.
+5. Implementasyon geliştirilir.
+6. Örnekler yürütülerek doğrulanır; yeni riskler ayrıca test edilir.
 
-Devam: [Requirements & Evidence](../01-foundations/03-requirements-expected-behavior-and-evidence.md), [Decision Table](03-decision-table-testing.md).
+Bu akış “tester testleri tek başına yazdı, diğerleri onayladı” yaklaşımından farklıdır. **Ortak anlayış** üretir.
 
-[ISTQB CTFL v4.0.1 §4.5](https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf).
+### TDD, ATDD ve BDD birbirinin aynısı mı?
+
+Hayır.
+
+| Yaklaşım | Ana vurgu | Basit örnek |
+|---|---|---|
+| **TDD** | Küçük kod davranışını testle yönlendirmek | Önce `calculateShipping` için başarısız unit test yazmak |
+| **ATDD** | İş kabulünü somut örneklerle önce netleştirmek | 99/100 €, active/inactive kararlarında uzlaşmak |
+| **BDD** | Beklenen davranışı ortak, anlaşılır dille tanımlamak | Given/When/Then senaryolarıyla paydaş iletişimi |
+
+Pratikte birlikte kullanılabilirler. **BDD = Cucumber** demek yanlıştır; Cucumber davranış senaryolarını çalıştırmada kullanılabilen bir araçtır. Aracın bulunması, otomatik olarak iyi iş birliği yapıldığı anlamına gelmez.
+
+## 10.6 Tam örnek: Belirsizliği çözen konuşma
+
+Tester: “100 € tam eşik kabul mü?”  
+Product owner: “Evet, **100 dahil**.”
+
+Tester: “Kupon uygulandıktan sonra toplam 98 € olursa ücretsiz kargo kalır mı?”  
+Product owner: “Henüz karar vermedik.”
+
+Developer: “Sistem şu an indirimsiz toplamı kullanıyor.”
+
+Bu son bilgi **kuralın doğruluğu** değildir; yalnız mevcut implementasyon gözlemidir.
+
+Tester'ın iyi yaklaşımı:
+- Soruyu **açık karar** olarak kaydet;
+- Farklı alternatifleri ve müşteri etkisini örnekle;
+- Product owner kararı geldikten sonra AC ve testleri güncelle;
+- Karar verilmeden “Pass” sonucuyla belirsizliği kapatma.
+
+Bu, testçi mühendisliğinin temel becerisidir.
+
+## 10.7 Kabul testlerinin sınırı
+
+Kabul kriterleri güçlüdür ama bütün ürünü kapsamaz.
+
+AC yalnız sepet kargo ücretini anlatıyorsa:
+- Başka hesabın sepetine erişim;
+- Ani ağ kopması;
+- Performans ve accessibility;
+- Paralel request'lerde veri tutarlılığı;
+
+hala ayrıca risk temelli değerlendirme gerektirebilir.
+
+**Acceptance başarılı = bütün kusurlar sıfır** değildir. Kabul testleri, üzerine uzlaşılan iş hedefinin belirli örnekleri için kanıttır.
+
+## 10.8 Alıştırma — yeni story'ye uygula
+
+Story:
+
+> “Bir kullanıcı olarak teslim edilmiş siparişimi iade etmek istiyorum.”
+
+**Görev:**
+1. Üç açık soru yaz.
+2. Son gün kuralı “14 takvim günü dahil” olarak onaylanırsa iki kabul örneği yaz.
+3. Bir negative state örneği yaz.
+
+**Örnek çözüm:**
+
+**Açık sorular:** Teslim tarihinin hangi timezone'u geçerli? Kısmi iade mümkün mü? Aynı siparişe iki açık iade açılabilir mi?
+
+**İki sınır örneği:**
+- Given sipariş DELIVERED ve 14. gün; When iade istenir; Then talep kabul.
+- Given sipariş DELIVERED ve 15. gün; When iade istenir; Then talep reddedilir, yeni kayıt oluşmaz.
+
+**Negatif state:** Given sipariş CREATED; When iade istenir; Then talep reddedilir, state değişmez.
+
+Bu bölüm tamamlandığında yalnız bir “teknik adı” öğrenmedik. **Belirsiz iş isteğini ortak, test edilebilir davranışa dönüştürme** sürecini kurduk.
+
+## I1'i pekiştirme
+
+Sonraki dosya zorunlu bir sınav dersi değildir. Orada tek bir örnek üzerinden bütün teknikleri bir araya getirip isteğe bağlı İngilizce mülakat ve sertifika pratiğini **ana anlatımdan ayrı** yapacağız.
+
+→ [I1 Uygulama, Tekrar ve Mülakat Çalışması](08-i1-practice-and-interview-companion.md)
