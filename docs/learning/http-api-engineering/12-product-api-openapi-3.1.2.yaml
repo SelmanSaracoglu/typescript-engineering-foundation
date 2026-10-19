@@ -1,0 +1,365 @@
+openapi: 3.1.2
+
+info:
+  title: Product API — Learning Contract
+  version: 0.1.0
+  description: |
+    Synthetic API contract for Epic 03 / I2 (API-A2).
+    No backend server, runtime validator, authentication, or authorization
+    is implemented by this document. Do not treat it as a live API.
+    Price is a simplified positive JSON number; monetary precision and
+    currency modeling require additional design in real applications.
+
+servers:
+  - url: https://api.example.test
+    description: Documentation-only example domain; not a running endpoint
+
+paths:
+  /products:
+    get:
+      operationId: listProducts
+      summary: List products
+      description: |
+        Returns a JSON array. Optional status query filters results.
+        Without the query parameter, returns all products in this small
+        synthetic catalogue. Pagination and resource limits are out of I2 scope.
+      parameters:
+        - $ref: '#/components/parameters/StatusFilter'
+      responses:
+        '200':
+          description: Product list, possibly empty
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+              example:
+                - id: p-101
+                  name: Wireless Mouse
+                  price: 29.99
+                  status: active
+                - id: p-103
+                  name: Gaming Keyboard
+                  price: 79.99
+                  status: active
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    post:
+      operationId: createProduct
+      summary: Create a product
+      description: |
+        Consumer provides name and price. Provider generates product id
+        and sets initial status to active. Extra input fields are rejected.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+            example:
+              name: Gaming Keyboard
+              price: 79.99
+      responses:
+        '201':
+          description: A new product was created
+          headers:
+            Location:
+              description: Relative URI of the created product
+              schema:
+                type: string
+              example: /products/p-103
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              example:
+                id: p-103
+                name: Gaming Keyboard
+                price: 79.99
+                status: active
+        '400':
+          $ref: '#/components/responses/BadJson'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /products/{productId}:
+    parameters:
+      - $ref: '#/components/parameters/ProductId'
+
+    get:
+      operationId: getProduct
+      summary: Get one product
+      responses:
+        '200':
+          description: Product was found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+              example:
+                id: p-101
+                name: Wireless Mouse
+                price: 29.99
+                status: active
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    put:
+      operationId: replaceProduct
+      summary: Replace updatable fields of an existing product
+      description: |
+        Requires name, price and status in the body. The id comes from
+        the path and cannot be changed. If the current product is inactive,
+        updates are blocked with a 409 PRODUCT_INACTIVE error.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplaceProductRequest'
+            example:
+              name: Gaming Keyboard
+              price: 89.99
+              status: active
+      responses:
+        '200':
+          description: Updated product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadJson'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ProductInactive'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    patch:
+      operationId: patchProduct
+      summary: Partially update an existing product
+      description: |
+        Uses JSON Merge Patch (RFC 7396). Omitted fields remain unchanged.
+        This API disallows null for these fields, so deletion through null
+        is not permitted. At least one updatable field is required.
+        Updates to an already inactive product return 409 PRODUCT_INACTIVE.
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/PatchProductRequest'
+            example:
+              price: 89.99
+      responses:
+        '200':
+          description: Updated product after patch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadJson'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ProductInactive'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      operationId: deleteProduct
+      summary: Remove a product from normal API access
+      description: |
+        On success, subsequent GET of the same product returns 404.
+        Physical database deletion is not required by this contract.
+      responses:
+        '204':
+          description: Product removed from normal API access; no response body
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+components:
+  parameters:
+    ProductId:
+      name: productId
+      in: path
+      required: true
+      description: Provider-issued product identifier, e.g. p-101
+      schema:
+        type: string
+        pattern: '^p-[0-9]+$'
+      example: p-101
+    StatusFilter:
+      name: status
+      in: query
+      required: false
+      description: If absent, do not filter by status
+      schema:
+        type: string
+        enum: [active, inactive]
+
+  schemas:
+    Product:
+      type: object
+      description: Product representation returned by the provider
+      required: [id, name, price, status]
+      properties:
+        id:
+          type: string
+          pattern: '^p-[0-9]+$'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          pattern: '.*\S.*'
+        price:
+          type: number
+          exclusiveMinimum: 0
+        status:
+          type: string
+          enum: [active, inactive]
+      additionalProperties: false
+
+    CreateProductRequest:
+      type: object
+      description: Client cannot provide id or initial status
+      required: [name, price]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          pattern: '.*\S.*'
+        price:
+          type: number
+          exclusiveMinimum: 0
+      additionalProperties: false
+
+    ReplaceProductRequest:
+      type: object
+      description: All updatable fields are required for PUT in this API
+      required: [name, price, status]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          pattern: '.*\S.*'
+        price:
+          type: number
+          exclusiveMinimum: 0
+        status:
+          type: string
+          enum: [active, inactive]
+      additionalProperties: false
+
+    PatchProductRequest:
+      type: object
+      description: One or more non-null updatable fields for JSON Merge Patch
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          pattern: '.*\S.*'
+        price:
+          type: number
+          exclusiveMinimum: 0
+        status:
+          type: string
+          enum: [active, inactive]
+      additionalProperties: false
+
+    ErrorResponse:
+      type: object
+      description: Consistent machine-readable and human-readable error shape
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          minLength: 1
+        message:
+          type: string
+          minLength: 1
+        details:
+          type: array
+          items:
+            type: object
+            required: [field, reason]
+            properties:
+              field:
+                type: string
+              reason:
+                type: string
+            additionalProperties: false
+      additionalProperties: false
+
+  responses:
+    NotFound:
+      description: Product does not exist or is no longer accessible
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: PRODUCT_NOT_FOUND
+            message: Product not found
+
+    BadJson:
+      description: Malformed JSON request body
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: INVALID_JSON
+            message: Malformed JSON request body
+
+    UnsupportedMediaType:
+      description: Unsupported request body media type
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: UNSUPPORTED_MEDIA_TYPE
+            message: Expected a supported JSON media type
+
+    ValidationError:
+      description: Input does not satisfy the declared parameter/body schema
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: VALIDATION_ERROR
+            message: Request does not match the product schema
+            details:
+              - field: name
+                reason: Must contain a non-whitespace character
+
+    ProductInactive:
+      description: Updating an already inactive product conflicts with business rules
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: PRODUCT_INACTIVE
+            message: Inactive product cannot be updated
